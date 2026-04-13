@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="YouPander.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:YouPander"
+    xmlns:local2="clr-namespace:YouPander.Services"
+    xmlns:resx="clr-namespace:YouPander.Resources.Localization"
+    xmlns:views="clr-namespace:YouPander.Views"
+    Title="YouPander">
+
+    <ShellContent
+        Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Home]}"
+        ContentTemplate="{DataTemplate views:MainPage}"
+        Route="MainPage" />
+
+    <ShellContent
+        Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Settings]}"
+        ContentTemplate="{DataTemplate views:SettingsPage}"
+        Route="SettingsPage" />
+
+</Shell>

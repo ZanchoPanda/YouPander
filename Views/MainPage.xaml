@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YouPander.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local2="clr-namespace:YouPander.Services"
+    xmlns:resx="clr-namespace:YouPander.Resources.Localization"
+    Title="">
+
+    <VerticalStackLayout Padding="20" Spacing="20">
+
+        <Label
+            FontSize="Title"
+            HorizontalTextAlignment="Center"
+            Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Home]}" />
+
+        <!--  URL  -->
+        <Entry Placeholder="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[URLToDownload]}" Text="{Binding Url}" />
+
+        <!--  Tipo  -->
+        <Picker Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}" SelectedItem="{Binding SelectedFormat}">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Video</x:String>
+                    <x:String>Audio</x:String>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
+
+        <!--  Botón  -->
+        <Button
+            Command="{Binding DownloadCommand}"
+            IsVisible="{Binding IsDownloading, Converter={StaticResource InverseBoolConverter}}"
+            Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Download]}" />
+
+        <Button
+            BackgroundColor="IndianRed"
+            Command="{Binding CancelCommand}"
+            IsVisible="{Binding IsDownloading}"
+            Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Cancel]}" />
+
+        <!--  Progreso  -->
+        <ProgressBar Progress="{Binding Progress}" ProgressColor="LimeGreen" />
+
+        <Label Text="{Binding Status}" TextColor="LimeGreen" />
+
+        <!--  Ir a settings  -->
+        <Button
+            Command="{Binding OpenSettingsCommand}"
+            HorizontalOptions="Start"
+            Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Settings]}" />
+
+    </VerticalStackLayout>
+
+</ContentPage>
