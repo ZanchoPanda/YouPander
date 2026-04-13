@@ -165,6 +165,9 @@
   <data name="Ok" xml:space="preserve">
     <value>Ok</value>
   </data>
+  <data name="OnlyAvailableOnWindows" xml:space="preserve">
+    <value>Downloaded function only able for Windows</value>
+  </data>
   <data name="OpenDownloadedFolder" xml:space="preserve">
     <value>Open downloads when finish</value>
   </data>

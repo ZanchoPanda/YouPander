@@ -4,100 +4,102 @@ using YouPander.ViewModels;
 
 public class MainViewModel : BaseViewModel
 {
-    #region Properties
+    #region Fields
 
     private CancellationTokenSource? _cts;
     private readonly YtDlpService? _ytDlp;
     private readonly SettingsService _settings;
 
-    public string Url { get; set; } = string.Empty;
-    //private string _Url;
-    //public string Url
-    //{
-    //    get
-    //    {
-    //        return _Url;
-    //    }
-    //    set
-    //    {
-    //        if (value != _Url)
-    //        {
-    //            _Url = value;
-    //            OnPropertyChanged("Url");
-    //        }
-    //    }
-    //}
+    #endregion
 
-    //public string SelectedFormat { get; set; } = "Video";
-    private string _SelectedFormat;
+    #region Properties
+
+    private string _url = string.Empty;
+    public string Url
+    {
+        get => _url;
+        set
+        {
+            if (value != _url)
+            {
+                _url = value;
+                OnPropertyChanged(nameof(Url));
+            }
+        }
+    }
+
+    private string _selectedFormat = "Audio";
     public string SelectedFormat
     {
-        get
-        {
-            return _SelectedFormat;
-        }
+        get => _selectedFormat;
         set
         {
-            if (value != _SelectedFormat)
+            if (value != _selectedFormat)
             {
-                _SelectedFormat = value;
-                OnPropertyChanged("SelectedFormat");
+                _selectedFormat = value;
+                OnPropertyChanged(nameof(SelectedFormat));
             }
         }
     }
 
-
-    private double _Progress;
+    private double _progress;
     public double Progress
     {
-        get
-        {
-            return _Progress;
-        }
+        get => _progress;
         set
         {
-            if (value != _Progress)
+            if (value != _progress)
             {
-                _Progress = value;
-                OnPropertyChanged("Progress");
+                _progress = value;
+                OnPropertyChanged(nameof(Progress));
             }
         }
     }
 
-    private string _Status;
+    private string _status = string.Empty;
     public string Status
     {
-        get
-        {
-            return _Status;
-        }
+        get => _status;
         set
         {
-            if (value != _Status)
+            if (value != _status)
             {
-                _Status = value;
-                OnPropertyChanged("Status");
+                _status = value;
+                OnPropertyChanged(nameof(Status));
             }
         }
     }
 
-    private bool _IsDownloading;
+    private bool _isDownloading;
     public bool IsDownloading
     {
-        get
-        {
-            return _IsDownloading;
-        }
+        get => _isDownloading;
         set
         {
-            if (value != _IsDownloading)
+            if (value != _isDownloading)
             {
-                _IsDownloading = value;
-                OnPropertyChanged("IsDownloading");
+                _isDownloading = value;
+                OnPropertyChanged(nameof(IsDownloading));
             }
         }
     }
 
+    private string _errorMessage = string.Empty;
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set
+        {
+            if (value != _errorMessage)
+            {
+                _errorMessage = value;
+                OnPropertyChanged(nameof(ErrorMessage));
+                OnPropertyChanged(nameof(HasError)); // para binding en la View
+            }
+        }
+    }
+
+    public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
     #endregion
 
     #region Commands
@@ -117,104 +119,110 @@ public class MainViewModel : BaseViewModel
             var ytPath = Path.Combine(FileSystem.AppDataDirectory, "yt-dlp.exe");
             _ytDlp = new YtDlpService(ytPath);
         }
-        else
-        {
-            _ytDlp = null;
-        }
-        SelectedFormat = "Video";
 
-        DownloadCommand = new Command(async () => await Download());
-        CancelCommand = new Command(async () => await CancelDownload());
-
-        OpenSettingsCommand = new Command(async () =>
-            await Shell.Current.GoToAsync("///SettingsPage"));
+        DownloadCommand = new Command(async () => await Download(), () => !IsDownloading);
+        CancelCommand = new Command(async () => await CancelDownload(), () => IsDownloading);
+        OpenSettingsCommand = new Command(async () => await Shell.Current.GoToAsync("///SettingsPage"));
     }
 
     private async Task Download()
     {
+        ErrorMessage = string.Empty;
+
         if (string.IsNullOrWhiteSpace(Url))
-        {
             return;
-        }
 
         var settings = _settings.Load();
 
         if (string.IsNullOrWhiteSpace(settings.DownloadPath))
-        {
             return;
-        }
 
         if (!OperatingSystem.IsWindows() || _ytDlp == null)
         {
-            Status = $"La descarga solo está disponible en Windows.";
-            Progress = 0;
-            OnPropertyChanged(nameof(Status));
-            OnPropertyChanged(nameof(Progress));
+            Status = Strings.OnlyAvailableOnWindows; // Localizado
             return;
         }
 
         _cts = new CancellationTokenSource();
         IsDownloading = true;
+        NotifyCommandsCanExecuteChanged();
 
-        var progress = new Progress<string>(line =>
+        try
         {
-            Status = line;
-
-            if (line.Contains("%"))
+            var progress = new Progress<string>(line =>
             {
-                var percentText = line.Split('%')[0]
-                    .Split(' ')
-                    .Last();
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    if (line.StartsWith("⚠️"))
+                    {
+                        ErrorMessage = line;
+                        return;
+                    }
 
-                if (double.TryParse(percentText, out double value))
-                    Progress = value / 100;
-            }
-        });
+                    Status = line;
 
-        await _ytDlp.EnsureInstalledAsync();
+                    if (line.Contains('%'))
+                    {
+                        var parts = line.Split('%')[0].Split(' ');
+                        if (double.TryParse(parts.Last(),
+                            System.Globalization.NumberStyles.Any,
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            out double value))
+                        {
+                            Progress = value / 100.0;
+                        }
+                    }
+                });
+            });
 
-        await _ytDlp.DownloadAsync(
-            Url,
-            settings.DownloadPath,
-            SelectedFormat,
-            progress, _cts.Token
-        );
+            await _ytDlp.EnsureInstalledAsync();
+            await _ytDlp.EnsureFfmpegInstalledAsync();
+            await _ytDlp.DownloadAsync(Url, settings.DownloadPath, SelectedFormat, progress, _cts.Token);
 
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            Progress = 0;           // barra vacía
-            Status = string.Empty;  // texto limpio
-        });
-
-        if (settings.OpenDownloads)
-        {
-            await OpenDownloads();
+            if (settings.OpenDownloads)
+                await OpenDownloads();
         }
-
-        IsDownloading = false;
-
+        catch (OperationCanceledException)
+        {
+            // Cancelado por el usuario, no es un error
+        }
+        catch (Exception ex)
+        {
+            Page? page = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (page != null)
+                await page.DisplayAlertAsync(Strings.Error, ex.Message, Strings.Ok);
+        }
+        finally
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Progress = 0;
+                Status = string.Empty;
+                IsDownloading = false;
+                NotifyCommandsCanExecuteChanged();
+            });
+        }
     }
 
     private async Task CancelDownload()
     {
-        IsDownloading = false;
-
-        if (_ytDlp?.currentProcess != null)
-        {
-            _ytDlp?.currentProcess.Kill();
-            _ytDlp?.currentProcess = null;
-        }
+        _cts?.Cancel();
+        _ytDlp?.KillCurrentProcess();
 
         Progress = 0;
         Status = $"{Strings.CancelDownloads}...";
 
-        await OpenDownloads();
+        await Task.Delay(300); // Pequeña pausa para que el proceso muera limpiamente
+        Status = string.Empty;
+        IsDownloading = false;
+        NotifyCommandsCanExecuteChanged();
     }
 
     public async Task OpenDownloads()
     {
         var settings = _settings.Load();
         Page? page = Application.Current?.Windows?.FirstOrDefault()?.Page;
+
         try
         {
             await Launcher.OpenAsync(settings.DownloadPath);
@@ -222,14 +230,13 @@ public class MainViewModel : BaseViewModel
         catch (Exception ex)
         {
             if (page != null)
-            {
-                await page.DisplayAlertAsync(
-                    Strings.Error,
-                    $"{Strings.CannotOpenFolder}: {ex.Message}",
-                    Strings.Ok
-                );
-            }
+                await page.DisplayAlertAsync(Strings.Error, $"{Strings.CannotOpenFolder}: {ex.Message}", Strings.Ok);
         }
     }
 
+    private void NotifyCommandsCanExecuteChanged()
+    {
+        DownloadCommand.ChangeCanExecute();
+        CancelCommand.ChangeCanExecute();
+    }
 }

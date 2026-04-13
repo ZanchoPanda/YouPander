@@ -165,6 +165,9 @@
   <data name="Ok" xml:space="preserve">
     <value>Ok</value>
   </data>
+  <data name="OnlyAvailableOnWindows" xml:space="preserve">
+    <value>La descarga solo está disponible en Windows.</value>
+  </data>
   <data name="OpenDownloadedFolder" xml:space="preserve">
     <value>Abrir descargas al terminar</value>
   </data>

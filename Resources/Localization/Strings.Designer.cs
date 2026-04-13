@@ -205,6 +205,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Downloaded function only able for Windows.
+        /// </summary>
+        internal static string OnlyAvailableOnWindows {
+            get {
+                return ResourceManager.GetString("OnlyAvailableOnWindows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Open downloads when finish.
         /// </summary>
         internal static string OpenDownloadedFolder {

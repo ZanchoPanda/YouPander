@@ -93,8 +93,12 @@ namespace YouPander.Models
 			}
 		}
 
+        #region Ventana
+        public double WindowWidth { get; set; } = 0;
+        public double WindowHeight { get; set; } = 0;
+        #endregion
 
-		public AppSettings()
+        public AppSettings()
         {
             DownloadPath = FileSystem.AppDataDirectory;
             Language = "en";

@@ -21,8 +21,8 @@
         <Picker Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}" SelectedItem="{Binding SelectedFormat}">
             <Picker.ItemsSource>
                 <x:Array Type="{x:Type x:String}">
-                    <x:String>Video</x:String>
                     <x:String>Audio</x:String>
+                    <x:String>Video</x:String>
                 </x:Array>
             </Picker.ItemsSource>
         </Picker>
@@ -43,6 +43,12 @@
         <ProgressBar Progress="{Binding Progress}" ProgressColor="LimeGreen" />
 
         <Label Text="{Binding Status}" TextColor="LimeGreen" />
+        <Label
+            FontSize="12"
+            HorizontalTextAlignment="Center"
+            IsVisible="{Binding HasError}"
+            Text="{Binding ErrorMessage}"
+            TextColor="Red" />
 
         <!--  Ir a settings  -->
         <Button
