@@ -333,10 +333,10 @@ namespace YouPander.Services
             var id = el.GetStringOrEmpty("id");
 
             // Intentar obtener la URL por orden de prioridad
-            var url = el.GetStringOrEmpty("webpage_url")
-                   ?? el.GetStringOrEmpty("url")
-                   ?? el.GetStringOrEmpty("original_url")
-                   ?? BuildUrlFromId(el, id);
+            var url = !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("webpage_url")) ? el.GetStringOrEmpty("webpage_url"):
+                !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("url")) ? el.GetStringOrEmpty("url") :
+                !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("original_url")) ? el.GetStringOrEmpty("original_url") :
+                BuildUrlFromId(el, id);
 
             return new VideoInfo
             {
