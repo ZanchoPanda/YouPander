@@ -330,14 +330,41 @@ namespace YouPander.Services
                     .FirstOrDefault() ?? string.Empty;
             }
 
+            var id = el.GetStringOrEmpty("id");
+
+            // Intentar obtener la URL por orden de prioridad
+            var url = el.GetStringOrEmpty("webpage_url")
+                   ?? el.GetStringOrEmpty("url")
+                   ?? el.GetStringOrEmpty("original_url")
+                   ?? BuildUrlFromId(el, id);
+
             return new VideoInfo
             {
-                Id = el.GetStringOrEmpty("id"),
+                Id = id,
                 Title = el.GetStringOrEmpty("title"),
                 Channel = el.GetStringOrEmpty("channel") ?? el.GetStringOrEmpty("uploader"),
                 Thumbnail = thumbnail,
-                Url = el.GetStringOrEmpty("url") ?? el.GetStringOrEmpty("webpage_url"),
+                Url = url,
                 Duration = Duration
+            };
+        }
+
+        private static string BuildUrlFromId(JsonElement el, string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return string.Empty;
+
+            // Detectar el extractor/plataforma para construir la URL correcta
+            var extractor = el.GetStringOrEmpty("ie_key")
+                         ?? el.GetStringOrEmpty("extractor")
+                         ?? string.Empty;
+
+            return extractor?.ToLowerInvariant() switch
+            {
+                "youtube" or "youtubetab" => $"https://www.youtube.com/watch?v={id}",
+                "soundcloud" => string.Empty, // SoundCloud no tiene URL predecible por ID
+                "twitch:vod" => $"https://www.twitch.tv/videos/{id}",
+                _ => $"https://www.youtube.com/watch?v={id}" // fallback razonable
             };
         }
 

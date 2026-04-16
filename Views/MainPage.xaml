@@ -91,11 +91,16 @@
             Spacing="12">
 
             <Image
-                HeightRequest="80"
+                MinimumWidthRequest="150"
+                MinimumHeightRequest="150"
+                VerticalOptions="Center"
                 HorizontalOptions="Center"
+                Aspect="AspectFit"
+                MaximumWidthRequest="200"
+                MaximumHeightRequest="200"
                 IsVisible="Visible"
                 Source="imageyoupander.png"
-                WidthRequest="80" />
+                />
 
             <!--  URL + botón buscar en la misma fila  -->
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
@@ -132,7 +137,7 @@
             <!--  Botones Download / Cancel (solo si NO hay lista múltiple)  -->
             <Button
                 Command="{Binding DownloadCommand}"
-                IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
+                IsVisible="{Binding ShowVideoList}"
                 Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Download]}" />
 
             <Button
@@ -177,7 +182,7 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border Padding="4" StrokeShape="RoundRectangle 8">
+                        <Border Padding="5,5" StrokeShape="RoundRectangle 25">
                             <Grid
                                 Margin="5"
                                 ColumnDefinitions="72,*,Auto"
@@ -188,7 +193,7 @@
                                 <Image
                                     Grid.RowSpan="3"
                                     Grid.Column="0"
-                                    Aspect="AspectFill"
+                                    Aspect="AspectFill" 
                                     Source="{Binding ThumbnailUrl}" />
 
                                 <!--  Título  -->
