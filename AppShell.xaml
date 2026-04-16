@@ -12,6 +12,7 @@
     <ShellContent
         Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Home]}"
         ContentTemplate="{DataTemplate views:MainPage}"
+        Icon="imageyoupander.png"
         Route="MainPage" />
 
     <ShellContent

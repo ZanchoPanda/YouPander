@@ -1,4 +1,7 @@
-﻿using YouPander.Resources.Localization;
+﻿using System.Collections.ObjectModel;
+using System.Windows.Input;
+using YouPander.Models;
+using YouPander.Resources.Localization;
 using YouPander.Services;
 using YouPander.ViewModels;
 
@@ -84,6 +87,20 @@ public class MainViewModel : BaseViewModel
         }
     }
 
+    private bool _isSearching;
+    public bool IsSearching
+    {
+        get => _isSearching;
+        set
+        {
+            if (_isSearching != value)
+            {
+                _isSearching = value; OnPropertyChanged();
+                NotifyCommandsCanExecuteChanged();
+            }
+        }
+    }
+
     private string _errorMessage = string.Empty;
     public string ErrorMessage
     {
@@ -100,10 +117,38 @@ public class MainViewModel : BaseViewModel
     }
 
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+
+
+    #region Videos
+
+    private ObservableCollection<VideoItem> _VideoItems;
+
+    public ObservableCollection<VideoItem> VideoItems
+    {
+        get
+        {
+            return _VideoItems;
+        }
+        set
+        {
+            if (value != _VideoItems)
+            {
+                _VideoItems = value;
+                OnPropertyChanged("VideoItems");
+                OnPropertyChanged(nameof(ShowVideoList));
+            }
+        }
+    }
+
+    public bool ShowVideoList => VideoItems.Count > 1;
+
+    #endregion
+
     #endregion
 
     #region Commands
 
+    public Command SearchCommand { get; }
     public Command DownloadCommand { get; }
     public Command OpenSettingsCommand { get; }
     public Command CancelCommand { get; }
@@ -120,102 +165,266 @@ public class MainViewModel : BaseViewModel
             _ytDlp = new YtDlpService(ytPath);
         }
 
+        VideoItems = new ObservableCollection<VideoItem>();
+
+        SearchCommand = new Command(async () => await SearchAsync(), () => !IsSearching && !IsDownloading);
         DownloadCommand = new Command(async () => await Download(), () => !IsDownloading);
         CancelCommand = new Command(async () => await CancelDownload(), () => IsDownloading);
         OpenSettingsCommand = new Command(async () => await Shell.Current.GoToAsync("///SettingsPage"));
     }
 
-    private async Task Download()
+    #region Commands-Actions
+
+    private async Task SearchAsync()
     {
         ErrorMessage = string.Empty;
+        VideoItems.Clear();
+        OnPropertyChanged(nameof(ShowVideoList));
 
-        if (string.IsNullOrWhiteSpace(Url))
-            return;
-
-        var settings = _settings.Load();
-
-        if (string.IsNullOrWhiteSpace(settings.DownloadPath))
-            return;
-
+        if (string.IsNullOrWhiteSpace(Url)) return;
         if (!OperatingSystem.IsWindows() || _ytDlp == null)
         {
-            Status = Strings.OnlyAvailableOnWindows; // Localizado
+            Status = Strings.OnlyAvailableOnWindows;
             return;
         }
 
         _cts = new CancellationTokenSource();
-        IsDownloading = true;
-        NotifyCommandsCanExecuteChanged();
+        IsSearching = true;
+        Status = Strings.FetchingInfo; // "Obteniendo información..."
 
         try
         {
-            var progress = new Progress<string>(line =>
-            {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    if (line.StartsWith("⚠️"))
-                    {
-                        ErrorMessage = line;
-                        return;
-                    }
-
-                    Status = line;
-
-                    if (line.Contains('%'))
-                    {
-                        var parts = line.Split('%')[0].Split(' ');
-                        if (double.TryParse(parts.Last(),
-                            System.Globalization.NumberStyles.Any,
-                            System.Globalization.CultureInfo.InvariantCulture,
-                            out double value))
-                        {
-                            Progress = value / 100.0;
-                        }
-                    }
-                });
-            });
-
             await _ytDlp.EnsureInstalledAsync();
-            await _ytDlp.EnsureFfmpegInstalledAsync();
-            await _ytDlp.DownloadAsync(Url, settings.DownloadPath, SelectedFormat, progress, _cts.Token);
+            var infos = await _ytDlp.FetchInfoAsync(Url, _cts.Token);
 
-            if (settings.OpenDownloads)
+            foreach (var info in infos)
+            {
+                VideoItems.Add(new VideoItem
+                {
+                    Id = info.Id,
+                    Title = info.Title,
+                    Channel = info.Channel,
+                    ThumbnailUrl = info.Thumbnail,
+                    Url = info.Url,
+                    Duration = info.Duration,
+                    IsSelected = true
+                });
+            }
+
+            OnPropertyChanged(nameof(ShowVideoList));
+            NotifyCommandsCanExecuteChanged();
+
+            // Si es un solo video, lanzar descarga directamente
+            if (VideoItems.Count == 1)
+                await Download();
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex) { ErrorMessage = ex.Message; }
+        finally
+        {
+            IsSearching = false;
+            Status = string.Empty;
+        }
+    }
+
+    private async Task Download()
+    {
+        #region Version 1
+        //ErrorMessage = string.Empty;
+
+        //if (string.IsNullOrWhiteSpace(Url))
+        //    return;
+
+        //var settings = _settings.Load();
+
+        //if (string.IsNullOrWhiteSpace(settings.DownloadPath))
+        //    return;
+
+        //if (!OperatingSystem.IsWindows() || _ytDlp == null)
+        //{
+        //    Status = Strings.OnlyAvailableOnWindows; // Localizado
+        //    return;
+        //}
+
+        //_cts = new CancellationTokenSource();
+        //IsDownloading = true;
+        //NotifyCommandsCanExecuteChanged();
+
+        //try
+        //{
+        //    var progress = new Progress<string>(line =>
+        //    {
+        //        MainThread.BeginInvokeOnMainThread(() =>
+        //        {
+        //            if (line.StartsWith("⚠️"))
+        //            {
+        //                ErrorMessage = line;
+        //                return;
+        //            }
+
+        //            Status = line;
+
+        //            if (line.Contains('%'))
+        //            {
+        //                var parts = line.Split('%')[0].Split(' ');
+        //                if (double.TryParse(parts.Last(),
+        //                    System.Globalization.NumberStyles.Any,
+        //                    System.Globalization.CultureInfo.InvariantCulture,
+        //                    out double value))
+        //                {
+        //                    Progress = value / 100.0;
+        //                }
+        //            }
+        //        });
+        //    });
+
+        //    await _ytDlp.EnsureInstalledAsync();
+        //    await _ytDlp.EnsureFfmpegInstalledAsync();
+        //    await _ytDlp.DownloadAsync(Url, settings.DownloadPath, SelectedFormat, progress, _cts.Token);
+
+        //    if (settings.OpenDownloads)
+        //        await OpenDownloads();
+        //}
+        //catch (OperationCanceledException)
+        //{
+        //    // Cancelado por el usuario, no es un error
+        //}
+        //catch (Exception ex)
+        //{
+        //    Page? page = Application.Current?.Windows?.FirstOrDefault()?.Page;
+        //    if (page != null)
+        //        await page.DisplayAlertAsync(Strings.Error, ex.Message, Strings.Ok);
+        //}
+        //finally
+        //{
+        //    MainThread.BeginInvokeOnMainThread(() =>
+        //    {
+        //        Progress = 0;
+        //        Status = string.Empty;
+        //        IsDownloading = false;
+        //        NotifyCommandsCanExecuteChanged();
+        //    });
+        //}
+        #endregion
+
+        #region Version 2
+        ErrorMessage = string.Empty;
+        var settings = _settings.Load();
+
+        if (string.IsNullOrWhiteSpace(settings.DownloadPath)) return;
+        if (!OperatingSystem.IsWindows() || _ytDlp == null) return;
+
+        var toDownload = VideoItems.Count == 1
+            ? VideoItems.ToList()
+            : VideoItems.Where(v => v.IsSelected).ToList();
+
+        if (!toDownload.Any()) return;
+
+        _cts = new CancellationTokenSource();
+        IsDownloading = true;
+
+        try
+        {
+            await _ytDlp.EnsureFfmpegInstalledAsync();
+
+            foreach (VideoItem item in toDownload)
+            {
+                if (_cts.Token.IsCancellationRequested) break;
+
+                item.Status = Strings.Downloading;
+                item.Progress = 0;
+
+                var progress = new Progress<string>(line =>
+                {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (line.StartsWith("⚠️"))
+                        {
+                            item.Status = line;
+                            return;
+                        }
+
+                        item.Status = line;
+
+                        // Actualizar también el progreso global si es un solo video
+                        if (!ShowVideoList) Status = line;
+
+                        if (line.Contains('%'))
+                        {
+                            var parts = line.Split('%')[0].Split(' ');
+                            if (double.TryParse(parts.Last(),
+                                System.Globalization.NumberStyles.Any,
+                                System.Globalization.CultureInfo.InvariantCulture,
+                                out double value))
+                            {
+                                item.Progress = value / 100.0;
+                                if (!ShowVideoList) Progress = item.Progress;
+                            }
+                        }
+                    });
+                });
+
+                try
+                {
+                    await _ytDlp.DownloadAsync(item.Url, settings.DownloadPath, SelectedFormat, progress, _cts.Token);
+
+                    item.IsDownloaded = true;
+                    item.Progress = 1.0;
+                    item.Status = Strings.Done;
+                }
+                catch (OperationCanceledException)
+                {
+                    item.Status = Strings.Cancelled; break;
+                }
+                catch (Exception ex)
+                {
+                    item.Status = $"❌ {ex.Message}";
+                }
+            }
+
+            if (settings.OpenDownloads && !_cts.Token.IsCancellationRequested)
                 await OpenDownloads();
-        }
-        catch (OperationCanceledException)
-        {
-            // Cancelado por el usuario, no es un error
-        }
-        catch (Exception ex)
-        {
-            Page? page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-            if (page != null)
-                await page.DisplayAlertAsync(Strings.Error, ex.Message, Strings.Ok);
         }
         finally
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                Progress = 0;
-                Status = string.Empty;
+                if (!ShowVideoList) { Progress = 0; Status = string.Empty; }
                 IsDownloading = false;
-                NotifyCommandsCanExecuteChanged();
             });
         }
+        #endregion
+
     }
 
     private async Task CancelDownload()
     {
+        #region Version 1
+        //_cts?.Cancel();
+        //_ytDlp?.KillCurrentProcess();
+
+        //Progress = 0;
+        //Status = $"{Strings.CancelDownloads}...";
+
+        //await Task.Delay(300);
+        //Status = string.Empty;
+        //IsDownloading = false;
+        //NotifyCommandsCanExecuteChanged();
+        #endregion
+
+        #region Version 2
+
         _cts?.Cancel();
         _ytDlp?.KillCurrentProcess();
-
-        Progress = 0;
         Status = $"{Strings.CancelDownloads}...";
-
-        await Task.Delay(300); // Pequeña pausa para que el proceso muera limpiamente
+        await Task.Delay(300);
         Status = string.Empty;
         IsDownloading = false;
+        IsSearching = false;
         NotifyCommandsCanExecuteChanged();
+
+        #endregion
+
     }
 
     public async Task OpenDownloads()
@@ -239,4 +448,12 @@ public class MainViewModel : BaseViewModel
         DownloadCommand.ChangeCanExecute();
         CancelCommand.ChangeCanExecute();
     }
+
+    public ICommand OpenUrlCommand => new Command<string>(async (url) =>
+    {
+        if (!string.IsNullOrEmpty(url))
+            await Launcher.Default.OpenAsync(url);
+    });
+
+    #endregion
 }

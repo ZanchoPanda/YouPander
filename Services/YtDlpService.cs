@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Runtime.Versioning;
 using System.Text;
+using System.Text.Json;
 using YouPander.Models;
 using YouPander.Resources.Localization;
 using YouPander.ViewModels;
@@ -276,5 +277,113 @@ namespace YouPander.Services
 
             return string.Empty;
         }
+
+
+
+        #region Get Info from URL
+
+        public async Task<List<VideoInfo>> FetchInfoAsync(string url, CancellationToken ct = default)
+        {
+            var raw = await RunAndCaptureAsync($"--flat-playlist -J \"{url}\"", ct);
+
+            var jsonStart = raw.Split('\n').FirstOrDefault(line => line.TrimStart().StartsWith("{") || line.TrimStart().StartsWith("["));
+
+            if (jsonStart == null)
+                throw new Exception("yt-dlp no devolvió JSON válido.");
+
+            // Reconstruimos desde esa línea en adelante
+            var jsonOnly = raw.Substring(raw.IndexOf(jsonStart, StringComparison.Ordinal));
+
+            using var doc = JsonDocument.Parse(jsonOnly);
+            var root = doc.RootElement;
+
+            var results = new List<VideoInfo>();
+
+            if (root.TryGetProperty("entries", out var entries))
+            {
+                foreach (var entry in entries.EnumerateArray())
+                {
+                    results.Add(ParseEntry(entry));
+                }
+            }
+            else
+            {
+                results.Add(ParseEntry(root));
+            }
+
+            return results;
+        }
+
+        private static VideoInfo ParseEntry(JsonElement el)
+        {
+            string Duration = el.TryGetProperty("duration", out var d) && d.TryGetDouble(out double seconds)
+                ? TimeSpan.FromSeconds(seconds).ToString(@"m\:ss")
+                : string.Empty;
+
+            string thumbnail = string.Empty;
+
+            if (el.TryGetProperty("thumbnails", out var thumbs) && thumbs.ValueKind == JsonValueKind.Array)
+            {
+                thumbnail = thumbs.EnumerateArray().Where(t => t.TryGetProperty("url", out _))
+                    .OrderByDescending(t => t.TryGetProperty("width", out var w) ? w.GetInt32() : 0)
+                    .Select(t => t.GetProperty("url").GetString())
+                    .FirstOrDefault() ?? string.Empty;
+            }
+
+            return new VideoInfo
+            {
+                Id = el.GetStringOrEmpty("id"),
+                Title = el.GetStringOrEmpty("title"),
+                Channel = el.GetStringOrEmpty("channel") ?? el.GetStringOrEmpty("uploader"),
+                Thumbnail = thumbnail,
+                Url = el.GetStringOrEmpty("url") ?? el.GetStringOrEmpty("webpage_url"),
+                Duration = Duration
+            };
+        }
+
+        public async Task<string> RunAndCaptureAsync(string arguments, CancellationToken ct = default)
+        {
+            var sb = new StringBuilder();
+
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = _path,
+                    Arguments = arguments,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            process.OutputDataReceived += (_, e) =>
+            {
+                if (e.Data != null)
+                    sb.AppendLine(e.Data);
+            };
+
+            process.ErrorDataReceived += (_, e) =>
+            {
+                if (e.Data != null)
+                    sb.AppendLine(e.Data);
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            await process.WaitForExitAsync(ct);
+
+            if (process.ExitCode != 0)
+                throw new Exception($"yt-dlp error (code {process.ExitCode}):\n{sb}");
+
+            return sb.ToString();
+        }
+
+        #endregion
+
     }
 }
+

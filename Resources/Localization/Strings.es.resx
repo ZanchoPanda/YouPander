@@ -123,6 +123,9 @@
   <data name="CancelDownloads" xml:space="preserve">
     <value>Cancelando descarga</value>
   </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>❌ Cancelado</value>
+  </data>
   <data name="CannotOpenFolder" xml:space="preserve">
     <value>No se puede abrir la carpeta</value>
   </data>
@@ -131,6 +134,9 @@
   </data>
   <data name="DarkMode" xml:space="preserve">
     <value>Modo oscuro</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>✅ Completado</value>
   </data>
   <data name="Download" xml:space="preserve">
     <value>Descargar</value>
@@ -146,6 +152,9 @@
   </data>
   <data name="ExtractingAudio" xml:space="preserve">
     <value>Extrayendo audio</value>
+  </data>
+  <data name="FetchingInfo" xml:space="preserve">
+    <value>Obteniendo información ...</value>
   </data>
   <data name="GettingInfo" xml:space="preserve">
     <value>Obteniendo información</value>

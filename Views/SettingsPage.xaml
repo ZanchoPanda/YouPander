@@ -28,9 +28,12 @@
             <Entry Text="{Binding Settings.DownloadPath}" />
 
             <!--  Color  -->
-            <Label FontAttributes="Bold" Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[PrincipalColorHex]}" />
+            <Label
+                FontAttributes="Bold"
+                IsVisible="Collapse"
+                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[PrincipalColorHex]}" />
 
-            <Entry Text="{Binding Settings.ThemeColor}" />
+            <Entry IsVisible="Collapse" Text="{Binding Settings.ThemeColor}" />
 
             <!--  Dark mode  -->
             <HorizontalStackLayout Spacing="10">
@@ -47,7 +50,8 @@
             <Button
                 Margin="0,20,0,0"
                 Command="{Binding SaveCommand}"
-                HorizontalOptions="FillAndExpand"
+                HorizontalOptions="End"
+                MinimumWidthRequest="100"
                 Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Save]}" />
 
         </VerticalStackLayout>

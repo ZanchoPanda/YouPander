@@ -79,6 +79,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a ❌ Cancelled.
+        /// </summary>
+        internal static string Cancelled {
+            get {
+                return ResourceManager.GetString("Cancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Can&apos;t open folder.
         /// </summary>
         internal static string CannotOpenFolder {
@@ -102,6 +111,15 @@ namespace YouPander.Resources.Localization {
         internal static string DarkMode {
             get {
                 return ResourceManager.GetString("DarkMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ✅ Done.
+        /// </summary>
+        internal static string Done {
+            get {
+                return ResourceManager.GetString("Done", resourceCulture);
             }
         }
         
@@ -147,6 +165,15 @@ namespace YouPander.Resources.Localization {
         internal static string ExtractingAudio {
             get {
                 return ResourceManager.GetString("ExtractingAudio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Getting info....
+        /// </summary>
+        internal static string FetchingInfo {
+            get {
+                return ResourceManager.GetString("FetchingInfo", resourceCulture);
             }
         }
         

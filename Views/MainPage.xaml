@@ -7,17 +7,31 @@
     xmlns:resx="clr-namespace:YouPander.Resources.Localization"
     Title="">
 
-    <VerticalStackLayout Padding="20" Spacing="20">
+    <!--#region Version 1-->
 
-        <Label
+    <!--<VerticalStackLayout Padding="10,0" Spacing="20">
+
+    -->
+    <!--<Label
             FontSize="Title"
             HorizontalTextAlignment="Center"
-            Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Home]}" />
+            Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Home]}" />-->
+    <!--
 
-        <!--  URL  -->
+        <Image
+            HeightRequest="100"
+            HorizontalOptions="Center"
+            Source="imageyoupander.png"
+            WidthRequest="100" />
+
+    -->
+    <!--  URL  -->
+    <!--
         <Entry Placeholder="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[URLToDownload]}" Text="{Binding Url}" />
 
-        <!--  Tipo  -->
+    -->
+    <!--  Tipo  -->
+    <!--
         <Picker Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}" SelectedItem="{Binding SelectedFormat}">
             <Picker.ItemsSource>
                 <x:Array Type="{x:Type x:String}">
@@ -27,7 +41,9 @@
             </Picker.ItemsSource>
         </Picker>
 
-        <!--  Botón  -->
+    -->
+    <!--  Botón  -->
+    <!--
         <Button
             Command="{Binding DownloadCommand}"
             IsVisible="{Binding IsDownloading, Converter={StaticResource InverseBoolConverter}}"
@@ -39,7 +55,9 @@
             IsVisible="{Binding IsDownloading}"
             Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Cancel]}" />
 
-        <!--  Progreso  -->
+    -->
+    <!--  Progreso  -->
+    <!--
         <ProgressBar Progress="{Binding Progress}" ProgressColor="LimeGreen" />
 
         <Label Text="{Binding Status}" TextColor="LimeGreen" />
@@ -50,12 +68,204 @@
             Text="{Binding ErrorMessage}"
             TextColor="Red" />
 
-        <!--  Ir a settings  -->
+    -->
+    <!--  Ir a settings  -->
+    <!--
         <Button
             Command="{Binding OpenSettingsCommand}"
             HorizontalOptions="Start"
             Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Settings]}" />
 
-    </VerticalStackLayout>
+    </VerticalStackLayout>-->
+
+    <!--#endregion-->
+
+    <!--#region Version 2-->
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!--  Zona superior fija  -->
+        <VerticalStackLayout
+            Grid.Row="0"
+            Padding="10,10,10,0"
+            Spacing="12">
+
+            <Image
+                HeightRequest="80"
+                HorizontalOptions="Center"
+                IsVisible="Visible"
+                Source="imageyoupander.png"
+                WidthRequest="80" />
+
+            <!--  URL + botón buscar en la misma fila  -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry
+                    Grid.Column="0"
+                    Placeholder="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[URLToDownload]}"
+                    ReturnCommand="{Binding SearchCommand}"
+                    Text="{Binding Url}" />
+
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding SearchCommand}"
+                    IsEnabled="{Binding IsSearching, Converter={StaticResource InverseBoolConverter}}"
+                    Text="🔍"
+                    WidthRequest="48" />
+            </Grid>
+
+            <!--  Picker tipo  -->
+            <Picker Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}" SelectedItem="{Binding SelectedFormat}">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>Audio</x:String>
+                        <x:String>Video</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+
+            <!--  Indicador de búsqueda  -->
+            <ActivityIndicator
+                IsRunning="{Binding IsSearching}"
+                IsVisible="{Binding IsSearching}"
+                Color="LimeGreen" />
+
+            <!--  Botones Download / Cancel (solo si NO hay lista múltiple)  -->
+            <Button
+                Command="{Binding DownloadCommand}"
+                IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
+                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Download]}" />
+
+            <Button
+                BackgroundColor="IndianRed"
+                Command="{Binding CancelCommand}"
+                IsVisible="{Binding IsDownloading}"
+                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Cancel]}" />
+
+            <!--  Progreso global (solo video único)  -->
+            <ProgressBar
+                IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
+                Progress="{Binding Progress}"
+                ProgressColor="LimeGreen" />
+
+            <Label
+                IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
+                Text="{Binding Status}"
+                TextColor="LimeGreen" />
+
+            <Label
+                FontSize="12"
+                HorizontalTextAlignment="Center"
+                IsVisible="{Binding HasError}"
+                Text="{Binding ErrorMessage}"
+                TextColor="Red" />
+
+        </VerticalStackLayout>
+
+        <!--  Lista de videos (playlist / múltiples)  -->
+        <Grid
+            Grid.Row="1"
+            IsVisible="{Binding ShowVideoList}"
+            RowDefinitions="*,Auto">
+
+            <CollectionView
+                x:Name="MyCollectionView"
+                Grid.Row="0"
+                Margin="10,8"
+                ItemsSource="{Binding VideoItems}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="4" StrokeShape="RoundRectangle 8">
+                            <Grid
+                                Margin="5"
+                                ColumnDefinitions="72,*,Auto"
+                                ColumnSpacing="10"
+                                RowDefinitions="Auto,Auto,Auto,Auto">
+
+                                <!--  Thumbnail  -->
+                                <Image
+                                    Grid.RowSpan="3"
+                                    Grid.Column="0"
+                                    Aspect="AspectFill"
+                                    Source="{Binding ThumbnailUrl}" />
+
+                                <!--  Título  -->
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    FontAttributes="Bold"
+                                    FontSize="13"
+                                    LineBreakMode="TailTruncation"
+                                    MaxLines="2"
+                                    Text="{Binding Title}" />
+
+                                <!--  Canal + duración  -->
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    FontSize="11"
+                                    Text="{Binding Channel}"
+                                    TextColor="Gray" />
+
+                                <!--  URL  -->
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    FontSize="11"
+                                    Text="{Binding Url}"
+                                    TextColor="CadetBlue"
+                                    TextDecorations="Underline">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding BindingContext.OpenUrlCommand, Source={x:Reference Name=MyCollectionView}}" CommandParameter="{Binding Url}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+
+                                <!--  ProgressBar por ítem  -->
+                                <ProgressBar
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    Progress="{Binding Progress}"
+                                    ProgressColor="LimeGreen" />
+
+                                <!--  Checkbox selección  -->
+                                <CheckBox
+                                    Grid.RowSpan="3"
+                                    Grid.Column="2"
+                                    IsChecked="{Binding IsSelected}"
+                                    VerticalOptions="Center" />
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!--  Botón descargar seleccionados (fijo al fondo)  -->
+            <Grid
+                Grid.Row="1"
+                Padding="10,6"
+                ColumnDefinitions="*,Auto"
+                ColumnSpacing="8">
+                <Button
+                    Grid.Column="0"
+                    Command="{Binding DownloadCommand}"
+                    IsVisible="{Binding IsDownloading, Converter={StaticResource InverseBoolConverter}}"
+                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Download]}" />
+                <Button
+                    Grid.Column="1"
+                    BackgroundColor="IndianRed"
+                    Command="{Binding CancelCommand}"
+                    HorizontalOptions="Fill"
+                    IsVisible="{Binding IsDownloading}"
+                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Cancel]}" />
+            </Grid>
+
+        </Grid>
+
+    </Grid>
+
+    <!--#endregion-->
 
 </ContentPage>
