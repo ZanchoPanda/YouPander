@@ -83,6 +83,7 @@ public class MainViewModel : BaseViewModel
             {
                 _isDownloading = value;
                 OnPropertyChanged(nameof(IsDownloading));
+                NotifyCommandsCanExecuteChanged();
             }
         }
     }
@@ -111,7 +112,7 @@ public class MainViewModel : BaseViewModel
             {
                 _errorMessage = value;
                 OnPropertyChanged(nameof(ErrorMessage));
-                OnPropertyChanged(nameof(HasError)); // para binding en la View
+                OnPropertyChanged(nameof(HasError));
             }
         }
     }
@@ -190,7 +191,7 @@ public class MainViewModel : BaseViewModel
 
         _cts = new CancellationTokenSource();
         IsSearching = true;
-        Status = Strings.FetchingInfo; // "Obteniendo información..."
+        Status = Strings.FetchingInfo;
 
         try
         {
@@ -229,85 +230,6 @@ public class MainViewModel : BaseViewModel
 
     private async Task Download()
     {
-        #region Version 1
-        //ErrorMessage = string.Empty;
-
-        //if (string.IsNullOrWhiteSpace(Url))
-        //    return;
-
-        //var settings = _settings.Load();
-
-        //if (string.IsNullOrWhiteSpace(settings.DownloadPath))
-        //    return;
-
-        //if (!OperatingSystem.IsWindows() || _ytDlp == null)
-        //{
-        //    Status = Strings.OnlyAvailableOnWindows; // Localizado
-        //    return;
-        //}
-
-        //_cts = new CancellationTokenSource();
-        //IsDownloading = true;
-        //NotifyCommandsCanExecuteChanged();
-
-        //try
-        //{
-        //    var progress = new Progress<string>(line =>
-        //    {
-        //        MainThread.BeginInvokeOnMainThread(() =>
-        //        {
-        //            if (line.StartsWith("⚠️"))
-        //            {
-        //                ErrorMessage = line;
-        //                return;
-        //            }
-
-        //            Status = line;
-
-        //            if (line.Contains('%'))
-        //            {
-        //                var parts = line.Split('%')[0].Split(' ');
-        //                if (double.TryParse(parts.Last(),
-        //                    System.Globalization.NumberStyles.Any,
-        //                    System.Globalization.CultureInfo.InvariantCulture,
-        //                    out double value))
-        //                {
-        //                    Progress = value / 100.0;
-        //                }
-        //            }
-        //        });
-        //    });
-
-        //    await _ytDlp.EnsureInstalledAsync();
-        //    await _ytDlp.EnsureFfmpegInstalledAsync();
-        //    await _ytDlp.DownloadAsync(Url, settings.DownloadPath, SelectedFormat, progress, _cts.Token);
-
-        //    if (settings.OpenDownloads)
-        //        await OpenDownloads();
-        //}
-        //catch (OperationCanceledException)
-        //{
-        //    // Cancelado por el usuario, no es un error
-        //}
-        //catch (Exception ex)
-        //{
-        //    Page? page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-        //    if (page != null)
-        //        await page.DisplayAlertAsync(Strings.Error, ex.Message, Strings.Ok);
-        //}
-        //finally
-        //{
-        //    MainThread.BeginInvokeOnMainThread(() =>
-        //    {
-        //        Progress = 0;
-        //        Status = string.Empty;
-        //        IsDownloading = false;
-        //        NotifyCommandsCanExecuteChanged();
-        //    });
-        //}
-        #endregion
-
-        #region Version 2
         ErrorMessage = string.Empty;
         var settings = _settings.Load();
 
@@ -393,27 +315,11 @@ public class MainViewModel : BaseViewModel
                 IsDownloading = false;
             });
         }
-        #endregion
 
     }
 
     private async Task CancelDownload()
     {
-        #region Version 1
-        //_cts?.Cancel();
-        //_ytDlp?.KillCurrentProcess();
-
-        //Progress = 0;
-        //Status = $"{Strings.CancelDownloads}...";
-
-        //await Task.Delay(300);
-        //Status = string.Empty;
-        //IsDownloading = false;
-        //NotifyCommandsCanExecuteChanged();
-        #endregion
-
-        #region Version 2
-
         _cts?.Cancel();
         _ytDlp?.KillCurrentProcess();
         Status = $"{Strings.CancelDownloads}...";
@@ -422,8 +328,6 @@ public class MainViewModel : BaseViewModel
         IsDownloading = false;
         IsSearching = false;
         NotifyCommandsCanExecuteChanged();
-
-        #endregion
 
     }
 
@@ -445,8 +349,9 @@ public class MainViewModel : BaseViewModel
 
     private void NotifyCommandsCanExecuteChanged()
     {
-        DownloadCommand.ChangeCanExecute();
-        CancelCommand.ChangeCanExecute();
+        (SearchCommand as Command)?.ChangeCanExecute();
+        (DownloadCommand as Command)?.ChangeCanExecute();
+        (CancelCommand as Command)?.ChangeCanExecute();
     }
 
     public ICommand OpenUrlCommand => new Command<string>(async (url) =>

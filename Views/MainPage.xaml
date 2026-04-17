@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local2="clr-namespace:YouPander.Services"
     xmlns:resx="clr-namespace:YouPander.Resources.Localization"
+    xmlns:sys="clr-namespace:System.Diagnostics;assembly=System.Runtime"
     Title="">
 
     <!--#region Version 1-->
@@ -91,16 +92,15 @@
             Spacing="12">
 
             <Image
-                MinimumWidthRequest="150"
-                MinimumHeightRequest="150"
-                VerticalOptions="Center"
-                HorizontalOptions="Center"
                 Aspect="AspectFit"
-                MaximumWidthRequest="200"
+                HorizontalOptions="Center"
+                IsVisible="{Binding Source={x:Static sys:Debugger.IsAttached}, Converter={StaticResource InverseBoolConverter}}"
                 MaximumHeightRequest="200"
-                IsVisible="Visible"
+                MaximumWidthRequest="200"
+                MinimumHeightRequest="150"
+                MinimumWidthRequest="150"
                 Source="imageyoupander.png"
-                />
+                VerticalOptions="Center" />
 
             <!--  URL + botón buscar en la misma fila  -->
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
@@ -128,29 +128,10 @@
                 </Picker.ItemsSource>
             </Picker>
 
-            <!--  Indicador de búsqueda  -->
             <ActivityIndicator
                 IsRunning="{Binding IsSearching}"
                 IsVisible="{Binding IsSearching}"
                 Color="LimeGreen" />
-
-            <!--  Botones Download / Cancel (solo si NO hay lista múltiple)  -->
-            <Button
-                Command="{Binding DownloadCommand}"
-                IsVisible="{Binding ShowVideoList}"
-                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Download]}" />
-
-            <Button
-                BackgroundColor="IndianRed"
-                Command="{Binding CancelCommand}"
-                IsVisible="{Binding IsDownloading}"
-                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Cancel]}" />
-
-            <!--  Progreso global (solo video único)  -->
-            <ProgressBar
-                IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
-                Progress="{Binding Progress}"
-                ProgressColor="LimeGreen" />
 
             <Label
                 IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
@@ -163,6 +144,29 @@
                 IsVisible="{Binding HasError}"
                 Text="{Binding ErrorMessage}"
                 TextColor="Red" />
+
+            <Grid IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}">
+                <!--  Indicador de búsqueda  -->
+
+                <!--  Botones Download / Cancel (solo si NO hay lista múltiple)  -->
+                <Button
+                    Command="{Binding DownloadCommand}"
+                    IsVisible="{Binding ShowVideoList}"
+                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Download]}" />
+
+                <Button
+                    BackgroundColor="IndianRed"
+                    Command="{Binding CancelCommand}"
+                    IsVisible="{Binding IsDownloading}"
+                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Cancel]}" />
+
+                <!--  Progreso global (solo video único)  -->
+                <ProgressBar
+                    IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
+                    Progress="{Binding Progress}"
+                    ProgressColor="LimeGreen" />
+
+            </Grid>
 
         </VerticalStackLayout>
 
@@ -193,7 +197,7 @@
                                 <Image
                                     Grid.RowSpan="3"
                                     Grid.Column="0"
-                                    Aspect="AspectFill" 
+                                    Aspect="AspectFill"
                                     Source="{Binding ThumbnailUrl}" />
 
                                 <!--  Título  -->
@@ -259,10 +263,9 @@
                     IsVisible="{Binding IsDownloading, Converter={StaticResource InverseBoolConverter}}"
                     Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Download]}" />
                 <Button
-                    Grid.Column="1"
+                    Grid.Column="0"
                     BackgroundColor="IndianRed"
                     Command="{Binding CancelCommand}"
-                    HorizontalOptions="Fill"
                     IsVisible="{Binding IsDownloading}"
                     Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Cancel]}" />
             </Grid>

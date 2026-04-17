@@ -144,31 +144,8 @@ namespace YouPander.Services
         public async Task DownloadAsync(string url, string output, string format, IProgress<string> progress, CancellationToken token)
         {
 
-            string args;
-            string[] parts;
-
-            if (format.Contains("Audio"))
-            {
-                parts = new[]
-                {
-                    $"-o \"{output}/%(title)s.%(ext)s\"",
-                    $"--ffmpeg-location \"{_ffmpegPath}\"",
-                    "-x --audio-format mp3 --audio-quality 0",
-                    "--embed-metadata --embed-thumbnail",
-                    "--newline"
-                };
-            }
-            else
-            {
-                parts = new[]
-                {
-                    $"-o \"{output}/%(title)s.%(ext)s\"",
-                    $"--newline",
-                };
-            }
-
-            parts = parts.Append(url).ToArray();
-            args = string.Join(" ", parts);
+            string[] parts = BuildArguments(url, output, format);
+            string args = string.Join(" ", parts);
 
             using Process process = new Process
             {
@@ -333,7 +310,7 @@ namespace YouPander.Services
             var id = el.GetStringOrEmpty("id");
 
             // Intentar obtener la URL por orden de prioridad
-            var url = !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("webpage_url")) ? el.GetStringOrEmpty("webpage_url"):
+            var url = !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("webpage_url")) ? el.GetStringOrEmpty("webpage_url") :
                 !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("url")) ? el.GetStringOrEmpty("url") :
                 !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("original_url")) ? el.GetStringOrEmpty("original_url") :
                 BuildUrlFromId(el, id);
@@ -407,6 +384,45 @@ namespace YouPander.Services
                 throw new Exception($"yt-dlp error (code {process.ExitCode}):\n{sb}");
 
             return sb.ToString();
+        }
+
+        #endregion
+
+        #region Args Constructor
+
+        private string[] BuildArguments(string url, string output, string format)
+        {
+            string[] commonArgs =
+            [
+                $"-o \"{output}/%(title)s.%(ext)s\"",
+                $"--ffmpeg-location \"{_ffmpegPath}\"",
+                "--newline"
+            ];
+
+            string[] formatArgs;
+
+            if (format.Contains("Audio"))
+            {
+                formatArgs =
+                [
+                    "-x",
+                    "--audio-format mp3",
+                    "--audio-quality 0",
+                    "--embed-metadata",
+                    "--embed-thumbnail"
+                ];
+            }
+            else
+            {
+                formatArgs =
+                [
+                    "-f \"bestvideo+bestaudio/best\"",
+                    "--merge-output-format mkv",
+                ];
+            }
+
+            //Return the combined arguments with the URL at the end
+            return [.. commonArgs, .. formatArgs, url];
         }
 
         #endregion
