@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YouPander.Views.HistoryPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local2="clr-namespace:YouPander.Services"
+    Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[History]}">
+    <Grid RowDefinitions="*,Auto">
+
+        <CollectionView
+            Grid.Row="0"
+            Margin="10"
+            ItemsSource="{Binding Records}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border
+                        Margin="0,4"
+                        Padding="8"
+                        StrokeShape="RoundRectangle 12">
+                        <Grid ColumnDefinitions="64,*,Auto" ColumnSpacing="10">
+
+                            <!--  Thumbnail  -->
+                            <Image
+                                Grid.Column="0"
+                                Aspect="AspectFill"
+                                HeightRequest="48"
+                                Source="{Binding ThumbnailUrl}"
+                                WidthRequest="64" />
+
+                            <!--  Info  -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="13"
+                                    LineBreakMode="TailTruncation"
+                                    MaxLines="2"
+                                    Text="{Binding Title}" />
+                                <Label
+                                    FontSize="11"
+                                    Text="{Binding Channel}"
+                                    TextColor="Gray" />
+                                <Label
+                                    FontSize="11"
+                                    Text="{Binding DownloadedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                    TextColor="Gray" />
+                                <Label
+                                    FontSize="11"
+                                    Text="{Binding Format}"
+                                    TextColor="CadetBlue" />
+                            </VerticalStackLayout>
+
+                            <!--  Acciones  -->
+                            <VerticalStackLayout
+                                Grid.Column="2"
+                                Spacing="4"
+                                VerticalOptions="Center">
+                                <Button
+                                    Command="{Binding BindingContext.ReDownloadCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                    CommandParameter="{Binding}"
+                                    HeightRequest="40"
+                                    Text="↩️"
+                                    WidthRequest="40" />
+                                <Button
+                                    BackgroundColor="IndianRed"
+                                    Command="{Binding BindingContext.DeleteCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                    CommandParameter="{Binding}"
+                                    HeightRequest="40"
+                                    Text="🗑️"
+                                    WidthRequest="40" />
+                            </VerticalStackLayout>
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!--  Botón limpiar todo  -->
+        <Button
+            Grid.Row="1"
+            Margin="10,6"
+            BackgroundColor="IndianRed"
+            Command="{Binding ClearAllCommand}"
+            Text="🗑️ Clear all" />
+
+    </Grid>
+</ContentPage>

@@ -25,13 +25,17 @@ namespace YouPander
                 });
 
             builder.Services.AddSingleton<SettingsService>();
+            builder.Services.AddSingleton<HistoryService>();
+
             // ViewModels
             builder.Services.AddTransient<MainViewModel>();
-            builder.Services.AddTransient<SettingsViewModel>(); // si lo tienes
+            builder.Services.AddTransient<SettingsViewModel>();
+            builder.Services.AddTransient<HistoryViewModel>();
 
             // Páginas
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<SettingsPage>();
+            builder.Services.AddTransient<HistoryPage>();
 
 #if WINDOWS
 

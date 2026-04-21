@@ -5,13 +5,14 @@ using YouPander.Resources.Localization;
 using YouPander.Services;
 using YouPander.ViewModels;
 
-public class MainViewModel : BaseViewModel
+public class MainViewModel : BaseViewModel, IQueryAttributable
 {
     #region Fields
 
     private CancellationTokenSource? _cts;
     private readonly YtDlpService? _ytDlp;
     private readonly SettingsService _settings;
+    private readonly HistoryService _history;
 
     #endregion
 
@@ -175,9 +176,10 @@ public class MainViewModel : BaseViewModel
         OpenSettingsCommand = new Command(async () => await Shell.Current.GoToAsync("///SettingsPage"));
     }
 
-    public MainViewModel(SettingsService settings, YtDlpService? ytDlp = null)
+    public MainViewModel(SettingsService settings, HistoryService history, YtDlpService? ytDlp = null)
     {
         _settings = settings;
+        _history = history;
         _ytDlp = OperatingSystem.IsWindows() ? ytDlp : null;
 
         VideoItems = new ObservableCollection<VideoItem>();
@@ -310,6 +312,23 @@ public class MainViewModel : BaseViewModel
                     item.IsDownloaded = true;
                     item.Progress = 1.0;
                     item.Status = Strings.Done;
+
+                    #region
+
+                    await _history.AddAsync(new DownloadRecord
+                    {
+                        Title = item.Title,
+                        Url = item.Url,
+                        Channel = item.Channel,
+                        ThumbnailUrl = item.ThumbnailUrl,
+                        Format = SelectedFormat,
+                        DownloadPath = settings.DownloadPath,
+                        DownloadedAt = DateTime.Now,
+                        Success = true
+                    });
+
+                    #endregion
+
                 }
                 catch (OperationCanceledException)
                 {
@@ -318,6 +337,14 @@ public class MainViewModel : BaseViewModel
                 catch (Exception ex)
                 {
                     item.Status = $"❌ {ex.Message}";
+                    await _history.AddAsync(new DownloadRecord
+                    {
+                        Title = item.Title,
+                        Url = item.Url,
+                        Format = SelectedFormat,
+                        DownloadedAt = DateTime.Now,
+                        Success = false
+                    });
                 }
             }
 
@@ -375,6 +402,14 @@ public class MainViewModel : BaseViewModel
         if (!string.IsNullOrEmpty(url))
             await Launcher.Default.OpenAsync(url);
     });
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue("url", out var url))
+        {
+            Url = Uri.UnescapeDataString(url.ToString() ?? string.Empty);
+        }
+    }
 
     #endregion
 }

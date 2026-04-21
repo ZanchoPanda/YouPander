@@ -147,24 +147,22 @@
 
             <Grid IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}">
                 <!--  Indicador de búsqueda  -->
+                <VerticalStackLayout>
 
-                <!--  Botones Download / Cancel (solo si NO hay lista múltiple)  -->
-                <Button
-                    Command="{Binding DownloadCommand}"
-                    IsVisible="{Binding ShowVideoList}"
-                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Download]}" />
+                    <!--  Progreso global (solo video único)  -->
+                    <ProgressBar
+                        Margin="0,10"
+                        IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
+                        Progress="{Binding Progress}"
+                        ProgressColor="LimeGreen" />
 
-                <Button
-                    BackgroundColor="IndianRed"
-                    Command="{Binding CancelCommand}"
-                    IsVisible="{Binding IsDownloading}"
-                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Cancel]}" />
+                    <Button
+                        BackgroundColor="IndianRed"
+                        Command="{Binding CancelCommand}"
+                        IsVisible="{Binding IsDownloading}"
+                        Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Cancel]}" />
 
-                <!--  Progreso global (solo video único)  -->
-                <ProgressBar
-                    IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
-                    Progress="{Binding Progress}"
-                    ProgressColor="LimeGreen" />
+                </VerticalStackLayout>
 
             </Grid>
 

@@ -16,6 +16,12 @@
         Route="MainPage" />
 
     <ShellContent
+        Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[History]}"
+        ContentTemplate="{DataTemplate views:HistoryPage}"
+        Icon="🕐"
+        Route="HistoryPage" />
+
+    <ShellContent
         Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Settings]}"
         ContentTemplate="{DataTemplate views:SettingsPage}"
         Route="SettingsPage" />
