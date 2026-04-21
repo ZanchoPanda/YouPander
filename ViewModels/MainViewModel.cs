@@ -136,7 +136,7 @@ public class MainViewModel : BaseViewModel
             {
                 _VideoItems = value;
                 OnPropertyChanged("VideoItems");
-                OnPropertyChanged(nameof(ShowVideoList));
+                
             }
         }
     }
@@ -167,6 +167,21 @@ public class MainViewModel : BaseViewModel
         }
 
         VideoItems = new ObservableCollection<VideoItem>();
+        VideoItems.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ShowVideoList));
+
+        SearchCommand = new Command(async () => await SearchAsync(), () => !IsSearching && !IsDownloading);
+        DownloadCommand = new Command(async () => await Download(), () => !IsDownloading);
+        CancelCommand = new Command(async () => await CancelDownload(), () => IsDownloading);
+        OpenSettingsCommand = new Command(async () => await Shell.Current.GoToAsync("///SettingsPage"));
+    }
+
+    public MainViewModel(SettingsService settings, YtDlpService? ytDlp = null)
+    {
+        _settings = settings;
+        _ytDlp = OperatingSystem.IsWindows() ? ytDlp : null;
+
+        VideoItems = new ObservableCollection<VideoItem>();
+        VideoItems.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ShowVideoList));
 
         SearchCommand = new Command(async () => await SearchAsync(), () => !IsSearching && !IsDownloading);
         DownloadCommand = new Command(async () => await Download(), () => !IsDownloading);
@@ -180,7 +195,7 @@ public class MainViewModel : BaseViewModel
     {
         ErrorMessage = string.Empty;
         VideoItems.Clear();
-        OnPropertyChanged(nameof(ShowVideoList));
+        
 
         if (string.IsNullOrWhiteSpace(Url)) return;
         if (!OperatingSystem.IsWindows() || _ytDlp == null)
@@ -189,6 +204,8 @@ public class MainViewModel : BaseViewModel
             return;
         }
 
+        _cts?.Cancel();
+        _cts?.Dispose();
         _cts = new CancellationTokenSource();
         IsSearching = true;
         Status = Strings.FetchingInfo;
@@ -212,7 +229,7 @@ public class MainViewModel : BaseViewModel
                 });
             }
 
-            OnPropertyChanged(nameof(ShowVideoList));
+            
             NotifyCommandsCanExecuteChanged();
 
             // Si es un solo video, lanzar descarga directamente
@@ -325,7 +342,6 @@ public class MainViewModel : BaseViewModel
         Status = $"{Strings.CancelDownloads}...";
         await Task.Delay(300);
         Status = string.Empty;
-        IsDownloading = false;
         IsSearching = false;
         NotifyCommandsCanExecuteChanged();
 

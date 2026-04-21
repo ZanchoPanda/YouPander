@@ -9,4 +9,12 @@ public partial class SettingsPage : ContentPage
 		InitializeComponent();
         BindingContext = new SettingsViewModel();
     }
+
+    public SettingsPage(SettingsViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = viewModel;
+    }
+
+
 }

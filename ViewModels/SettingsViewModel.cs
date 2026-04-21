@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Maui.Storage;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using YouPander.Models;
@@ -12,7 +13,13 @@ namespace YouPander.ViewModels
 
         public AppSettings Settings { get; set; }
 
+        #region Commands
+
         public Command SaveCommand { get; }
+
+        public Command BrowseFolderCommand { get; }
+
+        #endregion
 
         public SettingsViewModel()
         {
@@ -20,7 +27,21 @@ namespace YouPander.ViewModels
             Settings = _settingsService.Load();
 
             SaveCommand = new Command(async () => await Save());
+            BrowseFolderCommand = new Command(async () => await BrowseFolderAsync());
+
         }
+
+        public SettingsViewModel(AppSettings settingService)
+        {
+            _settingsService = new SettingsService();
+            Settings = _settingsService.Load();
+
+            SaveCommand = new Command(async () => await Save());
+            BrowseFolderCommand = new Command(async () => await BrowseFolderAsync());
+        }
+
+
+        #region Actions Commands
 
         private async Task Save()
         {
@@ -30,6 +51,22 @@ namespace YouPander.ViewModels
 
             ApplyTheme();
             await Shell.Current.GoToAsync("//MainPage");
+        }
+
+        private async Task BrowseFolderAsync()
+        {
+            try
+            {
+                var result = await FolderPicker.Default.PickAsync(CancellationToken.None);
+
+                if (result.IsSuccessful)
+                    Settings.DownloadPath = result.Folder.Path;
+            }
+            catch (Exception ex)
+            {
+                // Opcional: mostrar error
+                var ErrorMessage = ex.Message;
+            }
         }
 
         private void ApplyTheme()
@@ -68,5 +105,8 @@ namespace YouPander.ViewModels
             app.UserAppTheme =
                 Settings.DarkMode ? AppTheme.Dark : AppTheme.Light;
         }
+
+        #endregion
+
     }
 }

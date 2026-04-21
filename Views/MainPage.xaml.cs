@@ -10,5 +10,11 @@
             BindingContext = new MainViewModel();
         }
 
+        public MainPage(MainViewModel viewModel)
+        {
+            InitializeComponent();
+            BindingContext = viewModel;
+        }
+
     }
 }
