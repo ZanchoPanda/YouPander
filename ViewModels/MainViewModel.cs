@@ -120,6 +120,21 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
 
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
+    private ObservableCollection<FormatOption> _availableFormats = new();
+    public ObservableCollection<FormatOption> AvailableFormats
+    {
+        get => _availableFormats;
+        set { _availableFormats = value; OnPropertyChanged(); }
+    }
+
+    private FormatOption? _selectedFormatOption;
+    public FormatOption? SelectedFormatOption
+    {
+        get => _selectedFormatOption;
+        set { _selectedFormatOption = value; OnPropertyChanged(); }
+    }
+
+    public bool HasFormats => AvailableFormats.Count > 0;
 
     #region Videos
 
@@ -235,8 +250,20 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
             NotifyCommandsCanExecuteChanged();
 
             // Si es un solo video, lanzar descarga directamente
+            //if (VideoItems.Count == 1)
+            //    await Download();
+
             if (VideoItems.Count == 1)
-                await Download();
+            {
+                var formats = await _ytDlp.FetchFormatsAsync(Url, _cts.Token);
+                AvailableFormats = new ObservableCollection<FormatOption>(formats);
+                OnPropertyChanged(nameof(HasFormats));
+
+                SelectedFormatOption = AvailableFormats.FirstOrDefault(f => f.FormatId == "mp3");
+                // No lanzar descarga automática, esperar a que el usuario elija formato
+                return;
+            }
+
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) { ErrorMessage = ex.Message; }
@@ -307,7 +334,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
 
                 try
                 {
-                    await _ytDlp.DownloadAsync(item.Url, settings.DownloadPath, SelectedFormat, progress, _cts.Token);
+                    await _ytDlp.DownloadAsync(item.Url, settings.DownloadPath, SelectedFormat, progress, _cts.Token, SelectedFormatOption?.FormatId);
 
                     item.IsDownloaded = true;
                     item.Progress = 1.0;

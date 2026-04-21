@@ -119,7 +119,18 @@
             </Grid>
 
             <!--  Picker tipo  -->
-            <Picker Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}" SelectedItem="{Binding SelectedFormat}">
+            <!--<Picker Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}" SelectedItem="{Binding SelectedFormat}">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>Audio</x:String>
+                        <x:String>Video</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>-->
+            <Picker
+                Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}"
+                IsVisible="{Binding HasFormats, Converter={StaticResource InverseBoolConverter}}"
+                SelectedItem="{Binding SelectedFormat}">
                 <Picker.ItemsSource>
                     <x:Array Type="{x:Type x:String}">
                         <x:String>Audio</x:String>
@@ -127,6 +138,13 @@
                     </x:Array>
                 </Picker.ItemsSource>
             </Picker>
+
+            <Picker
+                Title="Quality"
+                IsVisible="{Binding HasFormats}"
+                ItemDisplayBinding="{Binding Label}"
+                ItemsSource="{Binding AvailableFormats}"
+                SelectedItem="{Binding SelectedFormatOption}" />
 
             <ActivityIndicator
                 IsRunning="{Binding IsSearching}"
@@ -148,13 +166,18 @@
             <Grid IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}">
                 <!--  Indicador de búsqueda  -->
                 <VerticalStackLayout>
-
                     <!--  Progreso global (solo video único)  -->
                     <ProgressBar
                         Margin="0,10"
                         IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
                         Progress="{Binding Progress}"
                         ProgressColor="LimeGreen" />
+
+                    <Button
+                        Command="{Binding DownloadCommand}"
+                        IsVisible="{Binding IsDownloading, Converter={StaticResource InverseBoolConverter}}"
+                        Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Download]}" />
+
 
                     <Button
                         BackgroundColor="IndianRed"
