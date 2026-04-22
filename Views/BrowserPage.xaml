@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YouPander.Views.BrowserPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <HorizontalStackLayout
+            Grid.Row="0"
+            Padding="8"
+            Spacing="8">
+            <Button
+                x:Name="BtnBack"
+                Clicked="OnBackClicked"
+                HeightRequest="40"
+                IsEnabled="False"
+                Text="◀"
+                WidthRequest="40" />
+            <Button
+                x:Name="BtnForward"
+                Clicked="OnForwardClicked"
+                HeightRequest="40"
+                IsEnabled="False"
+                Text="▶"
+                WidthRequest="40" />
+            <Button
+                Clicked="OnReloadClicked"
+                HeightRequest="40"
+                Text="🔄"
+                WidthRequest="40" />
+            <Label
+                x:Name="LblUrl"
+                FontSize="11"
+                HorizontalOptions="FillAndExpand"
+                LineBreakMode="TailTruncation"
+                TextColor="Gray"
+                VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
+        <WebView
+            x:Name="WebViewControl"
+            Grid.Row="1"
+            Navigated="OnNavigated"
+            Navigating="OnNavigating" />
+
+    </Grid>
+</ContentPage>

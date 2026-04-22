@@ -441,7 +441,10 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
     public ICommand OpenUrlCommand => new Command<string>(async (url) =>
     {
         if (!string.IsNullOrEmpty(url))
-            await Launcher.Default.OpenAsync(url);
+        {
+            //await Launcher.Default.OpenAsync(url);
+            await Shell.Current.GoToAsync($"BrowserPage?url={Uri.EscapeDataString(url)}");
+        }
     });
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)

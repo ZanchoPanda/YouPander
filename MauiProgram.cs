@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using YouPander.Handlers;
 using YouPander.Services;
 using YouPander.ViewModels;
 using YouPander.Views;
@@ -18,6 +19,10 @@ namespace YouPander
             builder
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()
+                .ConfigureMauiHandlers(handlers =>
+                {
+                    handlers.AddHandler<WebView, AdBlockWebViewHandler>();
+                })
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -36,6 +41,8 @@ namespace YouPander
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<HistoryPage>();
+
+            builder.Services.AddTransient<BrowserPage>();
 
 #if WINDOWS
 
