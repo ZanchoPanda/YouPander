@@ -1,5 +1,66 @@
 🎬 YouPander - .NET MAUI
 
+Application developed in .NET MAUI that allows you to browse YouTube, watch content, and download videos by selecting the desired quality, all from a simple and intuitive interface.
+
+⚠️ Personal project developed solo in my free time.
+
+🚀 Main Features
+📺 Built-in Browser
+Integrated web browser within the application.
+Allows you to browse YouTube without leaving the app.
+Includes an ad blocker for a cleaner and smoother experience.
+Ability to watch videos before downloading them.
+⬇️ Video Downloading
+Download videos directly from YouTube.
+Choose the video quality before starting the download.
+Simple and fast process.
+🕘 Download History
+Record of previously downloaded videos.
+Quick access to your recent activity.
+⚙️ Settings
+Simple and intuitive settings panel.
+Basic options to customize the user experience.
+🌍 Multilanguage Support
+Available in:
+🇪🇸 Spanish (Spain)
+🇬🇧 English
+💻 Platform
+
+Currently, the application:
+
+✔️ Works on Windows
+🔧 Planned to be adapted for other operating systems in the future (thanks to .NET MAUI)
+🧑‍💻 About the Project
+
+This is an independent project, developed by a single person in their free time.
+The goal is to learn, improve skills, and build a useful tool.
+
+⚠️ Legal Notice
+
+This application is intended for personal use only.
+The user is responsible for how they use the tool and for complying with YouTube’s terms of service.
+
+❤️ Support the Project
+
+If you like this application and want to support its development, you can make a donation:
+
+👉 PayPal: https://www.paypal.com/donate/?hosted_button_id=YOUR_ID_HERE
+
+(Replace the link with your actual PayPal donation link)
+
+📌 Future Improvements
+Multiplatform support (Android, macOS, etc.)
+Improved download performance
+More configuration options
+Advanced download management
+📄 License
+
+This project does not yet have a defined license.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+🎬 YouPander - .NET MAUI
+
 Aplicación desarrollada en .NET MAUI que permite navegar por YouTube, visualizar contenido y descargar vídeos seleccionando la calidad deseada, todo desde una interfaz sencilla e intuitiva.
 
 ⚠️ Proyecto personal desarrollado en solitario durante mi tiempo libre.
