@@ -47,6 +47,10 @@
                                     FontSize="11"
                                     Text="{Binding Format}"
                                     TextColor="CadetBlue" />
+                                <Label
+                                    FontSize="11"
+                                    Text="{Binding Url}"
+                                    TextColor="CadetBlue" />
                             </VerticalStackLayout>
 
                             <!--  Acciones  -->

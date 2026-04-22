@@ -152,12 +152,16 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
             {
                 _VideoItems = value;
                 OnPropertyChanged("VideoItems");
-                
+
             }
         }
     }
 
     public bool ShowVideoList => VideoItems.Count > 1;
+
+
+    // Campo - ajusta el número máximo de descargas simultáneas
+    private readonly SemaphoreSlim _downloadSemaphore = new(3);
 
     #endregion
 
@@ -212,7 +216,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
     {
         ErrorMessage = string.Empty;
         VideoItems.Clear();
-        
+
 
         if (string.IsNullOrWhiteSpace(Url)) return;
         if (!OperatingSystem.IsWindows() || _ytDlp == null)
@@ -246,7 +250,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
                 });
             }
 
-            
+
             NotifyCommandsCanExecuteChanged();
 
             // Si es un solo video, lanzar descarga directamente
@@ -295,85 +299,95 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
         {
             await _ytDlp.EnsureFfmpegInstalledAsync();
 
-            foreach (VideoItem item in toDownload)
-            {
-                if (_cts.Token.IsCancellationRequested) break;
+            #region Version 1
 
-                item.Status = Strings.Downloading;
-                item.Progress = 0;
+            //foreach (VideoItem item in toDownload)
+            //{
+            //    if (_cts.Token.IsCancellationRequested) break;
 
-                var progress = new Progress<string>(line =>
-                {
-                    MainThread.BeginInvokeOnMainThread(() =>
-                    {
-                        if (line.StartsWith("⚠️"))
-                        {
-                            item.Status = line;
-                            return;
-                        }
+            //    item.Status = Strings.Downloading;
+            //    item.Progress = 0;
 
-                        item.Status = line;
+            //    var progress = new Progress<string>(line =>
+            //    {
+            //        MainThread.BeginInvokeOnMainThread(() =>
+            //        {
+            //            if (line.StartsWith("⚠️"))
+            //            {
+            //                item.Status = line;
+            //                return;
+            //            }
 
-                        // Actualizar también el progreso global si es un solo video
-                        if (!ShowVideoList) Status = line;
+            //            item.Status = line;
 
-                        if (line.Contains('%'))
-                        {
-                            var parts = line.Split('%')[0].Split(' ');
-                            if (double.TryParse(parts.Last(),
-                                System.Globalization.NumberStyles.Any,
-                                System.Globalization.CultureInfo.InvariantCulture,
-                                out double value))
-                            {
-                                item.Progress = value / 100.0;
-                                if (!ShowVideoList) Progress = item.Progress;
-                            }
-                        }
-                    });
-                });
+            //            // Actualizar también el progreso global si es un solo video
+            //            if (!ShowVideoList) Status = line;
 
-                try
-                {
-                    await _ytDlp.DownloadAsync(item.Url, settings.DownloadPath, SelectedFormat, progress, _cts.Token, SelectedFormatOption?.FormatId);
+            //            if (line.Contains('%'))
+            //            {
+            //                var parts = line.Split('%')[0].Split(' ');
+            //                if (double.TryParse(parts.Last(),
+            //                    System.Globalization.NumberStyles.Any,
+            //                    System.Globalization.CultureInfo.InvariantCulture,
+            //                    out double value))
+            //                {
+            //                    item.Progress = value / 100.0;
+            //                    if (!ShowVideoList) Progress = item.Progress;
+            //                }
+            //            }
+            //        });
+            //    });
 
-                    item.IsDownloaded = true;
-                    item.Progress = 1.0;
-                    item.Status = Strings.Done;
+            //    try
+            //    {
+            //        await _ytDlp.DownloadAsync(item.Url, settings.DownloadPath, SelectedFormat, progress, _cts.Token, SelectedFormatOption?.FormatId);
 
-                    #region
+            //        item.IsDownloaded = true;
+            //        item.Progress = 1.0;
+            //        item.Status = Strings.Done;
 
-                    await _history.AddAsync(new DownloadRecord
-                    {
-                        Title = item.Title,
-                        Url = item.Url,
-                        Channel = item.Channel,
-                        ThumbnailUrl = item.ThumbnailUrl,
-                        Format = SelectedFormat,
-                        DownloadPath = settings.DownloadPath,
-                        DownloadedAt = DateTime.Now,
-                        Success = true
-                    });
+            //        #region
 
-                    #endregion
+            //        await _history.AddAsync(new DownloadRecord
+            //        {
+            //            Title = item.Title,
+            //            Url = item.Url,
+            //            Channel = item.Channel,
+            //            ThumbnailUrl = item.ThumbnailUrl,
+            //            Format = SelectedFormat,
+            //            DownloadPath = settings.DownloadPath,
+            //            DownloadedAt = DateTime.Now,
+            //            Success = true
+            //        });
 
-                }
-                catch (OperationCanceledException)
-                {
-                    item.Status = Strings.Cancelled; break;
-                }
-                catch (Exception ex)
-                {
-                    item.Status = $"❌ {ex.Message}";
-                    await _history.AddAsync(new DownloadRecord
-                    {
-                        Title = item.Title,
-                        Url = item.Url,
-                        Format = SelectedFormat,
-                        DownloadedAt = DateTime.Now,
-                        Success = false
-                    });
-                }
-            }
+            //        #endregion
+
+            //    }
+            //    catch (OperationCanceledException)
+            //    {
+            //        item.Status = Strings.Cancelled; break;
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        item.Status = $"❌ {ex.Message}";
+            //        await _history.AddAsync(new DownloadRecord
+            //        {
+            //            Title = item.Title,
+            //            Url = item.Url,
+            //            Format = SelectedFormat,
+            //            DownloadedAt = DateTime.Now,
+            //            Success = false
+            //        });
+            //    }
+            //}
+            #endregion
+
+            #region Version 2
+
+            List<Task> tasks = toDownload.Select(item => DownloadItemAsync(item, settings, _cts.Token)).ToList();
+            await Task.WhenAll(tasks);
+
+            #endregion
 
             if (settings.OpenDownloads && !_cts.Token.IsCancellationRequested)
                 await OpenDownloads();
@@ -435,6 +449,99 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
         if (query.TryGetValue("url", out var url))
         {
             Url = Uri.UnescapeDataString(url.ToString() ?? string.Empty);
+        }
+    }
+
+    private async Task DownloadItemAsync(VideoItem item, AppSettings settings, CancellationToken token)
+    {
+        if (token.IsCancellationRequested) return;
+
+        // Mostrar estado de cola ANTES de esperar el semáforo
+        item.Status = "⏳ En cola...";
+        item.Progress = 0;
+
+        await _downloadSemaphore.WaitAsync(token);
+
+        try
+        {
+            if (token.IsCancellationRequested)
+            {
+                item.Status = Strings.Cancelled;
+                return;
+            }
+
+            // Ya tiene su slot — empieza la descarga real
+            item.Status = Strings.Downloading;
+
+            var progress = new Progress<string>(line =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    if (line.StartsWith("⚠️"))
+                    {
+                        item.Status = line;
+                        return;
+                    }
+
+                    item.Status = line;
+
+                    if (!ShowVideoList) Status = line;
+
+                    if (line.Contains('%'))
+                    {
+                        var parts = line.Split('%')[0].Split(' ');
+                        if (double.TryParse(parts.Last(),
+                            System.Globalization.NumberStyles.Any,
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            out double value))
+                        {
+                            item.Progress = value / 100.0;
+                            if (!ShowVideoList) Progress = item.Progress;
+                        }
+                    }
+                });
+            });
+
+            try
+            {
+                await _ytDlp.DownloadAsync(item.Url, settings.DownloadPath, SelectedFormat, progress, token, SelectedFormatOption?.FormatId);
+
+                item.IsDownloaded = true;
+                item.Progress = 1.0;
+                item.Status = Strings.Done;
+
+                await _history.AddAsync(new DownloadRecord
+                {
+                    Title = item.Title,
+                    Url = item.Url,
+                    Channel = item.Channel,
+                    ThumbnailUrl = item.ThumbnailUrl,
+                    Format = SelectedFormat,
+                    DownloadPath = settings.DownloadPath,
+                    DownloadedAt = DateTime.Now,
+                    Success = true
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                item.Status = Strings.Cancelled;
+            }
+            catch (Exception ex)
+            {
+                item.Status = $"❌ {ex.Message}";
+                await _history.AddAsync(new DownloadRecord
+                {
+                    Title = item.Title,
+                    Url = item.Url,
+                    Format = SelectedFormat,
+                    DownloadedAt = DateTime.Now,
+                    Success = false
+                });
+            }
+        }
+        finally
+        {
+            _downloadSemaphore.Release();
         }
     }
 

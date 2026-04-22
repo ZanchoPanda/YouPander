@@ -10,6 +10,7 @@ namespace YouPander.Services
     {
 
         private readonly SQLiteAsyncConnection _db;
+        private readonly SemaphoreSlim _lock = new(1, 1);
 
         public HistoryService()
         {
@@ -18,7 +19,18 @@ namespace YouPander.Services
             _db.CreateTableAsync<DownloadRecord>().Wait();
         }
 
-        public Task AddAsync(DownloadRecord record) => _db.InsertAsync(record);
+        public async Task AddAsync(DownloadRecord record)
+        {
+            await _lock.WaitAsync();
+            try
+            {
+                await _db.InsertAsync(record);
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        } 
 
         public Task<List<DownloadRecord>> GetAllAsync() => _db.Table<DownloadRecord>()
                                                                 .OrderByDescending(r => r.DownloadedAt)

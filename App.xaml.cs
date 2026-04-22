@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using YouPander.Models;
 using YouPander.Services;
 
 namespace YouPander
@@ -13,8 +14,8 @@ namespace YouPander
             _settingsService = new SettingsService();
 
             // Cargar idioma guardado
-            var setting = _settingsService.Load();
-            var lang = setting.Language;
+            AppSettings setting = _settingsService.Load();
+            string lang = setting.Language;
 
             if (string.IsNullOrEmpty(lang))
                 lang = "en";
@@ -22,11 +23,15 @@ namespace YouPander
             if (string.IsNullOrWhiteSpace(setting.DownloadPath))
             {
                 setting.DownloadPath = GetDownloadPath();
+                if (!Path.Exists(setting.DownloadPath))
+                {
+                    Directory.CreateDirectory(setting.DownloadPath);
+                }
             }
 
             // Aplicar idioma al iniciar la app
             LocalizationResourceManager.Instance.SetCulture(lang);
-
+            _settingsService.Save(setting);
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
@@ -55,22 +60,22 @@ namespace YouPander
 
         public static string GetDownloadPath()
         {
-            
-            #if ANDROID
-                return Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads).AbsolutePath;
+
+#if ANDROID
+            return Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads).AbsolutePath, AppInfo.Name);
 
 #elif IOS
-                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),AppInfo.Name);
 
 #elif WINDOWS
                 return Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    "Downloads");
+                    AppInfo.Name);
 
 #elif MACCATALYST
                 return Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    "Downloads");
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                    ,AppInfo.Name);
 
 #else
                 return FileSystem.AppDataDirectory;

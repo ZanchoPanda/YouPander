@@ -124,21 +124,49 @@ namespace YouPander.Services
         }
         #endregion
 
+        private readonly List<Process> _activeProcesses = new();
+        private readonly object _processLock = new();
+
         /// <summary>
         /// Mata el proceso en curso y limpia la referencia.
         /// </summary>
         public void KillCurrentProcess()
         {
-            try
+            #region Version 1
+
+            //try
+            //{
+            //    if (_currentProcess != null && !_currentProcess.HasExited)
+            //        _currentProcess.Kill(entireProcessTree: true);
+            //}
+            //catch { /* El proceso ya terminó */ }
+            //finally
+            //{
+            //    currentProcess = null;
+            //}
+
+            #endregion
+
+            #region  Version 2
+
+            lock (_processLock)
             {
-                if (_currentProcess != null && !_currentProcess.HasExited)
-                    _currentProcess.Kill(entireProcessTree: true);
+                foreach (var p in _activeProcesses)
+                {
+                    try
+                    {
+                        if (!p.HasExited)
+                        {
+                            p.Kill(entireProcessTree: true);
+                        }
+                    }
+                    catch { }
+                }
+                _activeProcesses.Clear();
             }
-            catch { /* El proceso ya terminó */ }
-            finally
-            {
-                currentProcess = null;
-            }
+
+            #endregion
+
         }
 
         public async Task DownloadAsync(string url, string output, string format, IProgress<string> progress, CancellationToken token, string? formatID = null)
@@ -162,6 +190,9 @@ namespace YouPander.Services
             };
 
             currentProcess = process;
+
+            process.Start();
+            lock (_processLock) _activeProcesses.Add(process);
 
             try
             {
@@ -187,9 +218,12 @@ namespace YouPander.Services
             }
             finally
             {
+                lock (_processLock) _activeProcesses.Remove(process);
                 currentProcess = null;
             }
         }
+
+
 
         // Consume el stream sin bloquearlo, opcionalmente loguea errores
         private async Task ConsumeStreamAsync(StreamReader reader, IProgress<string>? progress, CancellationToken token)
@@ -407,7 +441,13 @@ namespace YouPander.Services
             {
                 foreach (var entry in entries.EnumerateArray())
                 {
-                    results.Add(ParseEntry(entry));
+                    var info = ParseEntry(entry);
+
+                    // Saltar vídeos privados o sin URL
+                    if (string.IsNullOrWhiteSpace(info.Url)) continue;
+                    if (info.Title == "[Private video]" || info.Title == "[Deleted video]") continue;
+
+                    results.Add(info);
                 }
             }
             else
@@ -420,37 +460,50 @@ namespace YouPander.Services
 
         private static VideoInfo ParseEntry(JsonElement el)
         {
-            string Duration = el.TryGetProperty("duration", out var d) && d.TryGetDouble(out double seconds)
-                ? TimeSpan.FromSeconds(seconds).ToString(@"m\:ss")
-                : string.Empty;
-
-            string thumbnail = string.Empty;
-
-            if (el.TryGetProperty("thumbnails", out var thumbs) && thumbs.ValueKind == JsonValueKind.Array)
+            try
             {
-                thumbnail = thumbs.EnumerateArray().Where(t => t.TryGetProperty("url", out _))
-                    .OrderByDescending(t => t.TryGetProperty("width", out var w) ? w.GetInt32() : 0)
-                    .Select(t => t.GetProperty("url").GetString())
-                    .FirstOrDefault() ?? string.Empty;
+
+                string Duration = el.TryGetProperty("duration", out var d)
+                    && d.ValueKind == JsonValueKind.Number
+                    && d.TryGetDouble(out double seconds)
+                    ? TimeSpan.FromSeconds(seconds).ToString(@"m\:ss")
+                    : string.Empty;
+
+                string thumbnail = string.Empty;
+
+                if (el.TryGetProperty("thumbnails", out var thumbs) && thumbs.ValueKind == JsonValueKind.Array)
+                {
+                    thumbnail = thumbs.EnumerateArray()
+                        .Where(t => t.TryGetProperty("url", out _))
+                        .OrderByDescending(t => t.TryGetProperty("width", out var w) && w.ValueKind == JsonValueKind.Number
+                        ? w.GetInt32() : 0)
+                        .Select(t => t.GetProperty("url").GetString())
+                        .FirstOrDefault() ?? string.Empty;
+                }
+
+                var id = el.GetStringOrEmpty("id");
+
+                // Intentar obtener la URL por orden de prioridad
+                var url = !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("webpage_url")) ? el.GetStringOrEmpty("webpage_url") :
+                    !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("url")) ? el.GetStringOrEmpty("url") :
+                    !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("original_url")) ? el.GetStringOrEmpty("original_url") :
+                    BuildUrlFromId(el, id);
+
+                return new VideoInfo
+                {
+                    Id = id,
+                    Title = el.GetStringOrEmpty("title"),
+                    Channel = el.GetStringOrEmpty("channel") ?? el.GetStringOrEmpty("uploader"),
+                    Thumbnail = thumbnail,
+                    Url = url,
+                    Duration = Duration
+                };
             }
-
-            var id = el.GetStringOrEmpty("id");
-
-            // Intentar obtener la URL por orden de prioridad
-            var url = !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("webpage_url")) ? el.GetStringOrEmpty("webpage_url") :
-                !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("url")) ? el.GetStringOrEmpty("url") :
-                !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("original_url")) ? el.GetStringOrEmpty("original_url") :
-                BuildUrlFromId(el, id);
-
-            return new VideoInfo
+            catch (Exception ex)
             {
-                Id = id,
-                Title = el.GetStringOrEmpty("title"),
-                Channel = el.GetStringOrEmpty("channel") ?? el.GetStringOrEmpty("uploader"),
-                Thumbnail = thumbnail,
-                Url = url,
-                Duration = Duration
-            };
+                var aux = ex;
+                throw;
+            }
         }
 
         private static string BuildUrlFromId(JsonElement el, string id)
@@ -556,7 +609,7 @@ namespace YouPander.Services
         {
             string[] commonArgs =
             [
-                $"-o \"{output}/%(title)s.%(ext)s\"", 
+                $"-o \"{output}/%(title)s.%(ext)s\"",
                 $"--ffmpeg-location \"{_ffmpegPath}\"",
                 "--newline"
             ];

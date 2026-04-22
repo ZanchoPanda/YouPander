@@ -54,8 +54,8 @@ namespace YouPander.ViewModels
             await Shell.Current.GoToAsync("//MainPage");
 
             // TODO: Reinicio de app x si da mucho por saco lo del idioma
-            //Process.Start(Environment.ProcessPath!);
-            //Application.Current?.Quit();
+            Process.Start(Environment.ProcessPath!);
+            Application.Current?.Quit();
 
         }
 
@@ -63,7 +63,7 @@ namespace YouPander.ViewModels
         {
             try
             {
-                var result = await FolderPicker.Default.PickAsync(CancellationToken.None);
+                var result = await FolderPicker.Default.PickAsync(Settings.DownloadPath ,CancellationToken.None);
 
                 if (result.IsSuccessful)
                     Settings.DownloadPath = result.Folder.Path;
