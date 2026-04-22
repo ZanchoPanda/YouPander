@@ -42,9 +42,13 @@ The user is responsible for how they use the tool and for complying with YouTube
 
 ❤️ Support the Project
 
-If you like this application and want to support its development, you can make a donation:
+If you like this application and want to support its development, you can buy me a coffe:
 
-👉 PayPal: https://www.paypal.com/donate/?hosted_button_id=YOUR_ID_HERE
+<script src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script>
+<script>
+  kofiwidget2.init('Buy a Ko-fi', '#29abe0', 'zanchopanda');
+  kofiwidget2.draw();
+</script>
 
 (Replace the link with your actual PayPal donation link)
 
@@ -103,9 +107,13 @@ El usuario es responsable del uso que haga de la herramienta y del cumplimiento 
 
 ❤️ Apoya el proyecto
 
-Si te gusta esta aplicación y quieres apoyar su desarrollo, puedes hacer una donación:
+Si te gusta esta aplicación y quieres apoyar su desarrollo, puedes comprarme un café:
 
-👉 PayPal: https://www.paypal.com/donate/?hosted_button_id=TU_ID_AQUI
+<script src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script>
+<script>
+  kofiwidget2.init('Invítate a un Ko-fi', '#29abe0', 'zanchopanda');
+  kofiwidget2.draw();
+</script>
 
 (Sustituye el enlace por tu enlace real de PayPal)
 
