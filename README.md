@@ -44,13 +44,7 @@ The user is responsible for how they use the tool and for complying with YouTube
 
 If you like this application and want to support its development, you can buy me a coffe:
 
-<script src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script>
-<script>
-  kofiwidget2.init('Buy a Ko-fi', '#29abe0', 'zanchopanda');
-  kofiwidget2.draw();
-</script>
-
-(Replace the link with your actual PayPal donation link)
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
 
 📌 Future Improvements
 Multiplatform support (Android, macOS, etc.)
@@ -109,13 +103,7 @@ El usuario es responsable del uso que haga de la herramienta y del cumplimiento 
 
 Si te gusta esta aplicación y quieres apoyar su desarrollo, puedes comprarme un café:
 
-<script src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script>
-<script>
-  kofiwidget2.init('Invítate a un Ko-fi', '#29abe0', 'zanchopanda');
-  kofiwidget2.draw();
-</script>
-
-(Sustituye el enlace por tu enlace real de PayPal)
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
 
 📌 Futuras mejoras
 Soporte multiplataforma (Android, macOS, etc.)
