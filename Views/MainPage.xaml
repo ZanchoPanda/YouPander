@@ -118,15 +118,6 @@
                     WidthRequest="48" />
             </Grid>
 
-            <!--  Picker tipo  -->
-            <!--<Picker Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}" SelectedItem="{Binding SelectedFormat}">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>Audio</x:String>
-                        <x:String>Video</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>-->
             <Picker
                 Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}"
                 IsVisible="{Binding HasFormats, Converter={StaticResource InverseBoolConverter}}"

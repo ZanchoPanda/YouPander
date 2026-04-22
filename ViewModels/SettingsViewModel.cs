@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui.Storage;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using YouPander.Models;
 using YouPander.Services;
@@ -51,6 +52,11 @@ namespace YouPander.ViewModels
 
             ApplyTheme();
             await Shell.Current.GoToAsync("//MainPage");
+
+            // TODO: Reinicio de app x si da mucho por saco lo del idioma
+            //Process.Start(Environment.ProcessPath!);
+            //Application.Current?.Quit();
+
         }
 
         private async Task BrowseFolderAsync()
