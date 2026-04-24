@@ -266,7 +266,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
             AvailableFormats = new ObservableCollection<FormatOption>(formats);
             OnPropertyChanged(nameof(HasFormats));
 
-            SelectedFormatOption = AvailableFormats.FirstOrDefault(f => f.FormatId == "mp3");
+            SelectedFormatOption = AvailableFormats.FirstOrDefault();
             // No lanzar descarga automática, esperar a que el usuario elija formato
             //return;
             //}

@@ -22,40 +22,24 @@
         <Grid
             Grid.Row="0"
             Padding="8"
-            ColumnDefinitions="Auto,Auto,*,Auto"
+            ColumnDefinitions="Auto,*"
             ColumnSpacing="8">
 
             <Button
-                x:Name="BtnBack"
                 Grid.Column="0"
-                Clicked="OnBackClicked"
+                Clicked="OnReloadClicked"
                 HeightRequest="40"
-                Text="◀"
-                WidthRequest="40" />
-
-            <Button
-                x:Name="BtnForward"
-                Grid.Column="1"
-                Clicked="OnForwardClicked"
-                HeightRequest="40"
-                Text="▶"
+                Text="🔄"
                 WidthRequest="40" />
 
             <Label
                 x:Name="LblUrl"
-                Grid.Column="2"
+                Grid.Column="1"
                 FontSize="12"
                 HorizontalOptions="Fill"
                 LineBreakMode="TailTruncation"
                 TextColor="Gray"
                 VerticalOptions="Center" />
-
-            <Button
-                Grid.Column="3"
-                Clicked="OnReloadClicked"
-                HeightRequest="40"
-                Text="🔄"
-                WidthRequest="40" />
 
         </Grid>
 

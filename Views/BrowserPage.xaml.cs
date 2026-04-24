@@ -41,20 +41,6 @@ public partial class BrowserPage : ContentPage
         LblUrl.Text = e.Url;
 
         // Actualizar estado de los botones tras cada navegación
-        BtnBack.IsEnabled = WebViewControl.CanGoBack;
-        BtnForward.IsEnabled = WebViewControl.CanGoForward;
-    }
-
-    private void OnBackClicked(object sender, EventArgs e)
-    {
-        if (WebViewControl.CanGoBack)
-            WebViewControl.GoBack();
-    }
-
-    private void OnForwardClicked(object sender, EventArgs e)
-    {
-        if (WebViewControl.CanGoForward)
-            WebViewControl.GoForward();
     }
 
     private void OnReloadClicked(object sender, EventArgs e)

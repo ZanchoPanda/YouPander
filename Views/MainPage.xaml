@@ -118,7 +118,7 @@
                     WidthRequest="48" />
             </Grid>
 
-            <Picker
+            <!--<Picker
                 Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}"
                 IsVisible="{Binding HasFormats, Converter={StaticResource InverseBoolConverter}}"
                 SelectedItem="{Binding SelectedFormat}">
@@ -128,11 +128,11 @@
                         <x:String>Video</x:String>
                     </x:Array>
                 </Picker.ItemsSource>
-            </Picker>
+            </Picker>-->
 
             <Picker
                 Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}"
-                IsVisible="{Binding HasFormats}"
+                IsVisible="{Binding ShowVideoList}"
                 ItemDisplayBinding="{Binding Label}"
                 ItemsSource="{Binding AvailableFormats}"
                 SelectedItem="{Binding SelectedFormatOption}" />
