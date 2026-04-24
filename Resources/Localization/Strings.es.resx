@@ -186,6 +186,9 @@
   <data name="OpenDownloadFolder" xml:space="preserve">
     <value>¿Quiere abrir la carpeta de descargas?</value>
   </data>
+  <data name="Player" xml:space="preserve">
+    <value>Reproductor</value>
+  </data>
   <data name="PrincipalColorHex" xml:space="preserve">
     <value>Color principal (#HEX)</value>
   </data>

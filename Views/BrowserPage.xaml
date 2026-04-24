@@ -2,41 +2,62 @@
 <ContentPage
     x:Class="YouPander.Views.BrowserPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:Localization="clr-namespace:YouPander.Services">
+
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Fill">
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Text="{Binding Source={x:Static Localization:LocalizationResourceManager.Instance}, Path=[Player]}"
+                VerticalOptions="Center" />
+        </Grid>
+    </Shell.TitleView>
 
     <Grid RowDefinitions="Auto,*">
 
-        <HorizontalStackLayout
+        <Grid
             Grid.Row="0"
             Padding="8"
-            Spacing="8">
+            ColumnDefinitions="Auto,Auto,*,Auto"
+            ColumnSpacing="8">
+
             <Button
                 x:Name="BtnBack"
+                Grid.Column="0"
                 Clicked="OnBackClicked"
                 HeightRequest="40"
-                IsEnabled="False"
                 Text="◀"
                 WidthRequest="40" />
+
             <Button
                 x:Name="BtnForward"
+                Grid.Column="1"
                 Clicked="OnForwardClicked"
                 HeightRequest="40"
-                IsEnabled="False"
                 Text="▶"
                 WidthRequest="40" />
+
+            <Label
+                x:Name="LblUrl"
+                Grid.Column="2"
+                FontSize="12"
+                HorizontalOptions="Fill"
+                LineBreakMode="TailTruncation"
+                TextColor="Gray"
+                VerticalOptions="Center" />
+
             <Button
+                Grid.Column="3"
                 Clicked="OnReloadClicked"
                 HeightRequest="40"
                 Text="🔄"
                 WidthRequest="40" />
-            <Label
-                x:Name="LblUrl"
-                FontSize="11"
-                HorizontalOptions="FillAndExpand"
-                LineBreakMode="TailTruncation"
-                TextColor="Gray"
-                VerticalOptions="Center" />
-        </HorizontalStackLayout>
+
+        </Grid>
 
         <WebView
             x:Name="WebViewControl"

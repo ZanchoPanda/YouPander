@@ -611,7 +611,9 @@ namespace YouPander.Services
             [
                 $"-o \"{output}/%(title)s.%(ext)s\"",
                 $"--ffmpeg-location \"{_ffmpegPath}\"",
-                "--newline"
+                "--newline",
+                "--embed-metadata",
+                "--embed-thumbnail"
             ];
 
             string[] formatArgs;
@@ -623,8 +625,6 @@ namespace YouPander.Services
                     "-x",
                     "--audio-format mp3",
                     "--audio-quality 0",
-                    "--embed-metadata",
-                    "--embed-thumbnail"
                 ];
             }
             else if (!string.IsNullOrEmpty(formatId))
@@ -638,8 +638,6 @@ namespace YouPander.Services
                     "-x",
                     "--audio-format mp3",
                     "--audio-quality 0",
-                    "--embed-metadata",
-                    "--embed-thumbnail"
                 ];
             }
             else

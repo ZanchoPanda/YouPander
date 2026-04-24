@@ -1,4 +1,5 @@
 
+
 namespace YouPander.Views;
 
 [QueryProperty(nameof(Url), "url")]
@@ -21,7 +22,7 @@ public partial class BrowserPage : ContentPage
     {
         InitializeComponent();
     }
-
+    
     protected override void OnAppearing()
     {
         base.OnAppearing();
@@ -60,4 +61,20 @@ public partial class BrowserPage : ContentPage
     {
         WebViewControl.Reload();
     }
+
+    protected override bool OnBackButtonPressed()
+    {
+        if (WebViewControl.CanGoBack)
+        {
+            WebViewControl.GoBack();
+            return true;
+        }
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Shell.Current.GoToAsync("//MainPage");
+        });
+        return true;
+    }
+
 }

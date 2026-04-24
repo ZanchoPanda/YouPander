@@ -186,6 +186,9 @@
   <data name="OpenDownloadFolder" xml:space="preserve">
     <value>Do you wanna open download's folder?</value>
   </data>
+  <data name="Player" xml:space="preserve">
+    <value>Player</value>
+  </data>
   <data name="PrincipalColorHex" xml:space="preserve">
     <value>Principal color (#HEX)</value>
   </data>

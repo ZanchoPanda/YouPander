@@ -4,6 +4,7 @@ using YouPander.Models;
 using YouPander.Resources.Localization;
 using YouPander.Services;
 using YouPander.ViewModels;
+using YouPander.Views;
 
 public class MainViewModel : BaseViewModel, IQueryAttributable
 {
@@ -157,7 +158,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
         }
     }
 
-    public bool ShowVideoList => VideoItems.Count > 1;
+    public bool ShowVideoList => VideoItems.Count >= 1;
 
 
     // Campo - ajusta el número máximo de descargas simultáneas
@@ -216,7 +217,9 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
     {
         ErrorMessage = string.Empty;
         VideoItems.Clear();
+        IsSearching = true;
 
+        OnPropertyChanged(nameof(ShowVideoList)); OnPropertyChanged(nameof(IsSearching));
 
         if (string.IsNullOrWhiteSpace(Url)) return;
         if (!OperatingSystem.IsWindows() || _ytDlp == null)
@@ -257,16 +260,16 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
             //if (VideoItems.Count == 1)
             //    await Download();
 
-            if (VideoItems.Count == 1)
-            {
-                var formats = await _ytDlp.FetchFormatsAsync(Url, _cts.Token);
-                AvailableFormats = new ObservableCollection<FormatOption>(formats);
-                OnPropertyChanged(nameof(HasFormats));
+            //if (VideoItems.Count == 1)
+            //{
+            var formats = await _ytDlp.FetchFormatsAsync(Url, _cts.Token);
+            AvailableFormats = new ObservableCollection<FormatOption>(formats);
+            OnPropertyChanged(nameof(HasFormats));
 
-                SelectedFormatOption = AvailableFormats.FirstOrDefault(f => f.FormatId == "mp3");
-                // No lanzar descarga automática, esperar a que el usuario elija formato
-                return;
-            }
+            SelectedFormatOption = AvailableFormats.FirstOrDefault(f => f.FormatId == "mp3");
+            // No lanzar descarga automática, esperar a que el usuario elija formato
+            //return;
+            //}
 
         }
         catch (OperationCanceledException) { }
@@ -519,7 +522,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
                     Url = item.Url,
                     Channel = item.Channel,
                     ThumbnailUrl = item.ThumbnailUrl,
-                    Format = SelectedFormat,
+                    Format = SelectedFormatOption?.Label ?? string.Empty,
                     DownloadPath = settings.DownloadPath,
                     DownloadedAt = DateTime.Now,
                     Success = true
