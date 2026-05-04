@@ -191,7 +191,7 @@ namespace YouPander.Services
 
             currentProcess = process;
 
-            process.Start();
+            //process.Start();
             lock (_processLock) _activeProcesses.Add(process);
 
             try
@@ -291,125 +291,72 @@ namespace YouPander.Services
 
         public async Task<List<FormatOption>> FetchFormatsAsync(string url, CancellationToken ct = default)
         {
-            #region Version 1
+            #region Version 3
 
-            //var raw = await RunAndCaptureAsync($"--list-formats -J \"{url}\"", ct);
+            string args = IsPlaylist(url)
+                ? $"-J --playlist-items 1 \"{url}\""
+                : $"-J \"{url}\"";
 
-            //var jsonStart = raw.Split('\n').FirstOrDefault(l => l.TrimStart().StartsWith("{") || l.TrimStart().StartsWith("["));
+            var raw = await Task.Run(() => RunAndCaptureAsync(args, ct), ct);
 
-            //if (jsonStart == null) return new List<FormatOption>();
-
-            //var jsonOnly = raw.Substring(raw.IndexOf(jsonStart, StringComparison.Ordinal));
-
-            //using var doc = JsonDocument.Parse(jsonOnly);
-            //var root = doc.RootElement;
-
-            //if (!root.TryGetProperty("formats", out var formats))
-            //{
-            //    return new List<FormatOption>();
-            //}
-
-            //var bestByType = new Dictionary<string, FormatOption>();
-
-            //bestByType["audio_mp3"] = new FormatOption
-            //{
-            //    FormatId = "mp3",
-            //    Extension = "mp3",
-            //    IsVideo = false,
-            //    Abr = 320,
-            //    Label = "Audio MP3"
-            //};
-
-            //List<FormatOption> results = new List<FormatOption>();
-
-            //foreach (var f in formats.EnumerateArray())
-            //{
-            //    string vcodec = f.GetStringOrEmpty("vcodec") ?? "none";
-            //    string acodec = f.GetStringOrEmpty("acodec") ?? "none";
-            //    string ext = f.GetStringOrEmpty("ext") ?? "";
-            //    string fmtId = f.GetStringOrEmpty("format_id") ?? "";
-            //    var height = f.TryGetProperty("height", out var h) && h.ValueKind == JsonValueKind.Number ? h.GetInt32() : 0;
-            //    var filesize = f.TryGetProperty("filesize_approx", out var fs) && fs.ValueKind == JsonValueKind.Number ? fs.GetInt64() : 0L;
-
-            //    // Solo formatos con video O audio, ignorar storyboards etc.
-            //    if (vcodec == "none" && acodec == "none")
-            //    {
-            //        continue;
-            //    }
-            //    if (ext == "mhtml" || ext == "3gp" || ext == "flv")
-            //    {
-            //        continue;
-            //    }
-
-            //    var tbr = f.TryGetProperty("tbr", out var tb) && tb.ValueKind == JsonValueKind.Number ? tb.GetDouble() : 0;
-            //    var abr = f.TryGetProperty("abr", out var ab) && ab.ValueKind == JsonValueKind.Number ? ab.GetDouble() : 0;
-            //    var fps = f.TryGetProperty("fps", out var fp) && fp.ValueKind == JsonValueKind.Number ? fp.GetInt32() : 0;
-
-            //    bool isVideo = vcodec != "none" && height > 0;
-            //    bool isAudio = acodec != "none" && vcodec == "none";
-
-            //    if (!isVideo && !isAudio)
-            //    {
-            //        continue;
-            //    }
-            //    string key = isVideo ? $"video_{ext}" : $"audio_{ext}";
-
-            //    var candidate = new FormatOption
-            //    {
-            //        FormatId = fmtId,
-            //        Extension = ext,
-            //        ResolutionInt = height,
-            //        Fps = fps,
-            //        Tbr = tbr,
-            //        Abr = abr,
-            //        IsVideo = isVideo,
-            //        // Label legible para el Picker
-            //        Label = isVideo ? $"Video {ext.ToUpper()} — {height}p{(fps >= 60 ? $" {fps}fps" : "")}"
-            //                    : $"Audio {ext.ToUpper()} — ~{(int)abr}kbps"
-            //    };
-
-            //    // Reemplazar solo si el candidato es mejor
-            //    if (!bestByType.TryGetValue(key, out var current))
-            //    {
-            //        bestByType[key] = candidate;
-            //    }
-            //    else
-            //    {
-            //        bool isBetter = isVideo
-            //            ? (height > current.ResolutionInt || (height == current.ResolutionInt && tbr > current.Tbr))
-            //            : abr > current.Abr;
-
-            //        if (isBetter)
-            //            bestByType[key] = candidate;
-            //    }
-            //}
-
-            //return bestByType.Values
-            //    .OrderByDescending(f => f.IsVideo)
-            //    .ThenByDescending(f => f.ResolutionInt)
-            //    .ThenByDescending(f => f.Abr)
-            //    .ToList();
-            #endregion
-            #region Version 2
-
-            var raw = await RunAndCaptureAsync($"--list-formats -J \"{url}\"", ct);
-
-            var jsonStart = raw.Split('\n').FirstOrDefault(l => l.TrimStart().StartsWith("{") || l.TrimStart().StartsWith("["));
-
-            if (jsonStart == null) return new List<FormatOption>();
-
-            var jsonOnly = raw.Substring(raw.IndexOf(jsonStart, StringComparison.Ordinal));
-
-            using var doc = JsonDocument.Parse(jsonOnly);
-            var root = doc.RootElement;
-
-            if (!root.TryGetProperty("formats", out var formats))
+            int jsonIndex = FindJsonStart(raw);
+            if (jsonIndex < 0)
             {
                 return new List<FormatOption>();
             }
 
-            FormatOption bestVideo = null;
-            FormatOption bestAudio = null;
+            using var doc = JsonDocument.Parse(raw.AsMemory(jsonIndex));
+            var root = doc.RootElement;
+
+            JsonElement target = root;
+            if (root.TryGetProperty("entries", out var entries))
+            {
+                var first = entries.EnumerateArray().FirstOrDefault();
+                if (first.ValueKind == JsonValueKind.Undefined)
+                    return new List<FormatOption>();
+                target = first;
+            }
+
+            if (!target.TryGetProperty("formats", out var formats))
+                return new List<FormatOption>();
+
+            return ParseBestFormats(formats);
+
+            #endregion
+        }
+
+        private static bool IsPlaylist(string url) => 
+            url.Contains("list=", StringComparison.OrdinalIgnoreCase) ||
+            url.Contains("/playlist", StringComparison.OrdinalIgnoreCase);
+
+        private static int FindJsonStart(string raw)
+        {
+            int i = 0;
+            while (i < raw.Length)
+            {
+                int nl = raw.IndexOf('\n', i);
+                int end = nl < 0 ? raw.Length : nl;
+                var slice = raw.AsSpan(i, end - i).TrimStart();
+                if (slice.StartsWith("{") || slice.StartsWith("["))
+                    return i + (end - i - slice.Length); 
+                i = end + 1;
+            }
+            return -1;
+        }
+
+        private static List<FormatOption> ParseBestFormats(JsonElement formats)
+        {
+            FormatOption? bestVideo = null;
+            FormatOption? bestAudio = null;
+
+            bestAudio = new FormatOption
+            {
+                FormatId = "mp3",
+                Extension = "mp3",
+                IsVideo = false,
+                Abr = 320,
+                Label = "Audio MP3 — ~320kbps"
+            };
 
             foreach (var f in formats.EnumerateArray())
             {
@@ -418,20 +365,19 @@ namespace YouPander.Services
                 string ext = f.GetStringOrEmpty("ext") ?? "";
                 string fmtId = f.GetStringOrEmpty("format_id") ?? "";
 
-                // Ignorar basura
-                if ((vcodec == "none" && acodec == "none") || ext == "mhtml" || ext == "3gp" || ext == "flv")
+                if ((vcodec == "none" && acodec == "none")
+                    || ext is "mhtml" or "3gp" or "flv")
                     continue;
+
+                bool hasVideo = vcodec != "none";
+                bool hasAudio = acodec != "none";
 
                 var height = f.TryGetProperty("height", out var h) && h.ValueKind == JsonValueKind.Number ? h.GetInt32() : 0;
                 var tbr = f.TryGetProperty("tbr", out var tb) && tb.ValueKind == JsonValueKind.Number ? tb.GetDouble() : 0;
                 var abr = f.TryGetProperty("abr", out var ab) && ab.ValueKind == JsonValueKind.Number ? ab.GetDouble() : 0;
                 var fps = f.TryGetProperty("fps", out var fp) && fp.ValueKind == JsonValueKind.Number ? fp.GetInt32() : 0;
 
-
-                bool isVideo = vcodec != "none" && height > 0;
-                bool isAudio = acodec != "none" && vcodec == "none";
-
-                if (isVideo)
+                if (hasVideo && height > 0)
                 {
                     var candidate = new FormatOption
                     {
@@ -444,39 +390,19 @@ namespace YouPander.Services
                         Label = $"Video {ext.ToUpper()} — {height}p{(fps >= 60 ? $" {fps}fps" : "")}"
                     };
 
-                    if (bestVideo == null ||
-                        height > bestVideo.ResolutionInt ||
-                        (height == bestVideo.ResolutionInt && tbr > bestVideo.Tbr))
+                    if (bestVideo is null
+                        || height > bestVideo.ResolutionInt
+                        || (height == bestVideo.ResolutionInt && tbr > bestVideo.Tbr))
                     {
                         bestVideo = candidate;
-                    }
-                }
-                else if (isAudio)
-                {
-                    var candidate = new FormatOption
-                    {
-                        FormatId = fmtId,
-                        Extension = ext,
-                        Abr = abr,
-                        IsVideo = false,
-                        Label = $"Audio {ext.ToUpper()} — ~{(int)abr}kbps"
-                    };
-
-                    if (bestAudio == null || abr > bestAudio.Abr)
-                    {
-                        bestAudio = candidate;
                     }
                 }
             }
 
             var result = new List<FormatOption>();
-
             if (bestVideo != null) result.Add(bestVideo);
-            if (bestAudio != null) result.Add(bestAudio);
-
+            result.Add(bestAudio); 
             return result;
-
-            #endregion
         }
 
         #region Get Info from URL
@@ -490,7 +416,6 @@ namespace YouPander.Services
             if (jsonStart == null)
                 throw new Exception("yt-dlp no devolvió JSON válido.");
 
-            // Reconstruimos desde esa línea en adelante
             var jsonOnly = raw.Substring(raw.IndexOf(jsonStart, StringComparison.Ordinal));
 
             using var doc = JsonDocument.Parse(jsonOnly);
@@ -504,7 +429,6 @@ namespace YouPander.Services
                 {
                     var info = ParseEntry(entry);
 
-                    // Saltar vídeos privados o sin URL
                     if (string.IsNullOrWhiteSpace(info.Url)) continue;
                     if (info.Title == "[Private video]" || info.Title == "[Deleted video]") continue;
 
@@ -544,7 +468,6 @@ namespace YouPander.Services
 
                 var id = el.GetStringOrEmpty("id");
 
-                // Intentar obtener la URL por orden de prioridad
                 var url = !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("webpage_url")) ? el.GetStringOrEmpty("webpage_url") :
                     !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("url")) ? el.GetStringOrEmpty("url") :
                     !string.IsNullOrWhiteSpace(el.GetStringOrEmpty("original_url")) ? el.GetStringOrEmpty("original_url") :
@@ -572,7 +495,6 @@ namespace YouPander.Services
             if (string.IsNullOrEmpty(id))
                 return string.Empty;
 
-            // Detectar el extractor/plataforma para construir la URL correcta
             var extractor = el.GetStringOrEmpty("ie_key")
                          ?? el.GetStringOrEmpty("extractor")
                          ?? string.Empty;
@@ -580,9 +502,9 @@ namespace YouPander.Services
             return extractor?.ToLowerInvariant() switch
             {
                 "youtube" or "youtubetab" => $"https://www.youtube.com/watch?v={id}",
-                "soundcloud" => string.Empty, // SoundCloud no tiene URL predecible por ID
+                "soundcloud" => string.Empty, 
                 "twitch:vod" => $"https://www.twitch.tv/videos/{id}",
-                _ => $"https://www.youtube.com/watch?v={id}" // fallback razonable
+                _ => $"https://www.youtube.com/watch?v={id}" 
             };
         }
 
@@ -631,40 +553,40 @@ namespace YouPander.Services
 
         #region Args Constructor
 
-        private string[] BuildArguments(string url, string output, string format)
-        {
-            string[] commonArgs =
-            [
-                $"-o \"{output}/%(title)s.%(ext)s\"",
-                $"--ffmpeg-location \"{_ffmpegPath}\"",
-                "--newline"
-            ];
+        //private string[] BuildArguments(string url, string output, string format)
+        //{
+        //    string[] commonArgs =
+        //    [
+        //        $"-o \"{output}/%(title)s.%(ext)s\"",
+        //        $"--ffmpeg-location \"{_ffmpegPath}\"",
+        //        "--newline"
+        //    ];
 
-            string[] formatArgs;
+        //    string[] formatArgs;
 
-            if (format.Contains("Audio"))
-            {
-                formatArgs =
-                [
-                    "-x",
-                    "--audio-format mp3",
-                    "--audio-quality 0",
-                    "--embed-metadata",
-                    "--embed-thumbnail"
-                ];
-            }
-            else
-            {
-                formatArgs =
-                [
-                    "-f \"bestvideo+bestaudio/best\"",
-                    "--merge-output-format mkv",
-                ];
-            }
+        //    if (format.Contains("Audio"))
+        //    {
+        //        formatArgs =
+        //        [
+        //            "-x",
+        //            "--audio-format mp3",
+        //            "--audio-quality 0",
+        //            "--embed-metadata",
+        //            "--embed-thumbnail"
+        //        ];
+        //    }
+        //    else
+        //    {
+        //        formatArgs =
+        //        [
+        //            "-f \"bestvideo+bestaudio/best\"",
+        //            "--merge-output-format mkv",
+        //        ];
+        //    }
 
-            //Return the combined arguments with the URL at the end
-            return [.. commonArgs, .. formatArgs, url];
-        }
+        //    //Return the combined arguments with the URL at the end
+        //    return [.. commonArgs, .. formatArgs, url];
+        //}
 
         private string[] BuildArguments(string url, string output, string format, string? formatId = null)
         {
