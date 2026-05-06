@@ -6,6 +6,7 @@ using System.Net;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Text.Json;
+using System.Web;
 using YouPander.Models;
 using YouPander.Resources.Localization;
 using YouPander.ViewModels;
@@ -222,8 +223,33 @@ namespace YouPander.Services
                 currentProcess = null;
             }
         }
+        
+        public async Task DownloadAsync(string url, string output, string format, string? formatID = null)
+        {
+            string[] parts = BuildArguments(url, output, format, formatID);
+            string args = string.Join(" ", parts);
 
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = _path,
+                    Arguments = args,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
 
+            process.Start();
+
+            // Drenar stdout y stderr para evitar deadlock por buffer lleno
+            var stdoutTask = process.StandardOutput.ReadToEndAsync();
+            var stderrTask = process.StandardError.ReadToEndAsync();
+
+            await Task.WhenAll(stdoutTask, stderrTask, process.WaitForExitAsync());
+        }
 
         // Consume el stream sin bloquearlo, opcionalmente loguea errores
         private async Task ConsumeStreamAsync(StreamReader reader, IProgress<string>? progress, CancellationToken token)
@@ -404,6 +430,42 @@ namespace YouPander.Services
             result.Add(bestAudio); 
             return result;
         }
+
+        #region Clean URL (no list/playlists)
+
+        public string CleanYouTubeUrl(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return url;
+
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                return url;
+
+            var query = HttpUtility.ParseQueryString(uri.Query);
+
+            // Parámetros que queremos eliminar
+            string[] keysToRemove = { "list", "index", "start_radio", "pp" };
+
+            foreach (var key in keysToRemove)
+            {
+                query.Remove(key);
+            }
+
+            // Reconstruir query limpia
+            var newQuery = string.Join("&",
+                query.AllKeys
+                     .Where(k => !string.IsNullOrEmpty(k))
+                     .Select(k => $"{k}={query[k]}"));
+
+            var uriBuilder = new UriBuilder(uri)
+            {
+                Query = newQuery
+            };
+
+            return uriBuilder.Uri.ToString();
+        }
+
+        #endregion
 
         #region Get Info from URL
 

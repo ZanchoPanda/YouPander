@@ -198,7 +198,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
 
     public MainViewModel(SettingsService settings, HistoryService history, YtDlpService? ytDlp = null)
     {
-        _settings = settings;
+        _settings = new SettingsService();
         _history = history;
         _ytDlp = OperatingSystem.IsWindows() ? ytDlp : null;
 
@@ -425,7 +425,22 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
 
         try
         {
-            await Launcher.OpenAsync(settings.DownloadPath);
+            string FinalDownloadPath = settings.DownloadPath;
+            if (settings.AdvancedConfig)
+            {
+                if ((SelectedFormatOption?.IsVideo ?? false) && !string.IsNullOrWhiteSpace(settings.VideoDownloadPath))
+                {
+                    Directory.CreateDirectory(settings.VideoDownloadPath);
+                    FinalDownloadPath = settings.VideoDownloadPath;
+                }
+                else if (!string.IsNullOrWhiteSpace(settings.AudioDownloadPath))
+                {
+                    Directory.CreateDirectory(settings.AudioDownloadPath);
+                    FinalDownloadPath = settings.AudioDownloadPath;
+                }
+            }
+
+            await Launcher.OpenAsync(FinalDownloadPath);
         }
         catch (Exception ex)
         {
@@ -510,7 +525,22 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
 
             try
             {
-                await _ytDlp.DownloadAsync(item.Url, settings.DownloadPath, SelectedFormat, progress, token, SelectedFormatOption?.FormatId);
+                string FinalDownloadPath = settings.DownloadPath;
+                if (settings.AdvancedConfig)
+                {
+                    if ((SelectedFormatOption?.IsVideo ?? false) && !string.IsNullOrWhiteSpace(settings.VideoDownloadPath))
+                    {
+                        Directory.CreateDirectory(settings.VideoDownloadPath);
+                        FinalDownloadPath = settings.VideoDownloadPath;
+                    }
+                    else if (!string.IsNullOrWhiteSpace(settings.AudioDownloadPath))
+                    {
+                        Directory.CreateDirectory(settings.AudioDownloadPath);
+                        FinalDownloadPath = settings.AudioDownloadPath;
+                    }
+                }
+
+                await _ytDlp.DownloadAsync(item.Url, FinalDownloadPath, SelectedFormat, progress, token, SelectedFormatOption?.FormatId);
 
                 item.IsDownloaded = true;
                 item.Progress = 1.0;
@@ -523,7 +553,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
                     Channel = item.Channel,
                     ThumbnailUrl = item.ThumbnailUrl,
                     Format = SelectedFormatOption?.Label ?? string.Empty,
-                    DownloadPath = settings.DownloadPath,
+                    DownloadPath = FinalDownloadPath,
                     DownloadedAt = DateTime.Now,
                     Success = true
                 });

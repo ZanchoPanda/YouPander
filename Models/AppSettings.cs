@@ -96,9 +96,64 @@ namespace YouPander.Models
         #region Ventana
         public double WindowWidth { get; set; } = 0;
         public double WindowHeight { get; set; } = 0;
-        #endregion
+		#endregion
 
-        public AppSettings()
+		private bool _AdvancedConfig;
+		public bool AdvancedConfig
+		{
+			get
+			{
+				return _AdvancedConfig;
+			}
+			set
+			{
+				if (value != _AdvancedConfig)
+				{
+					_AdvancedConfig = value;
+					OnPropertyChanged("AdvancedConfig");
+				}
+			}
+		}
+
+		#region Advanced Settings
+
+		private string _AudioDownloadPath;
+		public string AudioDownloadPath
+		{
+			get
+			{
+				return _AudioDownloadPath;
+			}
+			set
+			{
+				if (value != _AudioDownloadPath)
+				{
+					_AudioDownloadPath = value;
+					OnPropertyChanged("AudioDownloadPath");
+				}
+			}
+		}
+
+		private string _VideoDownloadPath;
+		public string VideoDownloadPath
+		{
+			get
+			{
+				return _VideoDownloadPath;
+			}
+			set
+			{
+				if (value != _VideoDownloadPath)
+				{
+					_VideoDownloadPath = value;
+					OnPropertyChanged("VideoDownloadPath");
+				}
+			}
+		}
+
+		#endregion
+
+		public AppSettings()
         {
             DownloadPath = FileSystem.AppDataDirectory;
             Language = "en";

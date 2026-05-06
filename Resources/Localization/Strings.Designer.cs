@@ -61,6 +61,33 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Activate Advanced Config.
+        /// </summary>
+        internal static string ActivateAdvancedConfig {
+            get {
+                return ResourceManager.GetString("ActivateAdvancedConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Advanced Config.
+        /// </summary>
+        internal static string AdvancedConfig {
+            get {
+                return ResourceManager.GetString("AdvancedConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Audio Download Path.
+        /// </summary>
+        internal static string AudioDownloadPath {
+            get {
+                return ResourceManager.GetString("AudioDownloadPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Cancel.
         /// </summary>
         internal static string Cancel {
@@ -327,6 +354,15 @@ namespace YouPander.Resources.Localization {
         internal static string URLToDownload {
             get {
                 return ResourceManager.GetString("URLToDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Video Download Path.
+        /// </summary>
+        internal static string VideoDownloadPath {
+            get {
+                return ResourceManager.GetString("VideoDownloadPath", resourceCulture);
             }
         }
         

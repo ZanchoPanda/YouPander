@@ -22,7 +22,7 @@
         <Grid
             Grid.Row="0"
             Padding="8"
-            ColumnDefinitions="Auto,*"
+            ColumnDefinitions="Auto,*, Auto"
             ColumnSpacing="8">
 
             <Button
@@ -41,13 +41,21 @@
                 TextColor="Gray"
                 VerticalOptions="Center" />
 
+            <Button
+                Grid.Column="2"
+                Clicked="OnDownloadClicked"
+                HeightRequest="40"
+                IsEnabled="{Binding IsDownloading, Mode=TwoWay, Converter={StaticResource InverseBoolConverter}}"
+                Text="⤵️"
+                WidthRequest="40" />
+
         </Grid>
 
-        <WebView
-            x:Name="WebViewControl"
-            Grid.Row="1"
+        <WebView x:Name="WebViewControl" Grid.Row="1" />
+        <!--
+            Navigating="OnNavigating"
             Navigated="OnNavigated"
-            Navigating="OnNavigating" />
+        -->
 
     </Grid>
 </ContentPage>
