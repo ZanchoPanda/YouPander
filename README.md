@@ -82,6 +82,13 @@ If you enjoy YouPander and would like to support its development, you can buy me
 
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
 
+<p align="center">
+  <a href="https://ko-fi.com/zanchopanda" target="_blank">
+    <img width="500" alt="DigiviceKofi" src="https://github.com/user-attachments/assets/8199d3d7-30c7-4d1e-88aa-01c4efd2df49" />
+  </a>
+</p>
+
+[![Keep me debugging at 3AM](https://img.shields.io/badge/Keep_me_debugging_at_3AM-111111?style=for-the-badge&logo=github&logoColor=white)](https://ko-fi.com/zanchopanda)
 
 ⚠️ Legal Notice
 
@@ -179,6 +186,14 @@ Si quieres reportar un bug, proponer una mejora o enviar un pull request, abre u
 Si te gusta YouPander y quieres apoyar su desarrollo, puedes invitarme a un café:
 
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
+
+<p align="center">
+  <a href="https://ko-fi.com/zanchopanda" target="_blank">
+    <img width="500" alt="DigiviceKofi" src="https://github.com/user-attachments/assets/8199d3d7-30c7-4d1e-88aa-01c4efd2df49" />
+  </a>
+</p>
+
+[![Mantenme hasta las 3AM](https://img.shields.io/badge/Keep_me_debugging_at_3AM-111111?style=for-the-badge&logo=github&logoColor=white)](https://ko-fi.com/zanchopanda)
 
 ⚠️ Aviso legal
 
