@@ -1,115 +1,189 @@
-🎬 YouPander - .NET MAUI
+🚀 What is YouPander?
 
-Application developed in .NET MAUI that allows you to browse YouTube, watch content, and download videos by selecting the desired quality, all from a simple and intuitive interface.
+YouPander is an application built with .NET MAUI that combines an integrated browser with a powerful download system powered by yt-dlp and ffmpeg.
 
-⚠️ Personal project developed solo in my free time.
+It allows you to browse YouTube, watch content, and download videos or audio with format and quality selection, all from a simple, fast, and ad-free interface.
 
-🚀 Main Features
-📺 Built-in Browser
-Integrated web browser within the application.
-Allows you to browse YouTube without leaving the app.
-Includes an ad blocker for a cleaner and smoother experience.
-Ability to watch videos before downloading them.
-⬇️ Video Downloading
-Download videos directly from YouTube.
-Choose the video quality before starting the download.
-Simple and fast process.
-🕘 Download History
-Record of previously downloaded videos.
-Quick access to your recent activity.
-⚙️ Settings
-Simple and intuitive settings panel.
-Basic options to customize the user experience.
+The application automatically manages the required dependencies on Windows, providing a ready-to-use experience without complex configuration.
+
+    ⚠️ Personal project developed independently during my free time with the goal of learning, improving my skills, and creating a useful tool.
+
+✨ Main Features
+
+📺 YouTube Browser with Ad-Block
+- Built-in web browser inside the application
+- Smooth browsing experience without leaving the app
+- Integrated ad blocker
+
+⬇️ Video & Audio Downloads
+- Download content from YouTube and yt-dlp compatible platforms
+- Download as video or extract audio
+- Select quality and format before downloading
+- Playlist support
+- Simultaneous downloads with individual progress tracking
+- Real-time download cancellation
+
+🕘 History & Management
+- Complete download history storage
+- Quick retry for previous downloads
+- Simple management of download history and recent activity
+
+🎨 Customization
+- Light and dark themes
+- Advanced folder configuration
+- Automatic opening of the download folder
+
 🌍 Multilanguage Support
-Available in:
-🇪🇸 Spanish (Spain)
-🇬🇧 English
-💻 Platform
 
-Currently, the application:
+Currently available in:
+- 🇪🇸 Spanish
+- 🇬🇧 English
 
-✔️ Works on Windows
-🔧 Planned to be adapted for other operating systems in the future (thanks to .NET MAUI)
-🧑‍💻 About the Project
+💻 Supported Platforms
 
-This is an independent project, developed by a single person in their free time.
-The goal is to learn, improve skills, and build a useful tool.
+- ✅ Full Support	✅ -----> Window 10/11
+- ⚠️ Coming Soon	✅ -----> Android, iOS, macOS (Catalyst)
 
-⚠️ Legal Notice
+**Currently**, full download functionality is only available on Windows due to native process restrictions on other platforms.
 
-This application is intended for personal use only.
-The user is responsible for how they use the tool and for complying with YouTube’s terms of service.
+🛠️ Technologies Used
+
+- .NET MAUI 10 — Cross-platform application framework
+- yt-dlp — Download engine
+- ffmpeg — Multimedia conversion and processing
+- SQLite — Local download history
+- CommunityToolkit.Maui — Additional components and utilities
+- MVVM Architecture
+
+⚙️ Configuration
+
+From the settings panel, you can configure:
+
+- Download folder
+- Separate folders for audio and video
+- Application language
+- Visual theme
+- Automatic folder opening after downloads finish
+
+📌 Future Improvements
+- Full cross-platform support
+- Performance improvements
+- Advanced download management
+- More customization options (theme selector, colors, etc.)
+- New multimedia formats and tools
 
 ❤️ Support the Project
 
-If you like this application and want to support its development, you can buy me a coffe:
+Contributions are welcome.
 
+If you'd like to report a bug, suggest an improvement, or submit a pull request, please open an issue first to discuss it.
+
+If you enjoy YouPander and would like to support its development, you can buy me a coffee:
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
 
-📌 Future Improvements
-Multiplatform support (Android, macOS, etc.)
-Improved download performance
-More configuration options
-Advanced download management
+⚠️ Legal Notice
+
+This application is intended for personal and educational use only.
+
+The user is responsible for how they use the tool and for complying with the terms of service and policies of the platforms from which content is downloaded.
+
+YouPander uses yt-dlp as its download engine. Make sure you have the right to download the content before using the application.
+
+
 📄 License
 
-This project does not yet have a defined license.
+This project is licensed under the MIT License. See the LICENSE file for more information.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-🎬 YouPander - .NET MAUI
+🚀 ¿Qué es YouPander?
 
-Aplicación desarrollada en .NET MAUI que permite navegar por YouTube, visualizar contenido y descargar vídeos seleccionando la calidad deseada, todo desde una interfaz sencilla e intuitiva.
+YouPander es una aplicación desarrollada en .NET MAUI que combina un navegador integrado con un potente sistema de descargas basado en yt-dlp y ffmpeg.
 
-⚠️ Proyecto personal desarrollado en solitario durante mi tiempo libre.
+Permite navegar por YouTube, visualizar contenido y descargar vídeos o audio con selección de formato y calidad, todo desde una interfaz sencilla, rápida y sin anuncios.
 
-🚀 Características principales
-📺 Navegador integrado
-Navegador web incorporado dentro de la aplicación.
-Permite explorar YouTube sin salir de la app.
-Incluye bloqueador de anuncios para una experiencia más limpia y fluida.
-Posibilidad de visualizar vídeos antes de descargarlos.
-⬇️ Descarga de vídeos
-Descarga vídeos directamente desde YouTube.
-Selección de calidad de vídeo antes de iniciar la descarga.
-Proceso simple y rápido.
-🕘 Historial de descargas
-Registro de vídeos descargados previamente.
-Acceso rápido a tu actividad reciente.
+La aplicación gestiona automáticamente las dependencias necesarias en Windows, ofreciendo una experiencia lista para usar sin configuraciones complejas.
+
+    ⚠️ Proyecto personal desarrollado en solitario durante mi tiempo libre con el objetivo de aprender, mejorar habilidades y crear una herramienta útil.
+
+✨ Características principales
+
+📺 Navegador Youtube con ad-block
+- Navegador web incorporado dentro de la aplicación
+- Navegación fluida sin salir de la app
+- Bloqueador de anuncios integrado
+
+⬇️ Descarga de vídeos y audio
+- Descarga contenido desde YouTube y plataformas compatibles con yt-dlp
+- Descarga en formato vídeo o extracción de audio
+- Selección de calidad y formato antes de descargar
+- Compatibilidad con playlists
+- Descargas simultáneas con progreso individual
+- Cancelación de descargas en tiempo real
+
+🕘 Historial y gestión
+- Historial completo de descargas almacenado
+- Reintento rápido de descargas anteriores
+- Gestión sencilla del historial y actividad reciente
+
+🎨 Personalización
+- Temas claro y oscuro
+- Configuración avanzada de carpetas
+- Apertura automática de la carpeta de descarga
+
+🌍 Multiidioma
+
+Disponible actualmente en:
+- 🇪🇸 Español
+- 🇬🇧 Inglés
+
+💻 Plataformas compatibles
+- ✅ Full Support	✅ -----> Window 10/11
+- ⚠️ Próximamente	✅ -----> Android, iOS, macOS (Catalyst)
+
+**Actualmente**, la funcionalidad completa de descarga está disponible únicamente en Windows debido a restricciones de procesos nativos en otras plataformas.
+
+🛠️ Tecnologías utilizadas
+- .NET MAUI 10 — Aplicación multiplataforma
+- yt-dlp — Motor de descarga
+- ffmpeg — Conversión y procesamiento multimedia
+- SQLite — Historial local de descargas
+- CommunityToolkit.Maui — Componentes y utilidades adicionales
+- Arquitectura MVVM
+
 ⚙️ Configuración
-Panel de configuración sencillo e intuitivo.
-Opciones básicas para personalizar la experiencia de uso.
-🌍 Soporte multidioma
-Disponible en:
-🇪🇸 Español (España)
-🇬🇧 Inglés
-💻 Plataforma
 
-Actualmente, la aplicación:
+Desde el panel de ajustes puedes configurar:
+- Carpeta de descargas
+- Carpetas separadas para audio y vídeo
+- Idioma de la aplicación
+- Tema visual
+- Apertura automática de carpetas tras finalizar una descarga
 
-✔️ Funciona en Windows
-🔧 Está en desarrollo para ser compatible con otros sistemas operativos en el futuro (gracias a .NET MAUI)
-🧑‍💻 Sobre el proyecto
+📌 Futuras mejoras
 
-Este es un proyecto independiente, desarrollado por una sola persona en su tiempo libre.
-El objetivo es aprender, mejorar habilidades y crear una herramienta útil.
-
-⚠️ Aviso legal
-
-Esta aplicación está pensada únicamente para uso personal.
-El usuario es responsable del uso que haga de la herramienta y del cumplimiento de las políticas y términos de servicio de YouTube.
+- Soporte multiplataforma completo
+- Mejoras de rendimiento
+- Gestión avanzada de descargas
+- Más opciones de personalización (Selector de tema, color, etc)
+- Nuevos formatos y herramientas multimedia
 
 ❤️ Apoya el proyecto
 
-Si te gusta esta aplicación y quieres apoyar su desarrollo, puedes comprarme un café:
+Las contribuciones son bienvenidas.
 
+Si quieres reportar un bug, proponer una mejora o enviar un pull request, abre un issue primero para discutirlo.
+
+Si te gusta YouPander y quieres apoyar su desarrollo, puedes invitarme a un café:
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
 
-📌 Futuras mejoras
-Soporte multiplataforma (Android, macOS, etc.)
-Mejoras en el rendimiento de descarga
-Más opciones de configuración
-Gestión avanzada de descargas
+⚠️ Aviso legal
+
+Esta aplicación está pensada únicamente para uso personal y educativo.
+El usuario es responsable del uso que haga de la herramienta y del cumplimiento de los términos de servicio y políticas de las plataformas desde las que descargue contenido.
+
+YouPander utiliza yt-dlp como motor de descarga. Asegúrate de tener derecho a descargar el contenido antes de utilizar la aplicación.
+
 📄 Licencia
 
-Este proyecto aún no tiene una licencia definida.
+Este proyecto está bajo licencia MIT. Consulta el archivo LICENSE para más información.
