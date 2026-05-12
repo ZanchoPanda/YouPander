@@ -79,7 +79,9 @@ Contributions are welcome.
 If you'd like to report a bug, suggest an improvement, or submit a pull request, please open an issue first to discuss it.
 
 If you enjoy YouPander and would like to support its development, you can buy me a coffee:
+
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
+
 
 ⚠️ Legal Notice
 
@@ -175,6 +177,7 @@ Las contribuciones son bienvenidas.
 Si quieres reportar un bug, proponer una mejora o enviar un pull request, abre un issue primero para discutirlo.
 
 Si te gusta YouPander y quieres apoyar su desarrollo, puedes invitarme a un café:
+
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
 
 ⚠️ Aviso legal
