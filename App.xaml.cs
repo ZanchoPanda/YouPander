@@ -10,6 +10,17 @@ namespace YouPander
 
         public App()
         {
+
+#if WINDOWS
+    var userDataFolder = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "YouPander",
+        "WebView2Cache"
+    );
+    Directory.CreateDirectory(userDataFolder);
+    Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", userDataFolder);
+#endif
+
             InitializeComponent();
             _settingsService = new SettingsService();
 

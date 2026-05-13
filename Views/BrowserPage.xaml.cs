@@ -25,12 +25,20 @@ public partial class BrowserPage : ContentPage
         {
             _url = Uri.UnescapeDataString(value ?? string.Empty);
             OnPropertyChanged();
-            // Cargar la URL cuando el control esté listo
-            if (WebViewControl != null && WebViewControl.Source is UrlWebViewSource current
-            && current.Url != _url)
-            {
-                WebViewControl.Source = new UrlWebViewSource { Url = _url };
-            }
+
+            #region V1
+
+            //// Cargar la URL cuando el control esté listo
+            //if (WebViewControl != null && WebViewControl.Source is UrlWebViewSource current
+            //&& current.Url != _url)
+            //{
+            //    WebViewControl.Source = new UrlWebViewSource { Url = _url };
+            //}
+            #endregion
+
+            #region V2
+            MainThread.BeginInvokeOnMainThread(() => CargarUrl(_url));
+            #endregion
         }
     }
 
@@ -91,28 +99,175 @@ public partial class BrowserPage : ContentPage
         #endregion
 
         #region Version 2
-        base.OnAppearing();
-        if (!string.IsNullOrEmpty(_url))
-            WebViewControl.Source = new UrlWebViewSource { Url = _url };
+        //base.OnAppearing();
+        //if (!string.IsNullOrEmpty(_url))
+        //    WebViewControl.Source = new UrlWebViewSource { Url = _url };
 
-        _tracker = new WebViewUrlTracker(WebViewControl, url =>
+        //_tracker = new WebViewUrlTracker(WebViewControl, url =>
+        //{
+        //    _url = url;
+        //    LblUrl.Text = url;
+        //});
+        //_tracker.Start();
+        #endregion
+
+        #region V3
+        base.OnAppearing();
+
+        if (WebViewControl.Handler != null)
         {
-            _url = url;
-            LblUrl.Text = url;
-        });
-        _tracker.Start();
+            InicializarWebView();
+        }
+        else
+        {
+            WebViewControl.HandlerChanged += OnHandlerReady;
+        }
         #endregion
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        WebViewControl.HandlerChanged -= OnHandlerReady;
         _tracker?.Dispose();
     }
 
-    private void OnReloadClicked(object sender, EventArgs e)
+    private void OnHandlerReady(object? sender, EventArgs e)
     {
-        WebViewControl.Reload();
+        WebViewControl.HandlerChanged -= OnHandlerReady;
+        InicializarWebView();
+    }
+
+    private async void InicializarWebView()
+    {
+        #region Version log
+        string logPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "YouPander", "webview_log.txt"
+    );
+
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
+            File.WriteAllText(logPath, $"[{DateTime.Now}] Iniciando\n");
+
+#if WINDOWS
+        var platformView = WebViewControl.Handler?.PlatformView
+            as Microsoft.Maui.Platform.MauiWebView;
+        File.AppendAllText(logPath, $"MauiWebView null: {platformView == null}\n");
+
+        if (platformView != null)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+    platformView.CoreWebView2Initialized += (s, e) =>
+    {
+        File.AppendAllText(logPath, $"CoreWebView2Initialized disparado. Error: {e.Exception?.Message ?? "ninguno"}\n");
+        if (e.Exception != null)
+            tcs.TrySetException(e.Exception);
+        else
+            tcs.TrySetResult(true);
+    };
+
+    File.AppendAllText(logPath, "Estableciendo Source para forzar inicialización...\n");
+    platformView.Source = new Uri("about:blank");
+
+    File.AppendAllText(logPath, "Esperando CoreWebView2Initialized...\n");
+    var completado = await Task.WhenAny(tcs.Task, Task.Delay(5000));
+
+    if (completado == tcs.Task && tcs.Task.Result)
+        File.AppendAllText(logPath, "CoreWebView2 inicializado OK\n");
+    else
+        File.AppendAllText(logPath, "Timeout esperando CoreWebView2\n");
+        }
+#endif
+            File.AppendAllText(logPath, "Esperando 500ms antes de cargar URL...\n");
+            await Task.Delay(500);
+
+            File.AppendAllText(logPath, "Llamando CargarUrl...\n");
+            CargarUrl(_url);
+            File.AppendAllText(logPath, "CargarUrl OK\n");
+
+            _tracker?.Dispose();
+            _tracker = new WebViewUrlTracker(WebViewControl, url =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    _url = url;
+                    LblUrl.Text = url;
+                });
+            });
+            _tracker.Start();
+            File.AppendAllText(logPath, "Tracker OK\n");
+        }
+        catch (Exception ex)
+        {
+            File.AppendAllText(logPath, $"ERROR: {ex.GetType().Name}\n");
+            File.AppendAllText(logPath, $"Mensaje: {ex.Message}\n");
+            File.AppendAllText(logPath, $"StackTrace: {ex.StackTrace}\n");
+            await DisplayAlert("Error WebView", ex.Message, "OK");
+        }
+        #endregion
+
+        #region Version 
+
+        //try
+        //{
+        //    // Forzar inicialización del CoreWebView2 antes de cargar URL
+        //    await WebViewControl.EvaluateJavaScriptAsync("1");
+        //}
+        //catch { }
+
+        //try
+        //{
+        //    CargarUrl(_url);
+
+        //    _tracker?.Dispose();
+        //    _tracker = new WebViewUrlTracker(WebViewControl, url =>
+        //    {
+        //        MainThread.BeginInvokeOnMainThread(() =>
+        //        {
+        //            _url = url;
+        //            LblUrl.Text = url;
+        //        });
+        //    });
+        //    _tracker.Start();
+        //}
+        //catch (Exception ex)
+        //{
+        //    MainThread.BeginInvokeOnMainThread(async () =>
+        //        await DisplayAlert("Error WebView", ex.Message, "OK"));
+        //}
+        #endregion
+    }
+
+    private void CargarUrl(string url)
+    {
+        if (string.IsNullOrEmpty(url)) return;
+        if (WebViewControl == null) return;
+
+        // Eliminada la comprobación de URL igual para forzar siempre la carga
+        WebViewControl.Source = new UrlWebViewSource { Url = url };
+
+        if (LblUrl != null)
+        {
+            LblUrl.Text = url;
+        }
+    }
+
+    private async void OnReloadClicked(object sender, EventArgs e)
+    {
+        if (WebViewControl?.Handler?.PlatformView == null) return;
+
+        try
+        {
+            await WebViewControl.EvaluateJavaScriptAsync("1");
+            WebViewControl.Reload();
+        }
+        catch (Exception ex)
+        {
+            DisplayAlert("Error", $"No se pudo recargar: {ex.Message}", "OK");
+        }
     }
 
     protected override bool OnBackButtonPressed()
