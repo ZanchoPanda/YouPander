@@ -18,6 +18,8 @@ namespace YouPander.Services
     {
         #region Params
 
+        public string InstalledVersion => Preferences.Get("ytdlp_version", "Desconocida");
+
         private readonly string _path;
         private readonly string _ffmpegPath;
 
@@ -53,22 +55,58 @@ namespace YouPander.Services
         /// </summary>
         public async Task EnsureInstalledAsync()
         {
+            #region V1
+            //if (File.Exists(_path))
+            //    return;
+
+            //string url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
+            //string? dir = Path.GetDirectoryName(_path);
+
+            //if (!string.IsNullOrEmpty(dir))
+            //    Directory.CreateDirectory(dir);
+
+            //using HttpClient client = new HttpClient();
+            //using HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            //response.EnsureSuccessStatusCode();
+
+            //using Stream stream = await response.Content.ReadAsStreamAsync();
+            //using var fs = new FileStream(_path, FileMode.Create, FileAccess.Write, FileShare.None);
+            //await stream.CopyToAsync(fs);
+            #endregion
+
+            #region V2
             if (File.Exists(_path))
+            {
                 return;
+            }
+
+            string? dir = Path.GetDirectoryName(_path);
+            if (!string.IsNullOrEmpty(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            // Obtener la última versión disponible
+            using HttpClient client = new();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("YouPander/1.0");
+
+            var json = await client.GetStringAsync(ReleasesApi);
+            using var doc = JsonDocument.Parse(json);
+            var latestTag = doc.RootElement.GetProperty("tag_name").GetString();
 
             string url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
-            string? dir = Path.GetDirectoryName(_path);
 
-            if (!string.IsNullOrEmpty(dir))
-                Directory.CreateDirectory(dir);
-
-            using HttpClient client = new HttpClient();
             using HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
 
             using Stream stream = await response.Content.ReadAsStreamAsync();
             using var fs = new FileStream(_path, FileMode.Create, FileAccess.Write, FileShare.None);
             await stream.CopyToAsync(fs);
+
+            // Guardar versión instalada
+            Preferences.Set("ytdlp_version", latestTag ?? "");
+            #endregion
+
         }
 
         #endregion
@@ -698,6 +736,90 @@ namespace YouPander.Services
         }
 
         #endregion
+
+
+        #region Auto-Actualizacion
+
+        private const string ReleasesApi = "https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest";
+
+        public async Task<string?> CheckAndUpdateAsync(IProgress<string>? progress = null)
+        {
+            try
+            {
+                progress?.Report("Comprobando actualizaciones de yt-dlp...");
+
+                using var http = new HttpClient();
+                http.DefaultRequestHeaders.UserAgent.ParseAdd("YouPander/1.0");
+
+                var json = await http.GetStringAsync(ReleasesApi);
+                using var doc = JsonDocument.Parse(json);
+                var latestTag = doc.RootElement.GetProperty("tag_name").GetString();
+                var currentTag = Preferences.Get("ytdlp_version", "");
+
+                if (latestTag == currentTag)
+                {
+                    progress?.Report("yt-dlp ya está actualizado.");
+                    return null;
+                }
+
+                progress?.Report($"Nueva versión encontrada: {latestTag}. Descargando...");
+
+                // Buscar la URL del asset correcto (yt-dlp.exe en Windows)
+                var assets = doc.RootElement.GetProperty("assets");
+                var downloadUrl = assets.EnumerateArray()
+                    .FirstOrDefault(a => a.GetProperty("name").GetString() == "yt-dlp.exe")
+                    .GetProperty("browser_download_url").GetString();
+
+                if (string.IsNullOrEmpty(downloadUrl))
+                {
+                    progress?.Report("No se encontró el asset de descarga.");
+                    return null;
+                }
+
+                // Descargar a un fichero temporal primero — si falla, el binario actual queda intacto
+                var tempPath = _path + ".tmp";
+
+                using var response = await http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+                response.EnsureSuccessStatusCode();
+
+                var totalBytes = response.Content.Headers.ContentLength ?? -1;
+                var downloadedBytes = 0L;
+
+                await using var stream = await response.Content.ReadAsStreamAsync();
+                await using var fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None);
+
+                var buffer = new byte[81920]; // 80 KB por chunk
+                int read;
+                while ((read = await stream.ReadAsync(buffer)) > 0)
+                {
+                    await fs.WriteAsync(buffer.AsMemory(0, read));
+                    downloadedBytes += read;
+
+                    if (totalBytes > 0)
+                    {
+                        var pct = (int)(downloadedBytes * 100 / totalBytes);
+                        progress?.Report($"Descargando yt-dlp... {pct}%");
+                    }
+                }
+
+                // Reemplazar el binario actual con el nuevo
+                fs.Close();
+                if (File.Exists(_path)) File.Delete(_path);
+                File.Move(tempPath, _path);
+
+                Preferences.Set("ytdlp_version", latestTag ?? "");
+                progress?.Report($"yt-dlp actualizado a {latestTag}.");
+                return latestTag;
+            }
+            catch (Exception ex)
+            {
+                progress?.Report($"Error al actualizar yt-dlp: {ex.Message}");
+                return null;
+            }
+        }
+
+        #endregion
+
 
     }
 }

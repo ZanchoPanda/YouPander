@@ -12,8 +12,25 @@ namespace YouPander.ViewModels
     public class SettingsViewModel : BaseViewModel
     {
         private readonly SettingsService _settingsService;
+        private readonly YtDlpService _ytDlpService;
 
         public AppSettings Settings { get; set; }
+        private string _YtDlpVersion;
+        public string YtDlpVersion
+        {
+            get
+            {
+                return _YtDlpVersion;
+            }
+            set
+            {
+                if (value != _YtDlpVersion)
+                {
+                    _YtDlpVersion = value;
+                    OnPropertyChanged("YtDlpVersion");
+                }
+            }
+        }
 
         #region Commands
 
@@ -30,6 +47,14 @@ namespace YouPander.ViewModels
         public SettingsViewModel()
         {
             _settingsService = new SettingsService();
+
+            if (OperatingSystem.IsWindows())
+            {
+                var ytPath = Path.Combine(FileSystem.AppDataDirectory, "yt-dlp.exe");
+                _ytDlpService = new YtDlpService(ytPath);
+                YtDlpVersion = _ytDlpService.InstalledVersion;
+            }
+
             Settings = _settingsService.Load();
 
             SaveCommand = new Command(async () => await Save());

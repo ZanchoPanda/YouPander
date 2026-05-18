@@ -582,4 +582,40 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
     }
 
     #endregion
+
+
+    #region Inicializacion y actualización de yt-dlp
+
+    // En el constructor o en el método de inicialización de MainViewModel
+    public async Task InitializeAsync()
+    {
+        await _ytDlp.EnsureInstalledAsync();
+
+        // Comprobar actualizaciones en background, sin bloquear
+        _ = Task.Run(async () =>
+        {
+            var newVersion = await _ytDlp.CheckAndUpdateAsync(new Progress<string>(msg =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    // Opcional: mostrar en un label de estado si tienes uno
+                    System.Diagnostics.Debug.WriteLine(msg);
+                });
+            }));
+
+            if (newVersion != null)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Shell.Current.DisplayAlert(
+                        "yt-dlp actualizado",
+                        $"Se ha instalado la versión {newVersion} automáticamente.",
+                        "OK");
+                });
+            }
+        });
+    }
+
+    #endregion
+
 }

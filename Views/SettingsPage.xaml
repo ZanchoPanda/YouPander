@@ -60,6 +60,13 @@
                 </toolkit:Expander.Header>
 
                 <VerticalStackLayout>
+
+                    <Label
+                        Margin="10,4"
+                        FontSize="12"
+                        Text="{Binding YtDlpVersion, StringFormat='yt-dlp: {0}'}"
+                        TextColor="Gray" />
+
                     <Grid
                         ColumnDefinitions="50,Auto"
                         ColumnSpacing="6"
