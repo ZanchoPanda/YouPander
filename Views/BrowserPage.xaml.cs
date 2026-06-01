@@ -270,22 +270,22 @@ public partial class BrowserPage : ContentPage
         }
     }
 
-    protected override bool OnBackButtonPressed()
-    {
-        //Desactivado para evitar hacer tantos clicks en flecha
+    //protected override bool OnBackButtonPressed()
+    //{
+    //    //Desactivado para evitar hacer tantos clicks en flecha
 
-        //if (WebViewControl.CanGoBack)
-        //{
-        //    WebViewControl.GoBack();
-        //    return true;
-        //}
+    //    //if (WebViewControl.CanGoBack)
+    //    //{
+    //    //    WebViewControl.GoBack();
+    //    //    return true;
+    //    //}
 
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            await Shell.Current.GoToAsync("//MainPage");
-        });
-        return true;
-    }
+    //    MainThread.BeginInvokeOnMainThread(async () =>
+    //    {
+    //        await Shell.Current.GoToAsync("//MainPage");
+    //    });
+    //    return true;
+    //}
 
     private async void OnDownloadClicked(object sender, EventArgs e)
     {

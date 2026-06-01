@@ -49,6 +49,8 @@ namespace YouPander.ViewModels
         public Command ClearAllCommand { get; }
         public Command<DownloadRecord> ReDownloadCommand { get; }
 
+        public Command<DownloadRecord> OpenUrlCommand { get; }
+
         #endregion
 
         public HistoryViewModel(HistoryService history)
@@ -59,6 +61,7 @@ namespace YouPander.ViewModels
             DeleteCommand = new Command<DownloadRecord>(async (r) => await DeleteAsync(r));
             ClearAllCommand = new Command(async () => await ClearAllAsync());
             ReDownloadCommand = new Command<DownloadRecord>(async (r) => await ReDownloadAsync(r));
+            OpenUrlCommand = new Command<DownloadRecord>(async (r) => await OpenUrl(r));
         }
 
         #region Actions Commands
@@ -121,6 +124,15 @@ namespace YouPander.ViewModels
         {
             // Navigate to MainPage with preloaded URL
             await Shell.Current.GoToAsync($"///MainPage?url={Uri.EscapeDataString(record.Url)}");
+        }
+
+        private async Task OpenUrl(DownloadRecord record)
+        {
+            if (!string.IsNullOrEmpty(record.Url))
+            {
+                //await Launcher.Default.OpenAsync(url);
+                await Shell.Current.GoToAsync($"BrowserPage?url={Uri.EscapeDataString(record.Url)}");
+            }
         }
 
         #endregion

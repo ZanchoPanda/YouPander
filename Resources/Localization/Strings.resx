@@ -138,6 +138,9 @@
   <data name="CannotOpenFolder" xml:space="preserve">
     <value>Can't open folder</value>
   </data>
+  <data name="ClearAll" xml:space="preserve">
+    <value>ClearAll</value>
+  </data>
   <data name="CompletedDownload" xml:space="preserve">
     <value>Download completed</value>
   </data>
@@ -204,11 +207,17 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
   <data name="SelectFolder" xml:space="preserve">
     <value>Select folder</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="ShowOriginalVid" xml:space="preserve">
+    <value>Show Original Video</value>
   </data>
   <data name="Type" xml:space="preserve">
     <value>Type</value>

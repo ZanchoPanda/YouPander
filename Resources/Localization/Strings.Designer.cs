@@ -124,6 +124,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a ClearAll.
+        /// </summary>
+        internal static string ClearAll {
+            get {
+                return ResourceManager.GetString("ClearAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Download completed.
         /// </summary>
         internal static string CompletedDownload {
@@ -322,6 +331,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Search.
+        /// </summary>
+        internal static string Search {
+            get {
+                return ResourceManager.GetString("Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Select folder.
         /// </summary>
         internal static string SelectFolder {
@@ -336,6 +354,15 @@ namespace YouPander.Resources.Localization {
         internal static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Show Original Video.
+        /// </summary>
+        internal static string ShowOriginalVid {
+            get {
+                return ResourceManager.GetString("ShowOriginalVid", resourceCulture);
             }
         }
         

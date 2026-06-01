@@ -138,6 +138,9 @@
   <data name="CannotOpenFolder" xml:space="preserve">
     <value>No se puede abrir la carpeta</value>
   </data>
+  <data name="ClearAll" xml:space="preserve">
+    <value>Limpiar todo</value>
+  </data>
   <data name="CompletedDownload" xml:space="preserve">
     <value>Descarga completada</value>
   </data>
@@ -204,11 +207,17 @@
   <data name="Save" xml:space="preserve">
     <value>Guardar</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
   <data name="SelectFolder" xml:space="preserve">
     <value>Seleccionar carpeta</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Configuración</value>
+  </data>
+  <data name="ShowOriginalVid" xml:space="preserve">
+    <value>Ver video original</value>
   </data>
   <data name="Type" xml:space="preserve">
     <value>Tipo</value>

@@ -82,7 +82,7 @@
                     <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
+                    <!--<DataTemplate>
                         <Border Padding="5,5" StrokeShape="RoundRectangle 25">
                             <Grid
                                 Margin="5"
@@ -90,14 +90,12 @@
                                 ColumnSpacing="10"
                                 RowDefinitions="Auto,Auto,Auto,Auto">
 
-                                <!--  Thumbnail  -->
                                 <Image
                                     Grid.RowSpan="3"
                                     Grid.Column="0"
                                     Aspect="AspectFill"
                                     Source="{Binding ThumbnailUrl}" />
 
-                                <!--  Título  -->
                                 <Label
                                     Grid.Row="0"
                                     Grid.Column="1"
@@ -107,7 +105,6 @@
                                     MaxLines="2"
                                     Text="{Binding Title}" />
 
-                                <!--  Canal + duración  -->
                                 <Label
                                     Grid.Row="1"
                                     Grid.Column="1"
@@ -115,7 +112,6 @@
                                     Text="{Binding Channel}"
                                     TextColor="Gray" />
 
-                                <!--  URL  -->
                                 <Label
                                     Grid.Row="2"
                                     Grid.Column="1"
@@ -128,14 +124,12 @@
                                     </Label.GestureRecognizers>
                                 </Label>
 
-                                <!--  ProgressBar por ítem  -->
                                 <ProgressBar
                                     Grid.Row="3"
                                     Grid.Column="1"
                                     Progress="{Binding Progress}"
                                     ProgressColor="LimeGreen" />
 
-                                <!--  Checkbox selección  -->
                                 <CheckBox
                                     Grid.RowSpan="3"
                                     Grid.Column="2"
@@ -144,6 +138,91 @@
 
                             </Grid>
                         </Border>
+                    </DataTemplate>-->
+                    <DataTemplate>
+
+                        <Border
+                            Margin="0,4"
+                            Padding="8"
+                            BackgroundColor="{AppThemeBinding Light=White,
+                                                              Dark=#1E1E1E}"
+                            Stroke="#404040"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="1">
+
+                            <Grid ColumnDefinitions="220,*,Auto" ColumnSpacing="12">
+
+                                <!--  Thumbnail  -->
+                                <Grid Grid.Column="0">
+
+                                    <Image
+                                        Aspect="AspectFill"
+                                        HeightRequest="124"
+                                        Source="{Binding ThumbnailUrl}" />
+
+                                    <!--  Duración  -->
+                                    <Border
+                                        Margin="0,0,6,6"
+                                        Padding="5,2"
+                                        BackgroundColor="#AA000000"
+                                        HorizontalOptions="End"
+                                        StrokeShape="RoundRectangle 6"
+                                        VerticalOptions="End" />
+
+                                </Grid>
+
+                                <!--  Información  -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="6">
+
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        MaxLines="2"
+                                        Text="{Binding Title}" />
+
+                                    <Label
+                                        FontSize="13"
+                                        Text="{Binding Channel}"
+                                        TextColor="Gray" />
+
+                                    <Label
+                                        FontSize="13"
+                                        Text="{Binding Url}"
+                                        TextColor="Gray" />
+
+                                    <ProgressBar
+                                        Margin="0,8,0,0"
+                                        Progress="{Binding Progress}"
+                                        ProgressColor="LimeGreen" />
+
+                                </VerticalStackLayout>
+
+                                <!--  Acciones  -->
+                                <VerticalStackLayout
+                                    Grid.Column="2"
+                                    HorizontalOptions="Center"
+                                    Spacing="8"
+                                    VerticalOptions="Center">
+
+                                    <!--  Ver vídeo  -->
+                                    <ImageButton
+                                        BackgroundColor="#FF0000"
+                                        Command="{Binding BindingContext.OpenUrlCommand, Source={x:Reference MyCollectionView}}"
+                                        CommandParameter="{Binding Url}"
+                                        CornerRadius="21"
+                                        HeightRequest="42"
+                                        Source="tocar.png"
+                                        WidthRequest="42" />
+
+                                    <!--  Selección  -->
+                                    <CheckBox HorizontalOptions="Center" IsChecked="{Binding IsSelected}" />
+
+                                </VerticalStackLayout>
+
+                            </Grid>
+
+                        </Border>
+
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
