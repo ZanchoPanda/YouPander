@@ -20,6 +20,7 @@ namespace YouPander
             builder
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()
+                .UseMauiCommunityToolkitMediaElement(isAndroidForegroundServiceEnabled: false)
                 .ConfigureMauiHandlers(handlers =>
                 {
                     handlers.AddHandler<WebView, AdBlockWebViewHandler>();
@@ -38,12 +39,16 @@ namespace YouPander
             builder.Services.AddTransient<SettingsViewModel>();
             builder.Services.AddTransient<HistoryViewModel>();
 
+            builder.Services.AddTransient<LibraryViewModel>();
+
             // Páginas
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<HistoryPage>();
 
             builder.Services.AddTransient<BrowserPage>();
+
+            builder.Services.AddTransient<LibraryPage>();
 
 #if WINDOWS
 
@@ -55,9 +60,9 @@ namespace YouPander
 
 #endif
 
-//#if DEBUG
-//            builder.Logging.AddDebug();
-//#endif
+            //#if DEBUG
+            //            builder.Logging.AddDebug();
+            //#endif
 
             var logPath = Path.Combine(FileSystem.AppDataDirectory, "logs", "youpander-.txt");
 

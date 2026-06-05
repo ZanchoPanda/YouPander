@@ -9,6 +9,13 @@
     <Application.Resources>
         <ResourceDictionary>
             <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <conv:PlayPauseIconConverter x:Key="PlayPauseIconConverter" />
+            <conv:MediaIconConverter x:Key="MediaIconConverter" />
+            <conv:TabColorConverter x:Key="TabColorConverter" />
+            <conv:TabFontConverter x:Key="TabFontConverter" />
+            <conv:TabVisibleConverter x:Key="TabVisibleConverter" />
+            <conv:NullToBoolConverter x:Key="NullToBoolConverter" />
+            <conv:ActiveColorConverter x:Key="ActiveColorConverter" />
             <local2:LocalizationResourceManager x:Key="Loc" x:Shared="False" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />

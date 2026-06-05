@@ -250,6 +250,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Library.
+        /// </summary>
+        internal static string Library {
+            get {
+                return ResourceManager.GetString("Library", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Merging audio and video.
         /// </summary>
         internal static string MergingAudioVideo {

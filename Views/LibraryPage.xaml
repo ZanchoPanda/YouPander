@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YouPander.Views.LibraryPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:YouPander.Models"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:YouPander.ViewModels"
+    Title="Biblioteca"
+    x:DataType="vm:LibraryViewModel">
+
+    <ContentPage.Resources>
+        <toolkit:InvertedBoolConverter x:Key="InvertBool" />
+    </ContentPage.Resources>
+
+    <Grid
+        Margin="5"
+        BackgroundColor="{AppThemeBinding Light=White,
+                                          Dark=#1E1E1E}"
+        RowDefinitions="*,Auto">
+
+        <!--  ══════════════════════════════════════════════════════════  -->
+        <!--  ZONA LISTAS  -->
+        <!--  ══════════════════════════════════════════════════════════  -->
+
+        <!--  Sin pestañas: lista única  -->
+        <CollectionView
+            Grid.Row="0"
+            IsVisible="{Binding ShowTabs, Converter={StaticResource InvertBool}}"
+            ItemsSource="{Binding AllItems}"
+            SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:MediaItem">
+                    <Grid Padding="12,8" ColumnDefinitions="Auto,*,Auto">
+                        <Label
+                            Grid.Column="0"
+                            Margin="0,0,10,0"
+                            FontSize="22"
+                            Text="{Binding IsVideo, Converter={StaticResource MediaIconConverter}}"
+                            VerticalOptions="Center" />
+                        <Label
+                            Grid.Column="1"
+                            FontSize="14"
+                            LineBreakMode="TailTruncation"
+                            Text="{Binding Title}"
+                            TextColor="{AppThemeBinding Light=Black,
+                                                        Dark=White}"
+                            VerticalOptions="Center" />
+                        <Button
+                            Grid.Column="2"
+                            BackgroundColor="Transparent"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryViewModel}}, Path=PlayItemCommand}"
+                            CommandParameter="{Binding .}"
+                            Text="▶"
+                            TextColor="{AppThemeBinding Light=#2196F3,
+                                                        Dark=#64B5F6}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!--  Con pestañas: Música / Vídeo  -->
+        <Grid Grid.Row="0" IsVisible="{Binding ShowTabs}">
+            <Grid RowDefinitions="Auto,*">
+
+                <!--  Tab header manual (TabBar no funciona dentro de Grid)  -->
+                <Grid
+                    Grid.Row="0"
+                    BackgroundColor="{AppThemeBinding Light=#F5F5F5,
+                                                      Dark=#2D2D2D}"
+                    ColumnDefinitions="*,*"
+                    HeightRequest="44">
+                    <Button
+                        Grid.Column="0"
+                        BackgroundColor="{Binding SelectedTabIndex, Converter={StaticResource TabColorConverter}, ConverterParameter=0}"
+                        Command="{Binding SelectTabCommand}"
+                        CommandParameter="0"
+                        FontAttributes="{Binding SelectedTabIndex, Converter={StaticResource TabFontConverter}, ConverterParameter=0}"
+                        Text="🎵 Música"
+                        TextColor="{AppThemeBinding Light=Black,
+                                                    Dark=White}" />
+                    <Button
+                        Grid.Column="1"
+                        BackgroundColor="{Binding SelectedTabIndex, Converter={StaticResource TabColorConverter}, ConverterParameter=1}"
+                        Command="{Binding SelectTabCommand}"
+                        CommandParameter="1"
+                        FontAttributes="{Binding SelectedTabIndex, Converter={StaticResource TabFontConverter}, ConverterParameter=1}"
+                        Text="🎬 Vídeo"
+                        TextColor="{AppThemeBinding Light=Black,
+                                                    Dark=White}" />
+                </Grid>
+
+                <!--  Contenido de cada pestaña  -->
+                <CollectionView
+                    Grid.Row="1"
+                    IsVisible="{Binding SelectedTabIndex, Converter={StaticResource TabVisibleConverter}, ConverterParameter=0}"
+                    ItemsSource="{Binding MusicItems}"
+                    SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:MediaItem">
+                            <Grid Padding="12,8" ColumnDefinitions="Auto,*,Auto">
+                                <Label
+                                    Grid.Column="0"
+                                    Margin="0,0,10,0"
+                                    FontSize="22"
+                                    Text="🎵"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    Grid.Column="1"
+                                    FontSize="14"
+                                    LineBreakMode="TailTruncation"
+                                    Text="{Binding Title}"
+                                    TextColor="{AppThemeBinding Light=Black,
+                                                                Dark=White}"
+                                    VerticalOptions="Center" />
+                                <Button
+                                    Grid.Column="2"
+                                    BackgroundColor="Transparent"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryViewModel}}, Path=PlayItemCommand}"
+                                    CommandParameter="{Binding .}"
+                                    Text="▶"
+                                    TextColor="{AppThemeBinding Light=#2196F3,
+                                                                Dark=#64B5F6}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <CollectionView
+                    Grid.Row="1"
+                    IsVisible="{Binding SelectedTabIndex, Converter={StaticResource TabVisibleConverter}, ConverterParameter=1}"
+                    ItemsSource="{Binding VideoItems}"
+                    SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:MediaItem">
+                            <Grid Padding="12,8" ColumnDefinitions="Auto,*,Auto">
+                                <Label
+                                    Grid.Column="0"
+                                    Margin="0,0,10,0"
+                                    FontSize="22"
+                                    Text="🎬"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    Grid.Column="1"
+                                    FontSize="14"
+                                    LineBreakMode="TailTruncation"
+                                    Text="{Binding Title}"
+                                    TextColor="{AppThemeBinding Light=Black,
+                                                                Dark=White}"
+                                    VerticalOptions="Center" />
+                                <Button
+                                    Grid.Column="2"
+                                    BackgroundColor="Transparent"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryViewModel}}, Path=PlayItemCommand}"
+                                    CommandParameter="{Binding .}"
+                                    Text="▶"
+                                    TextColor="{AppThemeBinding Light=#2196F3,
+                                                                Dark=#64B5F6}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Grid>
+
+        <!--  ══════════════════════════════════════════════════════════  -->
+        <!--  PANEL REPRODUCTOR (fijo abajo)  -->
+        <!--  ══════════════════════════════════════════════════════════  -->
+        <Grid
+            Grid.Row="1"
+            Padding="12,8"
+            BackgroundColor="{AppThemeBinding Light=#EFEFEF,
+                                              Dark=#2D2D2D}"
+            IsVisible="{Binding CurrentItem, Converter={StaticResource NullToBoolConverter}}"
+            RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+
+            <!--  Vídeo (solo visible si el ítem actual es vídeo)  -->
+            <toolkit:MediaElement
+                x:Name="Player"
+                Grid.Row="0"
+                HeightRequest="250"
+                IsVisible="{Binding CurrentItem.IsVideo}"
+                MediaEnded="Player_MediaEnded"
+                MediaOpened="Player_MediaOpened"
+                PositionChanged="Player_PositionChanged"
+                ShouldAutoPlay="True"
+                ShouldShowPlaybackControls="False"
+                Volume="1.0" />
+
+            <!--  Título  -->
+            <Label
+                Grid.Row="1"
+                Margin="0,6"
+                FontAttributes="Bold"
+                FontSize="15"
+                HorizontalOptions="Center"
+                Text="{Binding CurrentItem.Title}"
+                TextColor="{AppThemeBinding Light=Black,
+                                            Dark=White}" />
+
+            <!--  Barra de progreso  -->
+            <Grid
+                Grid.Row="2"
+                Margin="0,4"
+                ColumnDefinitions="44,*,44">
+                <Label
+                    Grid.Column="0"
+                    FontSize="11"
+                    HorizontalOptions="Center"
+                    Text="{Binding PositionLabel}"
+                    TextColor="{AppThemeBinding Light=Gray,
+                                                Dark=LightGray}"
+                    VerticalOptions="Center" />
+                <Slider
+                    Grid.Column="1"
+                    DragCompleted="Slider_DragCompleted"
+                    Maximum="{Binding Duration}"
+                    Minimum="0"
+                    Value="{Binding Position}" />
+                <Label
+                    Grid.Column="2"
+                    FontSize="11"
+                    HorizontalOptions="Center"
+                    Text="{Binding DurationLabel}"
+                    TextColor="{AppThemeBinding Light=Gray,
+                                                Dark=LightGray}"
+                    VerticalOptions="Center" />
+            </Grid>
+
+            <!--  Controles  -->
+            <Grid
+                Grid.Row="3"
+                Margin="0,4"
+                ColumnDefinitions="*,*,*,*,*">
+                <!--  Shuffle  -->
+                <Button
+                    Grid.Column="0"
+                    BackgroundColor="Transparent"
+                    Command="{Binding ToggleShuffleCommand}"
+                    FontSize="20"
+                    Text="⇄"
+                    TextColor="{Binding IsShuffleOn, Converter={StaticResource ActiveColorConverter}}" />
+                <!--  Anterior  -->
+                <Button
+                    Grid.Column="1"
+                    BackgroundColor="Transparent"
+                    Command="{Binding PreviousCommand}"
+                    FontSize="20"
+                    Text="⏮"
+                    TextColor="{AppThemeBinding Light=Black,
+                                                Dark=White}" />
+                <!--  Play/Pause  -->
+                <Button
+                    Grid.Column="2"
+                    BackgroundColor="#2196F3"
+                    Command="{Binding PlayPauseCommand}"
+                    CornerRadius="24"
+                    FontSize="22"
+                    HeightRequest="48"
+                    Text="{Binding IsPlaying, Converter={StaticResource PlayPauseIconConverter}}"
+                    TextColor="White"
+                    WidthRequest="48" />
+                <!--  Siguiente  -->
+                <Button
+                    Grid.Column="3"
+                    BackgroundColor="Transparent"
+                    Command="{Binding NextCommand}"
+                    FontSize="20"
+                    Text="⏭"
+                    TextColor="{AppThemeBinding Light=Black,
+                                                Dark=White}" />
+                <!--  Repeat  -->
+                <Button
+                    Grid.Column="4"
+                    BackgroundColor="Transparent"
+                    Command="{Binding ToggleRepeatCommand}"
+                    FontSize="20"
+                    Text="↺"
+                    TextColor="{Binding IsRepeatOn, Converter={StaticResource ActiveColorConverter}}" />
+            </Grid>
+
+            <!--  Volumen  -->
+            <Grid
+                Grid.Row="4"
+                Margin="0,4,0,2"
+                ColumnDefinitions="Auto,*">
+                <Label
+                    Grid.Column="0"
+                    Margin="0,0,6,0"
+                    FontSize="14"
+                    Text="🔊"
+                    VerticalOptions="Center" />
+                <Slider
+                    Grid.Column="1"
+                    Maximum="1"
+                    Minimum="0"
+                    ValueChanged="VolumeSlider_ValueChanged"
+                    Value="{Binding Volume}" />
+            </Grid>
+
+        </Grid>
+
+    </Grid>
+</ContentPage>

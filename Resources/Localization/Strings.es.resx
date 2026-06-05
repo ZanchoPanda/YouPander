@@ -180,6 +180,9 @@
   <data name="Language" xml:space="preserve">
     <value>Idioma</value>
   </data>
+  <data name="Library" xml:space="preserve">
+    <value>Biblioteca</value>
+  </data>
   <data name="MergingAudioVideo" xml:space="preserve">
     <value>Uniendo audio y vídeo</value>
   </data>

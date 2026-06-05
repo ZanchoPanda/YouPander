@@ -261,7 +261,7 @@ namespace YouPander.Services
                 currentProcess = null;
             }
         }
-        
+
         public async Task DownloadAsync(string url, string output, string format, string? formatID = null)
         {
             string[] parts = BuildArguments(url, output, format, formatID);
@@ -389,7 +389,7 @@ namespace YouPander.Services
             #endregion
         }
 
-        private static bool IsPlaylist(string url) => 
+        private static bool IsPlaylist(string url) =>
             url.Contains("list=", StringComparison.OrdinalIgnoreCase) ||
             url.Contains("/playlist", StringComparison.OrdinalIgnoreCase);
 
@@ -402,7 +402,7 @@ namespace YouPander.Services
                 int end = nl < 0 ? raw.Length : nl;
                 var slice = raw.AsSpan(i, end - i).TrimStart();
                 if (slice.StartsWith("{") || slice.StartsWith("["))
-                    return i + (end - i - slice.Length); 
+                    return i + (end - i - slice.Length);
                 i = end + 1;
             }
             return -1;
@@ -465,7 +465,7 @@ namespace YouPander.Services
 
             var result = new List<FormatOption>();
             if (bestVideo != null) result.Add(bestVideo);
-            result.Add(bestAudio); 
+            result.Add(bestAudio);
             return result;
         }
 
@@ -602,9 +602,9 @@ namespace YouPander.Services
             return extractor?.ToLowerInvariant() switch
             {
                 "youtube" or "youtubetab" => $"https://www.youtube.com/watch?v={id}",
-                "soundcloud" => string.Empty, 
+                "soundcloud" => string.Empty,
                 "twitch:vod" => $"https://www.twitch.tv/videos/{id}",
-                _ => $"https://www.youtube.com/watch?v={id}" 
+                _ => $"https://www.youtube.com/watch?v={id}"
             };
         }
 
@@ -712,7 +712,11 @@ namespace YouPander.Services
             }
             else if (!string.IsNullOrEmpty(formatId))
             {
-                formatArgs = [$"-f \"{formatId}\""];
+                formatArgs =
+                    [
+                        $"-f \"{formatId}+bestaudio/best\"",
+                        "--merge-output-format mp4",
+                    ];
             }
             else if (format.Contains("Audio"))
             {
