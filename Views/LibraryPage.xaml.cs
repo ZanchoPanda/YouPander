@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Core.Primitives;
 using CommunityToolkit.Maui.Views;
 using YouPander.Services;
 using YouPander.ViewModels;
@@ -16,38 +17,50 @@ public partial class LibraryPage : ContentPage
         BindingContext = _vm = vm;
     }
 
+    // ── Ciclo de vida ─────────────────────────────────────────────────
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
-        // Cargar la config guardada
         var settings = new SettingsService().Load();
         _vm.LoadFromSettings(settings);
+        _vm.PropertyChanged += OnVmPropertyChanged;
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        _vm.PropertyChanged -= OnVmPropertyChanged;
         Player.Pause();
     }
 
-    // Sincroniza la fuente del MediaElement cuando cambia la pista
-    protected override void OnBindingContextChanged()
+    // ── Cambios del ViewModel ─────────────────────────────────────────
+
+    private void OnVmPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        base.OnBindingContextChanged();
-        _vm.PropertyChanged += (_, e) =>
+        if (e.PropertyName == nameof(LibraryViewModel.CurrentItem) && _vm.CurrentItem is not null)
         {
-            if (e.PropertyName == nameof(LibraryViewModel.CurrentItem) && _vm.CurrentItem is not null)
-            {
-                Player.Stop();
-                Player.Source = MediaSource.FromFile(_vm.CurrentItem.FilePath);
-            }
-            else if (e.PropertyName == nameof(LibraryViewModel.IsPlaying))
-            {
-                if (_vm.IsPlaying) Player.Play();
-                else Player.Pause();
-            }
-        };
+            Player.Stop();
+            Player.Source = MediaSource.FromFile(_vm.CurrentItem.FilePath);
+            // Play lo dispara Player_MediaOpened
+        }
+        else if (e.PropertyName == nameof(LibraryViewModel.IsPlaying))
+        {
+            if (_vm.IsPlaying) Player.Play();
+            else Player.Pause();
+        }
+    }
+
+    // ── Eventos MediaElement ──────────────────────────────────────────
+
+    private async void Player_MediaOpened(object? sender, EventArgs e)
+    {
+        await Task.Delay(150);
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            Player.Volume = 1.0;
+            Player.Play();
+        });
     }
 
     private void Player_PositionChanged(object? sender, MediaPositionChangedEventArgs e)
@@ -67,10 +80,9 @@ public partial class LibraryPage : ContentPage
         {
             _vm.OnMediaEnded();
         }
-        //_vm.OnMediaEnded();
-        //if (_vm.IsRepeatOn)
-        //    Player.SeekTo(TimeSpan.Zero);
     }
+
+    // ── Eventos UI ────────────────────────────────────────────────────
 
     private async void Slider_DragCompleted(object? sender, EventArgs e)
     {
@@ -83,21 +95,5 @@ public partial class LibraryPage : ContentPage
     {
         Player.Volume = e.NewValue;
         _vm.Volume = e.NewValue;
-    }
-
-    private async void Player_MediaOpened(object sender, EventArgs e)
-    {
-        try
-        {
-            Player.Volume = _vm.Volume;
-            await Task.Delay(100);
-            if (_vm.IsPlaying)
-                Player.Play();
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"INNER: {ex.InnerException?.Message ?? ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"STACK: {ex.InnerException?.StackTrace ?? ex.StackTrace}");
-        }
     }
 }

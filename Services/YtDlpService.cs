@@ -208,10 +208,10 @@ namespace YouPander.Services
 
         }
 
-        public async Task DownloadAsync(string url, string output, string format, IProgress<string> progress, CancellationToken token, string? formatID = null)
+        public async Task DownloadAsync(string url, string output, string format, IProgress<string> progress, CancellationToken token, string? formatID = null, string? TargetExtension = null)
         {
 
-            string[] parts = BuildArguments(url, output, format, formatID);
+            string[] parts = BuildArguments(url, output, format, formatID, TargetExtension);
             string args = string.Join(" ", parts);
 
             using Process process = new Process
@@ -408,19 +408,24 @@ namespace YouPander.Services
             return -1;
         }
 
-        private static List<FormatOption> ParseBestFormats(JsonElement formats)
+        private static List<FormatOption> ParseBestFormats(JsonElement formats, int topPerFormat = 2)
         {
-            FormatOption? bestVideo = null;
-            FormatOption? bestAudio = null;
-
-            bestAudio = new FormatOption
+            // Siempre ofrecemos MP3 como opción de extracción de audio
+            var audioMp3 = new FormatOption
             {
                 FormatId = "mp3",
                 Extension = "mp3",
                 IsVideo = false,
                 Abr = 320,
-                Label = "Audio MP3 — ~320kbps"
+                Label = "Audio MP3"
             };
+
+            // Recopilar todos los candidatos de vídeo válidos
+            var allVideoCandidates = new List<FormatOption>();
+
+            // Para audio nativo (m4a, opus, webm audio...)
+            // clave: ext, valor: mejor candidato por bitrate
+            var audioCandidates = new Dictionary<string, FormatOption>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var f in formats.EnumerateArray())
             {
@@ -430,20 +435,25 @@ namespace YouPander.Services
                 string fmtId = f.GetStringOrEmpty("format_id") ?? "";
 
                 if ((vcodec == "none" && acodec == "none")
-                    || ext is "mhtml" or "3gp" or "flv")
+                    || ext is "mhtml" or "3gp" or "flv" or "json")
                     continue;
 
                 bool hasVideo = vcodec != "none";
                 bool hasAudio = acodec != "none";
 
-                var height = f.TryGetProperty("height", out var h) && h.ValueKind == JsonValueKind.Number ? h.GetInt32() : 0;
-                var tbr = f.TryGetProperty("tbr", out var tb) && tb.ValueKind == JsonValueKind.Number ? tb.GetDouble() : 0;
-                var abr = f.TryGetProperty("abr", out var ab) && ab.ValueKind == JsonValueKind.Number ? ab.GetDouble() : 0;
-                var fps = f.TryGetProperty("fps", out var fp) && fp.ValueKind == JsonValueKind.Number ? fp.GetInt32() : 0;
+                var height = f.TryGetProperty("height", out var h) && h.ValueKind == JsonValueKind.Number
+                    ? h.GetInt32() : 0;
+                var tbr = f.TryGetProperty("tbr", out var tb) && tb.ValueKind == JsonValueKind.Number
+                    ? tb.GetDouble() : 0;
+                var abr = f.TryGetProperty("abr", out var ab) && ab.ValueKind == JsonValueKind.Number
+                    ? ab.GetDouble() : 0;
+                var fps = f.TryGetProperty("fps", out var fp) && fp.ValueKind == JsonValueKind.Number
+                    ? fp.GetInt32() : 0;
 
-                if (hasVideo && height > 0)
+                // ── Vídeo ────────────────────────────────────────────────────
+                if (hasVideo && (height > 0 || tbr > 0))
                 {
-                    var candidate = new FormatOption
+                    allVideoCandidates.Add(new FormatOption
                     {
                         FormatId = fmtId,
                         Extension = ext,
@@ -451,21 +461,63 @@ namespace YouPander.Services
                         Fps = fps,
                         Tbr = tbr,
                         IsVideo = true,
-                        Label = $"Video {ext.ToUpper()} — {height}p{(fps >= 60 ? $" {fps}fps" : "")}"
+                        Label = height > 0
+                            ? $"Video {ext.ToUpper()} — {height}p{(fps >= 60 ? $" {fps}fps" : "")}"
+                            : $"Video {ext.ToUpper()} — ~{tbr:F0}kbps"
+                    });
+                }
+
+                // ── Audio nativo (solo audio, sin vídeo) ─────────────────────
+                if (!hasVideo && hasAudio && ext is "m4a" or "webm" or "opus" or "ogg" or "mp3")
+                {
+                    double bitrate = abr > 0 ? abr : tbr;
+                    if (bitrate <= 0) continue;
+
+                    var candidate = new FormatOption
+                    {
+                        FormatId = fmtId,
+                        Extension = ext,
+                        IsVideo = false,
+                        Abr = bitrate,
+                        Label = $"Audio {ext.ToUpper()} — ~{bitrate:F0}kbps"
                     };
 
-                    if (bestVideo is null
-                        || height > bestVideo.ResolutionInt
-                        || (height == bestVideo.ResolutionInt && tbr > bestVideo.Tbr))
+                    // Guardar solo si es mejor que el anterior del mismo formato
+                    if (!audioCandidates.TryGetValue(ext, out var existing)
+                        || bitrate > existing.Abr)
                     {
-                        bestVideo = candidate;
+                        audioCandidates[ext] = candidate;
                     }
                 }
             }
 
             var result = new List<FormatOption>();
-            if (bestVideo != null) result.Add(bestVideo);
-            result.Add(bestAudio);
+
+            // ── Top N vídeos por extensión, ordenados por resolución desc ────
+            var videoGroups = allVideoCandidates
+                .GroupBy(v => v.Extension, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(g => g.Key); // mp4, webm...
+
+            foreach (var group in videoGroups)
+            {
+                var top = group
+                    .GroupBy(v => v.ResolutionInt) // una entrada por resolución
+                    .Select(g => g.OrderByDescending(v => v.Tbr).First()) // mejor tbr por resolución
+                    .OrderByDescending(v => v.ResolutionInt)
+                    .ThenByDescending(v => v.Tbr)
+                    .Take(topPerFormat);
+
+                result.AddRange(top);
+            }
+
+            // ── Audio nativo (el mejor de cada formato) ───────────────────────
+            result.AddRange(
+                audioCandidates.Values
+                    .OrderByDescending(a => a.Abr));
+
+            // ── MP3 siempre al final como opción de extracción ────────────────
+            result.Add(audioMp3);
+
             return result;
         }
 
@@ -688,7 +740,7 @@ namespace YouPander.Services
         //    return [.. commonArgs, .. formatArgs, url];
         //}
 
-        private string[] BuildArguments(string url, string output, string format, string? formatId = null)
+        private string[] BuildArguments(string url, string output, string format, string? formatId = null, string? targetExt = null)
         {
             string[] commonArgs =
             [
@@ -708,15 +760,34 @@ namespace YouPander.Services
                     "-x",
                     "--audio-format mp3",
                     "--audio-quality 0",
-                ];
+        ];
             }
             else if (!string.IsNullOrEmpty(formatId))
             {
+                // Determinar el contenedor de salida según la extensión del formato elegido
+                string mergeExt = targetExt?.ToLowerInvariant() switch
+                {
+                    "webm" => "webm",
+                    "mkv" => "mkv",
+                    _ => "mp4"   // mp4 por defecto para cualquier otro
+                };
+
+                // El audio compatible según el contenedor
+                string audioSelector = mergeExt == "webm"
+                    ? $"{formatId}+bestaudio[ext=webm]/bestaudio"
+                    : $"{formatId}+bestaudio[ext=m4a]/bestaudio";
+
+                // Códec de audio compatible con el contenedor
+                string audioCodec = mergeExt == "webm"
+                    ? "ffmpeg:-c:a libopus -b:a 192k"
+                    : "ffmpeg:-c:a aac -b:a 192k";
+
                 formatArgs =
-                    [
-                        $"-f \"{formatId}+bestaudio/best\"",
-                        "--merge-output-format mp4",
-                    ];
+                [
+                    $"-f \"{audioSelector}\"", 
+                    $"--merge-output-format {mergeExt}",
+                    $"--postprocessor-args \"{audioCodec}\"",
+        ];
             }
             else if (format.Contains("Audio"))
             {
@@ -725,20 +796,20 @@ namespace YouPander.Services
                     "-x",
                     "--audio-format mp3",
                     "--audio-quality 0",
-                ];
+        ];
             }
             else
             {
                 formatArgs =
                 [
                     "-f \"bestvideo+bestaudio/best\"",
-                    "--merge-output-format mkv",
-                ];
+                    "--merge-output-format mp4",
+                    "--postprocessor-args \"ffmpeg:-c:a aac -b:a 192k\"",
+        ];
             }
 
             return [.. commonArgs, .. formatArgs, url];
         }
-
         #endregion
 
 

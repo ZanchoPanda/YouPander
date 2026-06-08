@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using LibVLCSharp.MAUI;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using YouPander.Handlers;
@@ -19,6 +20,7 @@ namespace YouPander
 
             builder
                 .UseMauiApp<App>()
+                .UseLibVLCSharp()
                 .UseMauiCommunityToolkit()
                 .UseMauiCommunityToolkitMediaElement(isAndroidForegroundServiceEnabled: false)
                 .ConfigureMauiHandlers(handlers =>

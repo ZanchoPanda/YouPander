@@ -63,7 +63,7 @@
         <Grid Grid.Row="0" IsVisible="{Binding ShowTabs}">
             <Grid RowDefinitions="Auto,*">
 
-                <!--  Tab header manual (TabBar no funciona dentro de Grid)  -->
+                <!--  Tab header  -->
                 <Grid
                     Grid.Row="0"
                     BackgroundColor="{AppThemeBinding Light=#F5F5F5,
@@ -90,7 +90,7 @@
                                                     Dark=White}" />
                 </Grid>
 
-                <!--  Contenido de cada pestaña  -->
+                <!--  Pestaña Música  -->
                 <CollectionView
                     Grid.Row="1"
                     IsVisible="{Binding SelectedTabIndex, Converter={StaticResource TabVisibleConverter}, ConverterParameter=0}"
@@ -126,6 +126,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
+                <!--  Pestaña Vídeo  -->
                 <CollectionView
                     Grid.Row="1"
                     IsVisible="{Binding SelectedTabIndex, Converter={StaticResource TabVisibleConverter}, ConverterParameter=1}"
@@ -160,6 +161,7 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+
             </Grid>
         </Grid>
 
@@ -174,7 +176,7 @@
             IsVisible="{Binding CurrentItem, Converter={StaticResource NullToBoolConverter}}"
             RowDefinitions="Auto,Auto,Auto,Auto,Auto">
 
-            <!--  Vídeo (solo visible si el ítem actual es vídeo)  -->
+            <!--  Vídeo  -->
             <toolkit:MediaElement
                 x:Name="Player"
                 Grid.Row="0"
@@ -183,7 +185,8 @@
                 MediaEnded="Player_MediaEnded"
                 MediaOpened="Player_MediaOpened"
                 PositionChanged="Player_PositionChanged"
-                ShouldAutoPlay="True"
+                ShouldAutoPlay="False"
+                ShouldMute="False"
                 ShouldShowPlaybackControls="False"
                 Volume="1.0" />
 
@@ -198,7 +201,7 @@
                 TextColor="{AppThemeBinding Light=Black,
                                             Dark=White}" />
 
-            <!--  Barra de progreso  -->
+            <!--  Progreso  -->
             <Grid
                 Grid.Row="2"
                 Margin="0,4"
@@ -232,7 +235,6 @@
                 Grid.Row="3"
                 Margin="0,4"
                 ColumnDefinitions="*,*,*,*,*">
-                <!--  Shuffle  -->
                 <Button
                     Grid.Column="0"
                     BackgroundColor="Transparent"
@@ -240,7 +242,6 @@
                     FontSize="20"
                     Text="⇄"
                     TextColor="{Binding IsShuffleOn, Converter={StaticResource ActiveColorConverter}}" />
-                <!--  Anterior  -->
                 <Button
                     Grid.Column="1"
                     BackgroundColor="Transparent"
@@ -249,18 +250,13 @@
                     Text="⏮"
                     TextColor="{AppThemeBinding Light=Black,
                                                 Dark=White}" />
-                <!--  Play/Pause  -->
                 <Button
                     Grid.Column="2"
-                    BackgroundColor="#2196F3"
+                    BackgroundColor="Transparent"
                     Command="{Binding PlayPauseCommand}"
-                    CornerRadius="24"
-                    FontSize="22"
-                    HeightRequest="48"
+                    FontSize="25"
                     Text="{Binding IsPlaying, Converter={StaticResource PlayPauseIconConverter}}"
-                    TextColor="White"
-                    WidthRequest="48" />
-                <!--  Siguiente  -->
+                    TextColor="White" />
                 <Button
                     Grid.Column="3"
                     BackgroundColor="Transparent"
@@ -269,7 +265,6 @@
                     Text="⏭"
                     TextColor="{AppThemeBinding Light=Black,
                                                 Dark=White}" />
-                <!--  Repeat  -->
                 <Button
                     Grid.Column="4"
                     BackgroundColor="Transparent"
@@ -299,6 +294,5 @@
             </Grid>
 
         </Grid>
-
     </Grid>
 </ContentPage>

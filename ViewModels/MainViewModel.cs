@@ -540,7 +540,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
                     }
                 }
 
-                await _ytDlp.DownloadAsync(item.Url, FinalDownloadPath, SelectedFormat, progress, token, SelectedFormatOption?.FormatId);
+                await _ytDlp.DownloadAsync(item.Url, FinalDownloadPath, SelectedFormat, progress, token, SelectedFormatOption?.FormatId, SelectedFormatOption?.Extension);
 
                 item.IsDownloaded = true;
                 item.Progress = 1.0;
