@@ -3,11 +3,11 @@
     x:Class="YouPander.Views.LibraryPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local2="clr-namespace:YouPander.Services"
     xmlns:models="clr-namespace:YouPander.Models"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:vm="clr-namespace:YouPander.ViewModels"
-    Title="Biblioteca"
-    x:DataType="vm:LibraryViewModel">
+    Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Library]}">
 
     <ContentPage.Resources>
         <toolkit:InvertedBoolConverter x:Key="InvertBool" />
@@ -76,7 +76,7 @@
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="0"
                         FontAttributes="{Binding SelectedTabIndex, Converter={StaticResource TabFontConverter}, ConverterParameter=0}"
-                        Text="🎵 Música"
+                        Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Music]}"
                         TextColor="{AppThemeBinding Light=Black,
                                                     Dark=White}" />
                     <Button
@@ -85,7 +85,7 @@
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="1"
                         FontAttributes="{Binding SelectedTabIndex, Converter={StaticResource TabFontConverter}, ConverterParameter=1}"
-                        Text="🎬 Vídeo"
+                        Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Video]}"
                         TextColor="{AppThemeBinding Light=Black,
                                                     Dark=White}" />
                 </Grid>

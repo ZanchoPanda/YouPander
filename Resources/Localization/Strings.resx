@@ -186,6 +186,9 @@
   <data name="MergingAudioVideo" xml:space="preserve">
     <value>Merging audio and video</value>
   </data>
+  <data name="Music" xml:space="preserve">
+    <value>🎵 Music</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>No</value>
   </data>
@@ -227,6 +230,9 @@
   </data>
   <data name="URLToDownload" xml:space="preserve">
     <value>URL to download</value>
+  </data>
+  <data name="Video" xml:space="preserve">
+    <value>🎬 Video</value>
   </data>
   <data name="VideoDownloadPath" xml:space="preserve">
     <value>Video Download Path</value>

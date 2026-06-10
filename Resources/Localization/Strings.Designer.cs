@@ -268,6 +268,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a 🎵 Music.
+        /// </summary>
+        internal static string Music {
+            get {
+                return ResourceManager.GetString("Music", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a No.
         /// </summary>
         internal static string No {
@@ -390,6 +399,15 @@ namespace YouPander.Resources.Localization {
         internal static string URLToDownload {
             get {
                 return ResourceManager.GetString("URLToDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a 🎬 Video.
+        /// </summary>
+        internal static string Video {
+            get {
+                return ResourceManager.GetString("Video", resourceCulture);
             }
         }
         

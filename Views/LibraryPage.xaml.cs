@@ -10,6 +10,12 @@ public partial class LibraryPage : ContentPage
 {
     private readonly LibraryViewModel _vm;
     private bool _isSeeking;
+    private bool _isLoadingNewItem;
+
+    public LibraryPage()
+    {
+        InitializeComponent();
+    }
 
     public LibraryPage(LibraryViewModel vm)
     {
@@ -36,15 +42,19 @@ public partial class LibraryPage : ContentPage
 
     // ── Cambios del ViewModel ─────────────────────────────────────────
 
-    private void OnVmPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private async void OnVmPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(LibraryViewModel.CurrentItem) && _vm.CurrentItem is not null)
         {
-            Player.Stop();
-            Player.Source = MediaSource.FromFile(_vm.CurrentItem.FilePath);
-            // Play lo dispara Player_MediaOpened
+            _isLoadingNewItem = true;
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                Player.Stop();
+                Player.Source = MediaSource.FromFile(_vm.CurrentItem.FilePath);
+                // Play lo dispara Player_MediaOpened
+            });
         }
-        else if (e.PropertyName == nameof(LibraryViewModel.IsPlaying))
+        else if (e.PropertyName == nameof(LibraryViewModel.IsPlaying) && !_isLoadingNewItem)
         {
             if (_vm.IsPlaying) Player.Play();
             else Player.Pause();
@@ -58,7 +68,8 @@ public partial class LibraryPage : ContentPage
         await Task.Delay(150);
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
-            Player.Volume = 1.0;
+            _isLoadingNewItem = false; // ya está listo
+            Player.Volume = _vm.Volume;
             Player.Play();
         });
     }
@@ -78,7 +89,9 @@ public partial class LibraryPage : ContentPage
         }
         else
         {
-            _vm.OnMediaEnded();
+            // Diferir para salir del stack del evento MediaEnded antes de tocar el Player
+            await Task.Delay(100);
+            await MainThread.InvokeOnMainThreadAsync(() => _vm.OnMediaEnded());
         }
     }
 
