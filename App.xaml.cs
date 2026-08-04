@@ -29,7 +29,9 @@ namespace YouPander
             string lang = setting.Language;
 
             if (string.IsNullOrEmpty(lang))
+            {
                 lang = "en";
+            }
 
             if (string.IsNullOrWhiteSpace(setting.DownloadPath))
             {
@@ -43,6 +45,9 @@ namespace YouPander
             // Aplicar idioma al iniciar la app
             LocalizationResourceManager.Instance.SetCulture(lang);
             _settingsService.Save(setting);
+
+            TemaService.AplicarTemaPendiente();
+
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

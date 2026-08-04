@@ -225,6 +225,9 @@
   <data name="ShowOriginalVid" xml:space="preserve">
     <value>Ver video original</value>
   </data>
+  <data name="TextAdvancedConfig" xml:space="preserve">
+    <value>Configuración avanzada</value>
+  </data>
   <data name="Type" xml:space="preserve">
     <value>Tipo</value>
   </data>

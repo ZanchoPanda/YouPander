@@ -6,15 +6,22 @@
     xmlns:local2="clr-namespace:YouPander.Services"
     xmlns:resx="clr-namespace:YouPander.Resources.Localization"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Settings]}">
+    Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Settings]}"
+    BackgroundColor="{DynamicResource ColorFondoPrincipal}">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
             <!--  Idioma  -->
-            <Label FontAttributes="Bold" Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Language]}" />
+            <Label
+                FontAttributes="Bold"
+                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Language]}"
+                TextColor="{DynamicResource ColorTextoPrimario}" />
 
-            <Picker SelectedItem="{Binding Settings.Language}">
+            <Picker
+                BackgroundColor="{DynamicResource ColorFondoElevado}"
+                SelectedItem="{Binding Settings.Language}"
+                TextColor="{DynamicResource ColorTextoPrimario}">
                 <Picker.ItemsSource>
                     <x:Array Type="{x:Type x:String}">
                         <x:String>en</x:String>
@@ -24,14 +31,20 @@
             </Picker>
 
             <!--  Ruta  -->
-            <Label FontAttributes="Bold" Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[DownloadPath]}" />
+            <Label
+                FontAttributes="Bold"
+                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[DownloadPath]}"
+                TextColor="{DynamicResource ColorTextoPrimario}" />
 
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                 <Entry
                     Grid.Column="0"
+                    BackgroundColor="{DynamicResource ColorFondoElevado}"
                     IsReadOnly="True"
                     Placeholder="C:\Users\...\Downloads"
-                    Text="{Binding Settings.DownloadPath}" />
+                    PlaceholderColor="{DynamicResource ColorTextoDeshabilitado}"
+                    Text="{Binding Settings.DownloadPath}"
+                    TextColor="{DynamicResource ColorTextoPrimario}" />
 
                 <Button
                     Grid.Column="1"
@@ -56,7 +69,28 @@
 
             <toolkit:Expander>
                 <toolkit:Expander.Header>
-                    <Label FontAttributes="Bold" Text="Configuración avanzada" />
+                    <Border
+                        Padding="12"
+                        BackgroundColor="{DynamicResource ColorAcentoMuysuave}"
+                        Stroke="{DynamicResource ColorAcentoSuave}"
+                        StrokeShape="RoundRectangle 12">
+
+                        <Grid ColumnDefinitions="*,Auto">
+
+                            <Label
+                                FontAttributes="Bold"
+                                Text="Conf"
+                                TextColor="{DynamicResource ColorTextoPrimario}" />
+
+                            <Label
+                                Grid.Column="1"
+                                FontSize="18"
+                                Text="⚙"
+                                TextColor="{DynamicResource ColorTextoAcento}" />
+
+                        </Grid>
+
+                    </Border>
                 </toolkit:Expander.Header>
 
                 <VerticalStackLayout>
@@ -65,7 +99,7 @@
                         Margin="10,4"
                         FontSize="12"
                         Text="{Binding YtDlpVersion, StringFormat='yt-dlp: {0}'}"
-                        TextColor="Gray" />
+                        TextColor="{DynamicResource ColorTextoDeshabilitado}" />
 
                     <Grid
                         ColumnDefinitions="50,Auto"
@@ -80,11 +114,15 @@
                         <Label
                             Grid.Column="1"
                             Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[ActivateAdvancedConfig]}"
+                            TextColor="{DynamicResource ColorTextoPrimario}"
                             VerticalOptions="Center" />
 
                     </Grid>
 
-                    <VerticalStackLayout IsEnabled="{Binding Settings.AdvancedConfig}" Spacing="15">
+                    <VerticalStackLayout
+                        Padding="12"
+                        IsEnabled="{Binding Settings.AdvancedConfig}"
+                        Spacing="15">
                         <!--  Dark mode  -->
                         <Grid
                             ColumnDefinitions="50,Auto"
@@ -104,6 +142,7 @@
                         <Label
                             FontAttributes="Bold"
                             Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[AudioDownloadPath]}"
+                            TextColor="{DynamicResource ColorTextoPrimario}"
                             VerticalOptions="Center" />
 
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
@@ -127,6 +166,7 @@
                         <Label
                             FontAttributes="Bold"
                             Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[VideoDownloadPath]}"
+                            TextColor="{DynamicResource ColorTextoPrimario}"
                             VerticalOptions="Center" />
 
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">

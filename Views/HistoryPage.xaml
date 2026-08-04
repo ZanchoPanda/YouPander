@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local2="clr-namespace:YouPander.Services"
     Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[History]}">
+
     <Grid RowDefinitions="Auto,*,Auto">
 
         <Grid
@@ -27,88 +28,25 @@
             Margin="10"
             ItemsSource="{Binding Records}">
             <CollectionView.ItemTemplate>
-                <!--<DataTemplate>
-                    <Border
-                        Margin="0,4"
-                        Padding="8"
-                        StrokeShape="RoundRectangle 12">
-                        <Grid ColumnDefinitions="64,*,Auto" ColumnSpacing="10">
-
-                            <Image
-                                Grid.Column="0"
-                                Aspect="AspectFill"
-                                HeightRequest="48"
-                                Source="{Binding ThumbnailUrl}"
-                                WidthRequest="64" />
-
-                            <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="13"
-                                    LineBreakMode="TailTruncation"
-                                    MaxLines="2"
-                                    Text="{Binding Title}" />
-                                <Label
-                                    FontSize="11"
-                                    Text="{Binding Channel}"
-                                    TextColor="Gray" />
-                                <Label
-                                    FontSize="11"
-                                    Text="{Binding DownloadedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
-                                    TextColor="Gray" />
-                                <Label
-                                    FontSize="11"
-                                    Text="{Binding Format}"
-                                    TextColor="CadetBlue" />
-                                <Label
-                                    FontSize="11"
-                                    Text="{Binding Url}"
-                                    TextColor="CadetBlue" />
-                            </VerticalStackLayout>
-
-                            <VerticalStackLayout
-                                Grid.Column="2"
-                                Spacing="4"
-                                VerticalOptions="Center">
-                                <Button
-                                    Command="{Binding BindingContext.ReDownloadCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
-                                    CommandParameter="{Binding}"
-                                    HeightRequest="40"
-                                    Text="↩️"
-                                    WidthRequest="40" />
-                                <Button
-                                    BackgroundColor="IndianRed"
-                                    Command="{Binding BindingContext.DeleteCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
-                                    CommandParameter="{Binding}"
-                                    HeightRequest="40"
-                                    Text="🗑️"
-                                    WidthRequest="40" />
-                            </VerticalStackLayout>
-
-                        </Grid>
-                    </Border>
-                </DataTemplate>-->
                 <DataTemplate>
                     <Border
                         Margin="0,6"
                         Padding="10"
-                        BackgroundColor="{AppThemeBinding Light=White,
-                                                          Dark=#1E1E1E}"
-                        Stroke="#303030"
+                        BackgroundColor="{DynamicResource ColorFondoSuperficie}"
+                        Stroke="{DynamicResource ColorBordeNormal}"
                         StrokeShape="RoundRectangle 14"
-                        StrokeThickness="1">
+                        StrokeThickness="0.5">
 
                         <Grid ColumnDefinitions="140,*,Auto" ColumnSpacing="12">
 
                             <!--  Thumbnail  -->
                             <Grid Grid.Column="0">
-
                                 <Image
                                     Aspect="AspectFill"
                                     HeightRequest="80"
                                     Source="{Binding ThumbnailUrl}" />
 
-                                <!--  Formato  -->
+                                <!--  Badge de formato  -->
                                 <Border
                                     Margin="0,0,6,6"
                                     Padding="6,2"
@@ -116,27 +54,23 @@
                                     HorizontalOptions="End"
                                     StrokeShape="RoundRectangle 6"
                                     VerticalOptions="End">
-
                                     <Label
                                         FontSize="10"
                                         Text="{Binding Format}"
                                         TextColor="White" />
-
                                 </Border>
-
                             </Grid>
 
                             <!--  Información  -->
                             <VerticalStackLayout Grid.Column="1" Spacing="4">
 
-                                <!--  Título  -->
                                 <Label
                                     FontAttributes="Bold"
                                     FontSize="15"
                                     MaxLines="2"
-                                    Text="{Binding Title}" />
+                                    Text="{Binding Title}"
+                                    TextColor="{DynamicResource ColorTextoPrimario}" />
 
-                                <!--  Canal  -->
                                 <HorizontalStackLayout Spacing="4">
                                     <Label
                                         FontSize="12"
@@ -145,28 +79,24 @@
                                     <Label
                                         FontSize="12"
                                         Text="{Binding Channel}"
-                                        TextColor="Gray" />
+                                        TextColor="{DynamicResource ColorTextoSecundario}" />
                                 </HorizontalStackLayout>
 
-                                <!--  Fecha  -->
                                 <HorizontalStackLayout Spacing="4">
                                     <Label FontSize="12" Text="📅" />
                                     <Label
                                         FontSize="12"
                                         Text="{Binding DownloadedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
-                                        TextColor="Gray" />
+                                        TextColor="{DynamicResource ColorTextoSecundario}" />
                                 </HorizontalStackLayout>
 
-                                <!--  Abrir vídeo  -->
                                 <Label
                                     FontSize="12"
                                     Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[ShowOriginalVid]}"
-                                    TextColor="#2196F3">
-
+                                    TextColor="{DynamicResource ColorInfo}">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding BindingContext.OpenUrlCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}" CommandParameter="{Binding}" />
                                     </Label.GestureRecognizers>
-
                                 </Label>
 
                             </VerticalStackLayout>
@@ -177,10 +107,9 @@
                                 Spacing="8"
                                 VerticalOptions="Center">
 
-                                <!--  Re-descargar  -->
                                 <ImageButton
                                     Padding="10"
-                                    BackgroundColor="LimeGreen"
+                                    BackgroundColor="{DynamicResource ColorExito}"
                                     Command="{Binding BindingContext.ReDownloadCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
                                     CommandParameter="{Binding}"
                                     CornerRadius="21"
@@ -188,10 +117,9 @@
                                     Source="descargarflecha.png"
                                     WidthRequest="42" />
 
-                                <!--  Eliminar  -->
                                 <ImageButton
                                     Padding="10"
-                                    BackgroundColor="IndianRed"
+                                    BackgroundColor="{DynamicResource ColorError}"
                                     Command="{Binding BindingContext.DeleteCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
                                     CommandParameter="{Binding}"
                                     CornerRadius="21"
@@ -202,27 +130,15 @@
                             </VerticalStackLayout>
 
                         </Grid>
-
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!--  Botón limpiar todo  -->
-        <!--<ImageButton
-            Grid.Row="2"
-            Padding="10"
-            BackgroundColor="IndianRed"
-            Command="{Binding ClearAllCommand}"
-            CornerRadius="21"
-            HeightRequest="42"
-            Source="eliminar.png"
-            ToolTipProperties.Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[ClearAll]}"
-            WidthRequest="42" />-->
         <Button
             Grid.Row="2"
             Margin="10,6"
-            BackgroundColor="IndianRed"
+            BackgroundColor="{DynamicResource ColorError}"
             Command="{Binding ClearAllCommand}"
             Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[ClearAll]}" />
 

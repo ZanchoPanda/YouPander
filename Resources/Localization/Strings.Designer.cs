@@ -385,6 +385,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Custom config.
+        /// </summary>
+        internal static string TextAdvancedConfig {
+            get {
+                return ResourceManager.GetString("TextAdvancedConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Type.
         /// </summary>
         internal static string Type {

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ using YouPander.Services;
 
 namespace YouPander.ViewModels
 {
-    public class SettingsViewModel : BaseViewModel
+    public partial class SettingsViewModel : BaseViewModel
     {
         private readonly SettingsService _settingsService;
         private readonly YtDlpService _ytDlpService;
@@ -31,6 +32,9 @@ namespace YouPander.ViewModels
                 }
             }
         }
+
+        [ObservableProperty]
+        private bool _temaClaro;
 
         #region Commands
 

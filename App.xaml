@@ -18,9 +18,25 @@
             <conv:ActiveColorConverter x:Key="ActiveColorConverter" />
             <local2:LocalizationResourceManager x:Key="Loc" x:Shared="False" />
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/YouPanderStyles.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+
+        <Style TargetType="Label">
+            <Setter Property="TextColor" Value="{DynamicResource ColorTextoPrimario}" />
+        </Style>
+
+        <Style TargetType="Entry">
+            <Setter Property="BackgroundColor" Value="{DynamicResource ColorFondoElevado}" />
+            <Setter Property="TextColor" Value="{DynamicResource ColorTextoPrimario}" />
+        </Style>
+
+        <Style TargetType="Picker">
+            <Setter Property="BackgroundColor" Value="{DynamicResource ColorFondoElevado}" />
+            <Setter Property="TextColor" Value="{DynamicResource ColorTextoPrimario}" />
+        </Style>
+
     </Application.Resources>
 </Application>

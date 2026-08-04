@@ -36,6 +36,9 @@ namespace YouPander
             builder.Services.AddSingleton<SettingsService>();
             builder.Services.AddSingleton<HistoryService>();
 
+            var ajustesIniciales = new SettingsService().Load();
+            TemaService.TemaPendiente = ajustesIniciales.DarkMode;
+
             // ViewModels
             builder.Services.AddTransient<MainViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
