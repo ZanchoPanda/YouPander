@@ -56,25 +56,6 @@ namespace YouPander.Services
         public async Task EnsureInstalledAsync()
         {
             #region V1
-            //if (File.Exists(_path))
-            //    return;
-
-            //string url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
-            //string? dir = Path.GetDirectoryName(_path);
-
-            //if (!string.IsNullOrEmpty(dir))
-            //    Directory.CreateDirectory(dir);
-
-            //using HttpClient client = new HttpClient();
-            //using HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-            //response.EnsureSuccessStatusCode();
-
-            //using Stream stream = await response.Content.ReadAsStreamAsync();
-            //using var fs = new FileStream(_path, FileMode.Create, FileAccess.Write, FileShare.None);
-            //await stream.CopyToAsync(fs);
-            #endregion
-
-            #region V2
             if (File.Exists(_path))
             {
                 return;
@@ -442,13 +423,13 @@ namespace YouPander.Services
                 bool hasAudio = acodec != "none";
 
                 var height = f.TryGetProperty("height", out var h) && h.ValueKind == JsonValueKind.Number
-                    ? h.GetInt32() : 0;
+                    ? (int)h.GetDouble() : 0;
                 var tbr = f.TryGetProperty("tbr", out var tb) && tb.ValueKind == JsonValueKind.Number
-                    ? tb.GetDouble() : 0;
+                    ? (int)tb.GetDouble() : 0;
                 var abr = f.TryGetProperty("abr", out var ab) && ab.ValueKind == JsonValueKind.Number
-                    ? ab.GetDouble() : 0;
+                    ? (int)ab.GetDouble() : 0;
                 var fps = f.TryGetProperty("fps", out var fp) && fp.ValueKind == JsonValueKind.Number
-                    ? fp.GetInt32() : 0;
+                    ? (int)Math.Round(fp.GetDouble()) : 0;
 
                 // ── Vídeo ────────────────────────────────────────────────────
                 if (hasVideo && (height > 0 || tbr > 0))
