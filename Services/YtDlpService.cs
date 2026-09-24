@@ -6,6 +6,7 @@ using System.Net;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Web;
 using YouPander.Models;
 using YouPander.Resources.Localization;
@@ -540,7 +541,7 @@ namespace YouPander.Services
 
         #region Get Info from URL
 
-        public async Task<List<VideoInfo>> FetchInfoAsync(string url, CancellationToken ct = default)
+        public async Task<List<VideoInfo>> FetchInfoAsync(string url, CancellationToken ct = default, bool fullMetadata = false)
         {
             var raw = await RunAndCaptureAsync($"--flat-playlist -J \"{url}\"", ct);
 
@@ -581,11 +582,17 @@ namespace YouPander.Services
             try
             {
 
-                string Duration = el.TryGetProperty("duration", out var d)
-                    && d.ValueKind == JsonValueKind.Number
-                    && d.TryGetDouble(out double seconds)
-                    ? TimeSpan.FromSeconds(seconds).ToString(@"m\:ss")
-                    : string.Empty;
+                double? DurationSeconds = null;
+                string Duration = string.Empty;
+
+                if (el.TryGetProperty("duration", out var d) &&
+                    d.ValueKind == JsonValueKind.Number &&
+                    d.TryGetDouble(out double seconds))
+                {
+                    DurationSeconds = seconds;
+
+                    Duration = TimeSpan.FromSeconds(seconds).ToString(@"m\:ss");
+                }
 
                 string thumbnail = string.Empty;
 
@@ -613,7 +620,20 @@ namespace YouPander.Services
                     Channel = el.GetStringOrEmpty("channel") ?? el.GetStringOrEmpty("uploader"),
                     Thumbnail = thumbnail,
                     Url = url,
-                    Duration = Duration
+                    Duration = Duration,
+                    DurationSeconds = DurationSeconds,
+
+                    // Metadata musical
+                    Artist = el.GetStringOrEmpty("artist"),
+                    Artists = GetStringArray(el, "artists"),
+                    Album = el.GetStringOrEmpty("album"),
+                    AlbumArtist = el.GetStringOrEmpty("album_artist"),
+                    TrackNumber = GetInt32(el, "track_number"),
+                    DiscNumber = GetInt32(el, "disc_number"),
+                    Genre = el.GetStringOrEmpty("genre"),
+                    ReleaseDate = el.GetStringOrEmpty("release_date"),
+                    Description = el.GetStringOrEmpty("description"),
+
                 };
             }
             catch (Exception ex)
@@ -621,6 +641,37 @@ namespace YouPander.Services
                 var aux = ex;
                 throw;
             }
+        }
+
+        private static int? GetInt32(JsonElement el, string property)
+        {
+            if (!el.TryGetProperty(property, out var value))
+                return null;
+
+            if (value.ValueKind == JsonValueKind.Number &&
+                value.TryGetInt32(out var result))
+            {
+                return result;
+            }
+
+            return null;
+        }
+        private static List<string>? GetStringArray(JsonElement el, string property)
+        {
+            if (!el.TryGetProperty(property, out var value) ||
+                value.ValueKind != JsonValueKind.Array)
+            {
+                return null;
+            }
+
+            var result = value.EnumerateArray()
+                .Where(x => x.ValueKind == JsonValueKind.String)
+                .Select(x => x.GetString())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Cast<string>()
+                .ToList();
+
+            return result.Count > 0 ? result : null;
         }
 
         private static string BuildUrlFromId(JsonElement el, string id)
@@ -876,6 +927,126 @@ namespace YouPander.Services
 
         #endregion
 
+        #region Obtencion de MetaData
+
+        public static SongMetadata FromVideoInfo(VideoInfo info)
+        {
+            return new SongMetadata
+            {
+                Title = info.Title,
+
+                Artist =
+                    info.Artist ??
+                    (info.Artists?.Count > 0
+                        ? string.Join(", ", info.Artists)
+                        : null),
+
+                Album = info.Album,
+                AlbumArtist = info.AlbumArtist,
+
+                TrackNumber = info.TrackNumber,
+                DiscNumber = info.DiscNumber,
+
+                Genre = info.Genre,
+
+                CoverUrl = info.Thumbnail,
+
+                Year = ParseYear(info.ReleaseDate)
+            };
+        }
+
+        private static int? ParseYear(string? date)
+        {
+            if (string.IsNullOrWhiteSpace(date))
+                return null;
+
+            if (date.Length >= 4 &&
+                int.TryParse(date[..4], out var year))
+            {
+                return year;
+            }
+
+            return null;
+        }
+
+        public static SongCandidate CreateSongCandidate(VideoInfo info)
+        {
+            string? artist = info.Artist;
+
+            if (string.IsNullOrWhiteSpace(artist))
+            {
+                if (info.Artists?.Count > 0)
+                {
+                    artist = string.Join(", ", info.Artists);
+                }
+                else
+                {
+                    artist = info.Channel;
+                }
+            }
+
+            var title = CleanYoutubeTitle(
+                info.Title,
+                artist);
+
+            return new SongCandidate
+            {
+                Title = title,
+                Artist = artist,
+                DurationSeconds = info.DurationSeconds,
+                CoverUrl = info.Thumbnail
+            };
+        }
+
+        public static SongCandidate CreateCandidate(VideoInfo info)
+        {
+            var title = CleanYoutubeTitle(
+                info.Title,
+                info.Channel);
+
+            var artist =
+                !string.IsNullOrWhiteSpace(info.Artist)
+                    ? info.Artist
+                    : info.Channel;
+
+            return new SongCandidate
+            {
+                Title = title,
+                Artist = artist,
+                DurationSeconds = info.DurationSeconds,
+                CoverUrl = info.Thumbnail
+            };
+        }
+        private static string CleanYoutubeTitle(string? title, string? channel)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                return string.Empty;
+
+            var result = title.Trim();
+
+            // Eliminar contenido entre corchetes
+            result = Regex.Replace(result,
+                @"\s*\[[^\]]*\]",
+                "");
+
+            // Eliminar contenido entre paréntesis
+            result = Regex.Replace(result,
+                @"\s*\([^)]*\)",
+                "");
+
+            // Si termina en "- Linkin Park", quitarlo
+            if (!string.IsNullOrWhiteSpace(channel))
+            {
+                result = Regex.Replace(result,
+                    $@"\s*[-–—]\s*{Regex.Escape(channel)}\s*$",
+                    "",
+                    RegexOptions.IgnoreCase);
+            }
+
+            return result.Trim();
+        }
+
+        #endregion
 
     }
 }

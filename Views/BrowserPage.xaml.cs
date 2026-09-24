@@ -306,7 +306,7 @@ public partial class BrowserPage : ContentPage
             var settings = _settings.Load();
             string FinalDownloadPath = settings.DownloadPath;
 
-            var infos = await _ytDlp.FetchInfoAsync(UrlLimpia);
+            var infos = await _ytDlp.FetchInfoAsync(UrlLimpia, new CancellationToken(), true);
             VideoInfo Video = infos.FirstOrDefault();
 
             var formats = await _ytDlp.FetchFormatsAsync(UrlLimpia);
