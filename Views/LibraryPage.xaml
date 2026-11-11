@@ -214,6 +214,7 @@
                 <Slider
                     Grid.Column="1"
                     DragCompleted="Slider_DragCompleted"
+                    DragStarted="Slider_DragStarted"
                     Maximum="{Binding Duration}"
                     Minimum="0"
                     Value="{Binding Position}" />

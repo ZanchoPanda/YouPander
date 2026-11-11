@@ -423,7 +423,7 @@ namespace YouPander.Services
                 bool hasVideo = vcodec != "none";
                 bool hasAudio = acodec != "none";
 
-                var height = f.TryGetProperty("height", out var h) && h.ValueKind == JsonValueKind.Number
+                int height = f.TryGetProperty("height", out var h) && h.ValueKind == JsonValueKind.Number
                     ? (int)h.GetDouble() : 0;
                 var tbr = f.TryGetProperty("tbr", out var tb) && tb.ValueKind == JsonValueKind.Number
                     ? (int)tb.GetDouble() : 0;
@@ -432,6 +432,7 @@ namespace YouPander.Services
                 var fps = f.TryGetProperty("fps", out var fp) && fp.ValueKind == JsonValueKind.Number
                     ? (int)Math.Round(fp.GetDouble()) : 0;
 
+                int displayHeight = NormalizeResolution(height);
                 // ── Vídeo ────────────────────────────────────────────────────
                 if (hasVideo && (height > 0 || tbr > 0))
                 {
@@ -444,7 +445,7 @@ namespace YouPander.Services
                         Tbr = tbr,
                         IsVideo = true,
                         Label = height > 0
-                            ? $"Video {ext.ToUpper()} — {height}p{(fps >= 60 ? $" {fps}fps" : "")}"
+                            ? $"Video {ext.ToUpper()} — {displayHeight}p{(fps >= 60 ? $" {fps}fps" : "")}"
                             : $"Video {ext.ToUpper()} — ~{tbr:F0}kbps"
                     });
                 }
@@ -483,9 +484,9 @@ namespace YouPander.Services
             foreach (var group in videoGroups)
             {
                 var top = group
-                    .GroupBy(v => v.ResolutionInt) // una entrada por resolución
+                    .GroupBy(v => NormalizeResolution(v.ResolutionInt)) // una entrada por resolución
                     .Select(g => g.OrderByDescending(v => v.Tbr).First()) // mejor tbr por resolución
-                    .OrderByDescending(v => v.ResolutionInt)
+                    .OrderByDescending(v => NormalizeResolution(v.ResolutionInt))
                     .ThenByDescending(v => v.Tbr)
                     .Take(topPerFormat);
 
@@ -575,6 +576,28 @@ namespace YouPander.Services
             }
 
             return results;
+        }
+
+        private static int NormalizeResolution(int height)
+        {
+            if (height <= 0)
+                return 0;
+
+            int[] standardResolutions =
+                {
+                    144, 240, 360, 480, 540,
+                    720, 1080, 1440, 2160, 4320
+                };
+
+            // Buscar la resolución estándar más cercana,
+            // siempre que la diferencia no supere un margen.
+            int closest = standardResolutions
+                .OrderBy(r => Math.Abs(r - height))
+                .First();
+
+            return Math.Abs(closest - height) <= 30
+                ? closest
+                : height;
         }
 
         private static VideoInfo ParseEntry(JsonElement el)
@@ -816,7 +839,7 @@ namespace YouPander.Services
 
                 formatArgs =
                 [
-                    $"-f \"{audioSelector}\"", 
+                    $"-f \"{audioSelector}\"",
                     $"--merge-output-format {mergeExt}",
                     $"--postprocessor-args \"{audioCodec}\"",
         ];

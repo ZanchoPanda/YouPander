@@ -31,8 +31,7 @@ public partial class LibraryViewModel : ObservableObject
 
     // ── Tabs ──────────────────────────────────────────────────────────
     [RelayCommand]
-    public void SelectTab(string index) =>
-        SelectedTabIndex = int.TryParse(index, out int i) ? i : 0;
+    public void SelectTab(string index) => SelectedTabIndex = int.TryParse(index, out int i) ? i : 0;
 
     // ── Carga desde configuración ─────────────────────────────────────
     public void LoadFromSettings(AppSettings settings)
@@ -71,13 +70,17 @@ public partial class LibraryViewModel : ObservableObject
     private static void ScanInto(ObservableCollection<MediaItem> target, string? path)
     {
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+        {
             return;
+        }
 
         foreach (var file in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
         {
             var item = MediaItem.TryCreate(file);
             if (item is not null)
+            {
                 target.Add(item);
+            }
         }
     }
 
@@ -103,15 +106,28 @@ public partial class LibraryViewModel : ObservableObject
     [RelayCommand]
     public void Next()
     {
-        if (_queue.Count == 0) return;
-        _queueIndex = (_queueIndex + 1) % _queue.Count;
-        SetCurrentItem(_queue[_queueIndex]);
+        try
+        {
+            if (_queue.Count == 0)
+            {
+                return;
+            }
+            _queueIndex = (_queueIndex + 1) % _queue.Count;
+            SetCurrentItem(_queue[_queueIndex]);
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
     }
 
     [RelayCommand]
     public void Previous()
     {
-        if (_queue.Count == 0) return;
+        if (_queue.Count == 0)
+        {
+            return;
+        }
         _queueIndex = (_queueIndex - 1 + _queue.Count) % _queue.Count;
         SetCurrentItem(_queue[_queueIndex]);
     }
@@ -119,20 +135,30 @@ public partial class LibraryViewModel : ObservableObject
     [RelayCommand]
     public void ToggleShuffle()
     {
-        IsShuffleOn = !IsShuffleOn;
+        try
+        {
+            IsShuffleOn = !IsShuffleOn;
 
-        if (_queue.Count == 0) return;
+            if (_queue.Count == 0) return;
 
-        var current = _queueIndex >= 0 ? _queue[_queueIndex] : null;
+            var current = _queueIndex >= 0 ? _queue[_queueIndex] : null;
 
-        _queue = IsShuffleOn
-            ? _queue.OrderBy(_ => Random.Shared.Next()).ToList()
-            : (ShowTabs
-                ? (SelectedTabIndex == 0 ? MusicItems : VideoItems)
-                : AllItems).ToList();
+            _queue = IsShuffleOn
+                ? _queue.OrderBy(_ => Random.Shared.Next()).ToList()
+                : (ShowTabs
+                    ? (SelectedTabIndex == 0 ? MusicItems : VideoItems)
+                    : AllItems).ToList();
 
-        if (current is not null)
-            _queueIndex = _queue.IndexOf(current);
+            if (current is not null)
+            {
+                _queueIndex = _queue.IndexOf(current);
+            }
+        }
+        catch (Exception ex)
+        {
+            var aux = ex;
+            throw;
+        }
     }
 
     [RelayCommand]
@@ -140,8 +166,14 @@ public partial class LibraryViewModel : ObservableObject
 
     private void SetCurrentItem(MediaItem item)
     {
+        Position = 0;
+        Duration = 1;
+
+        PositionLabel = "0:00";
+        DurationLabel = "0:00";
+
+        IsPlaying = false;
         CurrentItem = item;
-        IsPlaying = true;
     }
 
     // ── Progreso ──────────────────────────────────────────────────────
@@ -156,9 +188,13 @@ public partial class LibraryViewModel : ObservableObject
     public void OnMediaEnded()
     {
         if (IsRepeatOn)
+        {
             SetCurrentItem(_queue[_queueIndex]); // misma pista
+        }
         else
+        {
             Next();
+        }
     }
 
     private static string FormatTime(double seconds)

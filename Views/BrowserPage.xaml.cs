@@ -91,27 +91,7 @@ public partial class BrowserPage : ContentPage
 
     protected override void OnAppearing()
     {
-        #region Version 1
-
-        //base.OnAppearing();
-        //if (!string.IsNullOrEmpty(_url))
-        //    WebViewControl.Source = new UrlWebViewSource { Url = _url };
-        #endregion
-
-        #region Version 2
-        //base.OnAppearing();
-        //if (!string.IsNullOrEmpty(_url))
-        //    WebViewControl.Source = new UrlWebViewSource { Url = _url };
-
-        //_tracker = new WebViewUrlTracker(WebViewControl, url =>
-        //{
-        //    _url = url;
-        //    LblUrl.Text = url;
-        //});
-        //_tracker.Start();
-        #endregion
-
-        #region V3
+        #region V1
         base.OnAppearing();
 
         if (WebViewControl.Handler != null)
@@ -205,7 +185,7 @@ public partial class BrowserPage : ContentPage
             File.AppendAllText(logPath, $"ERROR: {ex.GetType().Name}\n");
             File.AppendAllText(logPath, $"Mensaje: {ex.Message}\n");
             File.AppendAllText(logPath, $"StackTrace: {ex.StackTrace}\n");
-            await DisplayAlert("Error WebView", ex.Message, "OK");
+            await DisplayAlertAsync("Error WebView", ex.Message, "OK");
         }
         #endregion
 
@@ -266,26 +246,9 @@ public partial class BrowserPage : ContentPage
         }
         catch (Exception ex)
         {
-            DisplayAlert("Error", $"No se pudo recargar: {ex.Message}", "OK");
+            await DisplayAlertAsync("Error", $"No se pudo recargar: {ex.Message}", "OK");
         }
     }
-
-    //protected override bool OnBackButtonPressed()
-    //{
-    //    //Desactivado para evitar hacer tantos clicks en flecha
-
-    //    //if (WebViewControl.CanGoBack)
-    //    //{
-    //    //    WebViewControl.GoBack();
-    //    //    return true;
-    //    //}
-
-    //    MainThread.BeginInvokeOnMainThread(async () =>
-    //    {
-    //        await Shell.Current.GoToAsync("//MainPage");
-    //    });
-    //    return true;
-    //}
 
     private async void OnDownloadClicked(object sender, EventArgs e)
     {
