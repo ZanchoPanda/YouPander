@@ -24,7 +24,7 @@
     <ShellContent
         Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[History]}"
         ContentTemplate="{DataTemplate views:HistoryPage}"
-        Icon="descargarflecha.png"
+        Icon="descargarflechawb.png"
         Route="HistoryPage" />
 
     <ShellContent
