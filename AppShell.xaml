@@ -7,7 +7,17 @@
     xmlns:local2="clr-namespace:YouPander.Services"
     xmlns:resx="clr-namespace:YouPander.Resources.Localization"
     xmlns:views="clr-namespace:YouPander.Views"
-    Title="YouPander">
+    Title="YouPander"
+    Shell.BackgroundColor="{DynamicResource ColorFondoSuperficie}"
+    Shell.FlyoutBackgroundColor="{DynamicResource ColorFondoSuperficie}"
+    Shell.ForegroundColor="{DynamicResource ColorTextoPrimario}"
+    Shell.NavBarHasShadow="False"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarBackgroundColor="{DynamicResource ColorFondoSuperficie}"
+    Shell.TabBarForegroundColor="{DynamicResource ColorAcento}"
+    Shell.TabBarTitleColor="{DynamicResource ColorAcento}"
+    Shell.TabBarUnselectedColor="{DynamicResource ColorTextoSecundario}"
+    Shell.TitleColor="{DynamicResource ColorTextoPrimario}">
 
     <ShellContent
         Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Home]}"

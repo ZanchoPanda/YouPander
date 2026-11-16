@@ -46,16 +46,30 @@ namespace YouPander.Resources.Converters
     // Pestaña activa → color destacado
     public class TabColorConverter : IValueConverter
     {
-        public object Convert(object? value, Type t, object? p, CultureInfo c)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            int selected = value is int i ? i : 0;
-            int tab = p is string s && int.TryParse(s, out int parsed) ? parsed : 0;
-            return selected == tab
-                ? Color.FromArgb("#2196F3")
-                : Colors.Transparent;
+            int selected = System.Convert.ToInt32(value);
+            int tab = System.Convert.ToInt32(parameter);
+
+            bool isSelected = selected == tab;
+
+            string resourceKey = isSelected
+                ? "ColorTabSeleccionada"
+                : "ColorTabNoSeleccionada";
+
+            if (Application.Current?.Resources.TryGetValue(
+                resourceKey, out var color) == true)
+            {
+                return color;
+            }
+
+            return Colors.Transparent;
         }
-        public object ConvertBack(object? v, Type t, object? p, CultureInfo c)
-            => throw new NotImplementedException();
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     // Misma lógica pero para FontAttributes

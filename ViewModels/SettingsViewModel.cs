@@ -102,11 +102,8 @@ namespace YouPander.ViewModels
             LocalizationResourceManager.Instance.SetCulture(Settings.Language);
 
             ApplyTheme();
-            await Shell.Current.GoToAsync("//MainPage");
 
-            // TODO: Reinicio de app x si da mucho por saco lo del idioma
-            Process.Start(Environment.ProcessPath!);
-            Application.Current?.Quit();
+            await Shell.Current.GoToAsync("//MainPage");
 
         }
 
@@ -181,11 +178,14 @@ namespace YouPander.ViewModels
 
         private void ApplyTheme()
         {
-            var app = Application.Current;
-            if (app == null || Settings == null)
+            if (Settings == null)
                 return;
 
-            if (!string.IsNullOrEmpty(Settings.ThemeColor))
+            // Aplicar la paleta propia de YouPander
+            TemaService.AplicarTema(Settings.DarkMode);
+
+            // Aplicar el color personalizado si existe
+            if (!string.IsNullOrWhiteSpace(Settings.ThemeColor))
             {
                 try
                 {
@@ -196,24 +196,14 @@ namespace YouPander.ViewModels
 
                     var color = Color.FromArgb(hex);
 
-                    //app.Resources["Primary"] = color;
-                    if (app.Resources["Primary"] is SolidColorBrush brush)
-                    {
-                        brush.Color = color;
-                    }
-                    else
-                    {
-                        app.Resources["Primary"] = new SolidColorBrush(color);
-                    }
+                    Application.Current!.Resources["ColorAcento"] = color;
+
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Color error: {ex.Message}");
+                    Debug.WriteLine($"Color error: {ex.Message}");
                 }
             }
-
-            app.UserAppTheme =
-                Settings.DarkMode ? AppTheme.Dark : AppTheme.Light;
         }
 
         #endregion

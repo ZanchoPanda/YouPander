@@ -22,6 +22,8 @@ public static class TemaService
     /// </summary>
     public static void AplicarTema(bool darkMode)
     {
+        #region Version 1
+
         Uri uriNuevo = darkMode ? UriTemaOscuro : UriTemaClaro;
         var recursos = Application.Current!.Resources.MergedDictionaries;
 
@@ -38,10 +40,18 @@ public static class TemaService
         // que busca la clave en todos los diccionarios fusionados sin importar el orden
         var nuevoTema = darkMode ? CrearTemaOscuro() : CrearTemaClaro();
         recursos.Add(nuevoTema);
+
+        #endregion
+
     }
 
     private static ResourceDictionary CrearTemaOscuro() => new ResourceDictionary
     {
+        { "ColorTabSeleccionada", Color.FromArgb("#343A46") },
+        { "ColorTabNoSeleccionada", Color.FromArgb("#242831") },
+        { "ColorTextoTabSeleccionada", Color.FromArgb("#FFFFFF") },
+        { "ColorTextoTabNoSeleccionada", Color.FromArgb("#B8BEC9") },
+
         { "ColorFondoPrincipal",    Color.FromArgb("#0F0F11") },
         { "ColorFondoSuperficie",   Color.FromArgb("#1A1A1F") },
         { "ColorFondoElevado",      Color.FromArgb("#24242B") },
@@ -68,27 +78,37 @@ public static class TemaService
 
     private static ResourceDictionary CrearTemaClaro() => new ResourceDictionary
     {
-        { "ColorFondoPrincipal",    Color.FromArgb("#FDF1DD") },
-        { "ColorFondoSuperficie",   Color.FromArgb("#FDE1DD") },
-        { "ColorFondoElevado",      Color.FromArgb("#FDDDE9") },
-        { "ColorFondoControl",      Color.FromArgb("#E8E6E0") },
+        { "ColorTabSeleccionada", Color.FromArgb("#FFFFFF") },
+        { "ColorTabNoSeleccionada", Color.FromArgb("#EAECEF") },
+        { "ColorTextoTabSeleccionada", Color.FromArgb("#252525") },
+        { "ColorTextoTabNoSeleccionada", Color.FromArgb("#666666") },
 
-        { "ColorAcento",            Color.FromArgb("#DDE9FD") },
-        { "ColorAcentoOscuro",      Color.FromArgb("#4F45C8") },
-        { "ColorAcentoSuave",       Color.FromArgb("#F1DDFD") },
-        { "ColorAcentoMuysuave",    Color.FromArgb("#EEECFe") },
+        // Fondos
+        { "ColorFondoPrincipal",     Color.FromArgb("#F5F3EF") },
+        { "ColorFondoSuperficie",    Color.FromArgb("#FFFFFF") },
+        { "ColorFondoElevado",       Color.FromArgb("#FAF9F6") },
+        { "ColorFondoControl",       Color.FromArgb("#EEECE7") },
 
-        { "ColorTextoPrimario",     Color.FromArgb("#1A1A22") },
-        { "ColorTextoSecundario",   Color.FromArgb("#6B6A7E") },
-        { "ColorTextoDeshabilitado",Color.FromArgb("#B0AFBA") },
-        { "ColorTextoAcento",       Color.FromArgb("#5047D4") },
+        // Acentos morados
+        { "ColorAcento",             Color.FromArgb("#6558B5") },
+        { "ColorAcentoOscuro",       Color.FromArgb("#50458F") },
+        { "ColorAcentoSuave",        Color.FromArgb("#EAE7F5") },
+        { "ColorAcentoMuysuave",     Color.FromArgb("#F3F1FA") },
 
-        { "ColorBordeSutil",        Color.FromArgb("#DDD9D2") },
-        { "ColorBordeNormal",       Color.FromArgb("#C8C4BC") },
+        // Textos
+        { "ColorTextoPrimario",      Color.FromArgb("#292824") },
+        { "ColorTextoSecundario",    Color.FromArgb("#77746D") },
+        { "ColorTextoDeshabilitado", Color.FromArgb("#AAA79F") },
+        { "ColorTextoAcento",        Color.FromArgb("#574B9D") },
 
-        { "ColorExito",             Color.FromArgb("#2A9B63") },
-        { "ColorError",             Color.FromArgb("#CC3333") },
-        { "ColorAdvertencia",       Color.FromArgb("#C07A1A") },
-        { "ColorInfo",              Color.FromArgb("#2A7DC0") },
+        // Bordes
+        { "ColorBordeSutil",         Color.FromArgb("#E8E5DE") },
+        { "ColorBordeNormal",        Color.FromArgb("#D6D2C9") },
+
+        // Estados
+        { "ColorExito",              Color.FromArgb("#347A50") },
+        { "ColorError",              Color.FromArgb("#B84C4C") },
+        { "ColorAdvertencia",        Color.FromArgb("#A66D24") },
+        { "ColorInfo",               Color.FromArgb("#39769D") },
     };
 }
