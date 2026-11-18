@@ -162,6 +162,9 @@
   <data name="DownloadPath" xml:space="preserve">
     <value>Download path</value>
   </data>
+  <data name="EmptyUrlError" xml:space="preserve">
+    <value>Please enter a URL before continuing.</value>
+  </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
   </data>

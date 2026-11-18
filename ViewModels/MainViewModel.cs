@@ -215,13 +215,18 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
 
     private async Task SearchAsync()
     {
+        if (string.IsNullOrWhiteSpace(Url))
+        {
+            ErrorMessage = LocalizationResourceManager.Instance["EmptyUrlError"];
+            return;
+        }
+
         ErrorMessage = string.Empty;
         VideoItems.Clear();
         IsSearching = true;
 
         OnPropertyChanged(nameof(ShowVideoList)); OnPropertyChanged(nameof(IsSearching));
 
-        if (string.IsNullOrWhiteSpace(Url)) return;
         if (!OperatingSystem.IsWindows() || _ytDlp == null)
         {
             Status = Strings.OnlyAvailableOnWindows;

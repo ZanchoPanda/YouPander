@@ -196,6 +196,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Please enter a URL before continuing..
+        /// </summary>
+        internal static string EmptyUrlError {
+            get {
+                return ResourceManager.GetString("EmptyUrlError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Error.
         /// </summary>
         internal static string Error {
