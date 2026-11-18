@@ -7,6 +7,9 @@ using System.Text;
 
 namespace YouPander.ViewModels
 {
-    public partial class BaseViewModel : ObservableObject { }
-    
+    public partial class BaseViewModel : ObservableObject
+    {
+
+    }
+
 }

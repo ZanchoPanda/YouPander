@@ -105,6 +105,7 @@ namespace YouPander.ViewModels
 
             await Shell.Current.GoToAsync("//MainPage");
 
+            LocalizationResourceManager.Instance.DebugCulture();
         }
 
         #region Buttons

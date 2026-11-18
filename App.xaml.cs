@@ -26,12 +26,9 @@ namespace YouPander
 
             // Cargar idioma guardado
             AppSettings setting = _settingsService.Load();
-            string lang = setting.Language;
-
-            if (string.IsNullOrEmpty(lang))
-            {
-                lang = "en";
-            }
+            string lang = string.IsNullOrWhiteSpace(setting.Language)
+                ? "en"
+                : setting.Language;
 
             if (string.IsNullOrWhiteSpace(setting.DownloadPath))
             {

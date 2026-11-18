@@ -20,7 +20,7 @@
             <Picker
                 Grid.Column="1"
                 ItemsSource="{Binding FilterOptions}"
-                SelectedIndex="{Binding SelectedFilterIndex}" />
+                SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay}" />
         </Grid>
 
         <CollectionView

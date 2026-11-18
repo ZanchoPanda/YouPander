@@ -20,7 +20,9 @@ public partial class HistoryPage : ContentPage
         base.OnAppearing();
 
         if (BindingContext is HistoryViewModel vm)
-            await vm.LoadAsync(); // <- hacer LoadAsync público
+        {
+            await vm.LoadAsync();
+        }
     }
 
 }

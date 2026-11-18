@@ -123,6 +123,9 @@
   <data name="AdvancedConfig" xml:space="preserve">
     <value>Advanced Config</value>
   </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
   <data name="AudioDownloadPath" xml:space="preserve">
     <value>Audio Download Path</value>
   </data>
@@ -227,6 +230,15 @@
   </data>
   <data name="TextAdvancedConfig" xml:space="preserve">
     <value>Custom config</value>
+  </data>
+  <data name="ThisMonth" xml:space="preserve">
+    <value>This month</value>
+  </data>
+  <data name="ThisWeek" xml:space="preserve">
+    <value>This week</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Today</value>
   </data>
   <data name="Type" xml:space="preserve">
     <value>Type</value>
