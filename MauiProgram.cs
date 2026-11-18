@@ -63,6 +63,19 @@ namespace YouPander
                 return new YtDlpService(ytPath);
             });
 
+            Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("RemovePickerBorder", (handler, view) =>
+            {
+                handler.PlatformView.Background = null;
+                handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+            });
+
+            // Eliminar borde nativo del Entry
+            Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("RemoveEntryBorder", (handler, view) =>
+            {
+                handler.PlatformView.Background = null;
+                handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+            });
+
 #endif
 
             //#if DEBUG

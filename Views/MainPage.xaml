@@ -76,13 +76,15 @@
                 StrokeThickness="1">
 
                 <Picker
-                    Title="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Type]}"
+                    Title=""
                     BackgroundColor="Transparent"
+                    HorizontalOptions="Fill"
                     ItemDisplayBinding="{Binding Label}"
                     ItemsSource="{Binding AvailableFormats}"
                     SelectedItem="{Binding SelectedFormatOption}"
                     TextColor="{DynamicResource ColorTextoPrimario}"
-                    TitleColor="{DynamicResource ColorTextoSecundario}" />
+                    TitleColor="{DynamicResource ColorTextoSecundario}"
+                    VerticalOptions="Center" />
 
             </Border>
 
@@ -109,9 +111,10 @@
             <Label
                 FontSize="13"
                 HorizontalTextAlignment="Center"
-                IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"
+                IsVisible="Collapse"
                 Text="{Binding Status}"
                 TextColor="{DynamicResource ColorTextoSecundario}" />
+            <!--  IsVisible="{Binding ShowVideoList, Converter={StaticResource InverseBoolConverter}}"  -->
 
             <!--  ERRORES  -->
             <Border
