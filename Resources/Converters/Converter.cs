@@ -116,5 +116,19 @@ namespace YouPander.Resources.Converters
             => throw new NotImplementedException();
     }
 
+    public class TabColumnSpanConverter : IValueConverter
+    {
+        public object Convert(object? value, Type targetType, object? parameter,CultureInfo culture)
+        {
+            bool hasOtherTab = value is bool b && b;
+
+            return hasOtherTab ? 1 : 2;
+        }
+
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
 }
