@@ -2,13 +2,7 @@
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
-
-        public MainPage()
-        {
-            InitializeComponent();
-            BindingContext = new MainViewModel();
-        }
+        private bool _initialized;
 
         public MainPage(MainViewModel viewModel)
         {
@@ -19,9 +13,26 @@
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            if (BindingContext is MainViewModel vm)
-                await vm.InitializeAsync();
-        }
 
+            if (_initialized)
+            {
+                return;
+            }
+
+            if (BindingContext is MainViewModel vm)
+            {
+                _initialized = true;
+
+                try
+                {
+                    await vm.InitializeAsync();
+                }
+                catch (Exception ex)
+                {
+                    _initialized = false;
+                    System.Diagnostics.Debug.WriteLine($"Error inicializando YouPander: {ex}");
+                }
+            }
+        }
     }
 }

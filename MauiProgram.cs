@@ -40,7 +40,6 @@ namespace YouPander
             TemaService.TemaPendiente = ajustesIniciales.DarkMode;
 
             // ViewModels
-            builder.Services.AddTransient<MainViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
             builder.Services.AddTransient<HistoryViewModel>();
 
@@ -55,13 +54,23 @@ namespace YouPander
 
             builder.Services.AddTransient<LibraryPage>();
 
-#if WINDOWS
+
 
             builder.Services.AddSingleton<YtDlpService>(sp =>
             {
-                var ytPath = Path.Combine(FileSystem.AppDataDirectory, "yt-dlp.exe");
-                return new YtDlpService(ytPath);
+                string toolsDirectory = Path.Combine(FileSystem.AppDataDirectory,"Tools");
+
+                return new YtDlpService(toolsDirectory);
             });
+
+            builder.Services.AddTransient<MainViewModel>();
+#if WINDOWS
+
+            //builder.Services.AddSingleton<YtDlpService>(sp =>
+            //{
+            //    var ytPath = Path.Combine(FileSystem.AppDataDirectory, "yt-dlp.exe");
+            //    return new YtDlpService(ytPath);
+            //});
 
             Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("RemovePickerBorder", (handler, view) =>
             {
