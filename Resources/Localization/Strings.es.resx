@@ -147,6 +147,9 @@
   <data name="CompletedDownload" xml:space="preserve">
     <value>Descarga completada</value>
   </data>
+  <data name="CreationDate" xml:space="preserve">
+    <value>Fecha creación:</value>
+  </data>
   <data name="DarkMode" xml:space="preserve">
     <value>Modo oscuro</value>
   </data>
@@ -162,6 +165,9 @@
   <data name="DownloadPath" xml:space="preserve">
     <value>Ruta de descarga</value>
   </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Duración:</value>
+  </data>
   <data name="EmptyUrlError" xml:space="preserve">
     <value>Por favor, introduce una URL antes de continuar.</value>
   </data>
@@ -173,6 +179,15 @@
   </data>
   <data name="FetchingInfo" xml:space="preserve">
     <value>Obteniendo información ...</value>
+  </data>
+  <data name="FileInformation" xml:space="preserve">
+    <value>Información del archivo</value>
+  </data>
+  <data name="FileSize" xml:space="preserve">
+    <value>Tamaño:</value>
+  </data>
+  <data name="Format" xml:space="preserve">
+    <value>Formato:</value>
   </data>
   <data name="GettingInfo" xml:space="preserve">
     <value>Obteniendo información</value>
@@ -189,11 +204,20 @@
   <data name="Library" xml:space="preserve">
     <value>Biblioteca</value>
   </data>
+  <data name="Location" xml:space="preserve">
+    <value>Ubicación</value>
+  </data>
   <data name="MergingAudioVideo" xml:space="preserve">
     <value>Uniendo audio y vídeo</value>
   </data>
+  <data name="ModificationDate" xml:space="preserve">
+    <value>Fecha modificación:</value>
+  </data>
   <data name="Music" xml:space="preserve">
     <value>🎵 Música</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nombre:</value>
   </data>
   <data name="No" xml:space="preserve">
     <value>No</value>

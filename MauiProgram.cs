@@ -18,9 +18,9 @@ namespace YouPander
             var lang = Preferences.Get("Language", "en");
             LocalizationService.SetLanguage(lang);
 
+                //.UseLibVLCSharp()
             builder
                 .UseMauiApp<App>()
-                .UseLibVLCSharp()
                 .UseMauiCommunityToolkit()
                 .UseMauiCommunityToolkitMediaElement(isAndroidForegroundServiceEnabled: false)
                 .ConfigureMauiHandlers(handlers =>

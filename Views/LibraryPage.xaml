@@ -222,99 +222,116 @@
                                         <VerticalStackLayout Spacing="9">
 
                                             <Label
+                                                x:DataType="{x:Null}"
                                                 FontAttributes="Bold"
                                                 FontSize="12"
-                                                Text="INFORMACIÓN DEL ARCHIVO"
-                                                TextColor="{DynamicResource ColorAcentoOscuro}" />
+                                                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[FileInformation]}"
+                                                TextColor="{DynamicResource ColorAcentoOscuro}"
+                                                VerticalOptions="Center"
+                                                VerticalTextAlignment="Center" />
 
                                             <Grid ColumnDefinitions="100,*">
                                                 <Label
                                                     Grid.Column="0"
+                                                    x:DataType="{x:Null}"
                                                     FontSize="12"
-                                                    Text="Nombre:"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Name]}"
                                                     TextColor="Gray" />
                                                 <Label
                                                     Grid.Column="1"
                                                     FontSize="12"
                                                     Text="{Binding FileName}"
-                                                    TextColor="{DynamicResource ColorTextoPrimario}" />
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
                                             </Grid>
 
                                             <Grid ColumnDefinitions="100,*">
                                                 <Label
                                                     Grid.Column="0"
+                                                    x:DataType="{x:Null}"
                                                     FontSize="12"
-                                                    Text="Formato:"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Format]}"
                                                     TextColor="Gray" />
                                                 <Label
                                                     Grid.Column="1"
                                                     FontSize="12"
                                                     Text="{Binding Format}"
-                                                    TextColor="{DynamicResource ColorTextoPrimario}" />
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
                                             </Grid>
 
                                             <Grid ColumnDefinitions="100,*">
                                                 <Label
                                                     Grid.Column="0"
+                                                    x:DataType="{x:Null}"
                                                     FontSize="12"
-                                                    Text="Tamaño:"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[FileSize]}"
                                                     TextColor="Gray" />
                                                 <Label
                                                     Grid.Column="1"
                                                     FontSize="12"
                                                     Text="{Binding FileSize}"
-                                                    TextColor="{DynamicResource ColorTextoPrimario}" />
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
                                             </Grid>
 
                                             <Grid ColumnDefinitions="100,*">
                                                 <Label
                                                     Grid.Column="0"
+                                                    x:DataType="{x:Null}"
                                                     FontSize="12"
-                                                    Text="Creación:"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[CreationDate]}"
                                                     TextColor="Gray" />
                                                 <Label
                                                     Grid.Column="1"
                                                     FontSize="12"
                                                     Text="{Binding CreationDate}"
-                                                    TextColor="{DynamicResource ColorTextoPrimario}" />
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
                                             </Grid>
 
                                             <Grid ColumnDefinitions="100,*">
                                                 <Label
                                                     Grid.Column="0"
+                                                    x:DataType="{x:Null}"
                                                     FontSize="12"
-                                                    Text="Modificación:"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[ModificationDate]}"
                                                     TextColor="Gray" />
                                                 <Label
                                                     Grid.Column="1"
                                                     FontSize="12"
                                                     Text="{Binding ModificationDate}"
-                                                    TextColor="{DynamicResource ColorTextoPrimario}" />
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
                                             </Grid>
 
                                             <Grid ColumnDefinitions="100,*">
                                                 <Label
                                                     Grid.Column="0"
+                                                    x:DataType="{x:Null}"
                                                     FontSize="12"
-                                                    Text="Duración:"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Duration]}"
                                                     TextColor="Gray" />
                                                 <Label
                                                     Grid.Column="1"
                                                     FontSize="12"
                                                     Text="{Binding Duration}"
-                                                    TextColor="{DynamicResource ColorTextoPrimario}" />
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
                                             </Grid>
 
                                             <Label
+                                                x:DataType="{x:Null}"
                                                 FontSize="12"
-                                                Text="Ubicación"
+                                                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Location]}"
                                                 TextColor="Gray" />
 
                                             <Label
                                                 FontSize="11"
                                                 LineBreakMode="CharacterWrap"
                                                 Text="{Binding FilePath}"
-                                                TextColor="{DynamicResource ColorTextoPrimario}" />
+                                                TextColor="{DynamicResource ColorTextoPrimario}"
+                                                VerticalOptions="Center" />
 
                                         </VerticalStackLayout>
 

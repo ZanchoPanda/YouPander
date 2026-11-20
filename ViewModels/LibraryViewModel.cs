@@ -217,27 +217,27 @@ public partial class LibraryViewModel : ObservableObject
     /// <param name="target"></param>
     /// <param name="path"></param>
     /// <param name="isVideo"></param>
-    private static void ScanInto(
-        ObservableCollection<MediaItem> target,
-        string? path,
-        bool? isVideo = null)
+    private static void ScanInto(ObservableCollection<MediaItem> target, string? path, bool? isVideo = null)
     {
         if (string.IsNullOrWhiteSpace(path) ||
             !Directory.Exists(path))
+        {
             return;
+        }
 
-        foreach (var file in Directory.EnumerateFiles(
-            path,
-            "*.*",
-            SearchOption.AllDirectories))
+        foreach (var file in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
         {
             var item = MediaItem.TryCreate(file);
 
             if (item == null)
+            {
                 continue;
+            }
 
             if (isVideo.HasValue && item.IsVideo != isVideo.Value)
+            {
                 continue;
+            }
 
             target.Add(item);
         }

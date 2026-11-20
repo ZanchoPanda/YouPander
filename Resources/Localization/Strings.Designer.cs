@@ -151,6 +151,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Creation date:.
+        /// </summary>
+        internal static string CreationDate {
+            get {
+                return ResourceManager.GetString("CreationDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Dark mode.
         /// </summary>
         internal static string DarkMode {
@@ -196,6 +205,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Duration:.
+        /// </summary>
+        internal static string Duration {
+            get {
+                return ResourceManager.GetString("Duration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Please enter a URL before continuing..
         /// </summary>
         internal static string EmptyUrlError {
@@ -228,6 +246,33 @@ namespace YouPander.Resources.Localization {
         internal static string FetchingInfo {
             get {
                 return ResourceManager.GetString("FetchingInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a File Information.
+        /// </summary>
+        internal static string FileInformation {
+            get {
+                return ResourceManager.GetString("FileInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a File size:.
+        /// </summary>
+        internal static string FileSize {
+            get {
+                return ResourceManager.GetString("FileSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Format:.
+        /// </summary>
+        internal static string Format {
+            get {
+                return ResourceManager.GetString("Format", resourceCulture);
             }
         }
         
@@ -277,6 +322,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Location.
+        /// </summary>
+        internal static string Location {
+            get {
+                return ResourceManager.GetString("Location", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Merging audio and video.
         /// </summary>
         internal static string MergingAudioVideo {
@@ -286,11 +340,29 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Modification date:.
+        /// </summary>
+        internal static string ModificationDate {
+            get {
+                return ResourceManager.GetString("ModificationDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a 🎵 Music.
         /// </summary>
         internal static string Music {
             get {
                 return ResourceManager.GetString("Music", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Name:.
+        /// </summary>
+        internal static string Name {
+            get {
+                return ResourceManager.GetString("Name", resourceCulture);
             }
         }
         
