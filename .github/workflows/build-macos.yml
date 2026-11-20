@@ -56,7 +56,7 @@ jobs:
           dotnet publish YouPander.csproj \
             -f net10.0-maccatalyst \
             -c Release \
-            -r ${{ matrix.rid }} \
+            -r maccatalyst-x64 \
             -p:CreatePackage=false \
             -p:EnableCodeSigning=false
 
