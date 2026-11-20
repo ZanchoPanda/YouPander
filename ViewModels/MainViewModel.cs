@@ -177,37 +177,40 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
 
     #endregion
 
-    public MainViewModel()
+    //public MainViewModel()
+    //{
+    //    _settings = new SettingsService();
+
+    //    if (OperatingSystem.IsWindows())
+    //    {
+    //        var ytPath = Path.Combine(FileSystem.AppDataDirectory, "yt-dlp.exe");
+    //        _ytDlp = new YtDlpService(ytPath);
+    //    }
+
+    //    VideoItems = new ObservableCollection<VideoItem>();
+    //    VideoItems.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ShowVideoList));
+
+    //    SearchCommand = new Command(async () => await SearchAsync(), () => !IsSearching && !IsDownloading);
+    //    DownloadCommand = new Command(async () => await Download(), () => !IsDownloading);
+    //    CancelCommand = new Command(async () => await CancelDownload(), () => IsDownloading);
+    //    OpenSettingsCommand = new Command(async () => await Shell.Current.GoToAsync("///SettingsPage"));
+    //}
+
+    public MainViewModel(SettingsService settings, HistoryService history, YtDlpService ytDlp)
     {
-        _settings = new SettingsService();
-
-        if (OperatingSystem.IsWindows())
-        {
-            var ytPath = Path.Combine(FileSystem.AppDataDirectory, "yt-dlp.exe");
-            _ytDlp = new YtDlpService(ytPath);
-        }
-
-        VideoItems = new ObservableCollection<VideoItem>();
-        VideoItems.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ShowVideoList));
-
-        SearchCommand = new Command(async () => await SearchAsync(), () => !IsSearching && !IsDownloading);
-        DownloadCommand = new Command(async () => await Download(), () => !IsDownloading);
-        CancelCommand = new Command(async () => await CancelDownload(), () => IsDownloading);
-        OpenSettingsCommand = new Command(async () => await Shell.Current.GoToAsync("///SettingsPage"));
-    }
-
-    public MainViewModel(SettingsService settings, HistoryService history, YtDlpService? ytDlp = null)
-    {
-        _settings = new SettingsService();
+        _settings = settings;
         _history = history;
-        _ytDlp = OperatingSystem.IsWindows() ? ytDlp : null;
+        _ytDlp = ytDlp;
 
         VideoItems = new ObservableCollection<VideoItem>();
         VideoItems.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ShowVideoList));
 
         SearchCommand = new Command(async () => await SearchAsync(), () => !IsSearching && !IsDownloading);
+
         DownloadCommand = new Command(async () => await Download(), () => !IsDownloading);
+
         CancelCommand = new Command(async () => await CancelDownload(), () => IsDownloading);
+
         OpenSettingsCommand = new Command(async () => await Shell.Current.GoToAsync("///SettingsPage"));
     }
 

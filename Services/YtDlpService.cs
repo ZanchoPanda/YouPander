@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.IO.Compression;
 using System.Net;
-using System.Runtime.Versioning;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -14,7 +17,6 @@ using YouPander.ViewModels;
 
 namespace YouPander.Services
 {
-    [SupportedOSPlatform("windows")]
     public class YtDlpService : BaseViewModel
     {
         #region Params
@@ -38,15 +40,38 @@ namespace YouPander.Services
             }
         }
 
+        private readonly SemaphoreSlim _installationLock = new(1, 1);
+        private static readonly SemaphoreSlim _ffmpegInstallLock = new(1, 1);
+
+        private static readonly HttpClient _ffmpegHttpClient = new()
+        {
+            Timeout = TimeSpan.FromMinutes(30)
+        };
         #endregion
 
         public YtDlpService(string path)
         {
-            if (!OperatingSystem.IsWindows())
-                throw new PlatformNotSupportedException("YtDlpService solo es compatible en Windows.");
+            if (!OperatingSystem.IsWindows() && !OperatingSystem.IsMacCatalyst())
+            {
+                throw new PlatformNotSupportedException("YouPander solo admite Windows y macOS (Mac Catalyst).");
+            }
 
-            _path = path;
-            _ffmpegPath = Path.Combine(Path.GetDirectoryName(path)!, "ffmpeg.exe");
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("La ruta de yt-dlp no puede estar vacía.", nameof(path));
+            }
+
+            string directory = Path.GetDirectoryName(path) ?? throw new ArgumentException("La ruta debe incluir un directorio.", nameof(path));
+
+            Directory.CreateDirectory(directory);
+
+            string executableName = GetYtDlpAssetName();
+
+            _path = Path.Combine(directory, executableName);
+
+            _ffmpegPath = Path.Combine(directory, OperatingSystem.IsWindows()
+                ? "ffmpeg.exe"
+                : "ffmpeg");
         }
 
         #region yt-dlp
@@ -56,94 +81,596 @@ namespace YouPander.Services
         /// </summary>
         public async Task EnsureInstalledAsync()
         {
-            #region V1
-            if (File.Exists(_path))
+            #region Version con MAc
+            await _installationLock.WaitAsync();
+
+            string tempPath = _path + ".download";
+
+            try
+            {
+                if (File.Exists(_path))
+                {
+                    return;
+                }
+
+                string? directory = Path.GetDirectoryName(_path);
+
+                if (string.IsNullOrEmpty(directory))
+                {
+                    throw new InvalidOperationException("No se pudo determinar el directorio de yt-dlp.");
+                }
+
+                Directory.CreateDirectory(directory);
+
+                using HttpClient client = new();
+
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("YouPander/1.0");
+
+                using HttpResponseMessage apiResponse = await client.GetAsync(ReleasesApi);
+
+                apiResponse.EnsureSuccessStatusCode();
+
+                string json = await apiResponse.Content.ReadAsStringAsync();
+
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                JsonElement root = doc.RootElement;
+
+                string? latestTag = root.GetProperty("tag_name").GetString();
+
+                string assetName = GetYtDlpAssetName();
+
+                JsonElement asset = root.GetProperty("assets")
+                    .EnumerateArray()
+                    .FirstOrDefault(a =>
+                        a.GetProperty("name").GetString() == assetName);
+
+                if (asset.ValueKind == JsonValueKind.Undefined)
+                {
+                    throw new FileNotFoundException($"No se encontró el ejecutable oficial {assetName}.");
+                }
+
+                string? downloadUrl = asset
+                    .GetProperty("browser_download_url")
+                    .GetString();
+
+                string? digest = asset.TryGetProperty("digest", out var digestElement)
+                    ? digestElement.GetString()
+                    : null;
+
+                if (string.IsNullOrWhiteSpace(downloadUrl))
+                {
+                    throw new InvalidOperationException("GitHub no proporcionó una URL de descarga válida.");
+                }
+
+                if (string.IsNullOrWhiteSpace(digest) || !digest.StartsWith("sha256:", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("GitHub no proporcionó un SHA-256 verificable para yt-dlp.");
+                }
+
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+
+                using HttpResponseMessage downloadResponse = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+
+                downloadResponse.EnsureSuccessStatusCode();
+
+                await using (Stream stream = await downloadResponse.Content.ReadAsStreamAsync())
+                await using (FileStream file = new(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                    await stream.CopyToAsync(file);
+                }
+
+                // Verificar integridad SHA-256.
+                string expectedHash = digest["sha256:".Length..];
+
+                await using (FileStream file = File.OpenRead(tempPath))
+                {
+                    byte[] hash = await SHA256.HashDataAsync(file);
+
+                    string actualHash = Convert.ToHexString(hash);
+
+                    if (!actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidDataException("La comprobación SHA-256 de yt-dlp ha fallado.");
+                    }
+                }
+
+                // macOS necesita permiso de ejecución.
+                if (OperatingSystem.IsMacCatalyst())
+                {
+                    File.SetUnixFileMode(
+                        tempPath,
+                        UnixFileMode.UserRead |
+                        UnixFileMode.UserWrite |
+                        UnixFileMode.UserExecute |
+                        UnixFileMode.GroupRead |
+                        UnixFileMode.GroupExecute |
+                        UnixFileMode.OtherRead |
+                        UnixFileMode.OtherExecute);
+                }
+
+                // Instalar únicamente después de verificar el archivo.
+                File.Move(tempPath, _path, overwrite: true);
+
+                Preferences.Set("ytdlp_version", latestTag ?? "");
+            }
+            finally
+            {
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+
+                _installationLock.Release();
+            }
+            #endregion
+        }
+
+        private static string GetYtDlpAssetName()
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                return "yt-dlp.exe";
+            }
+
+            if (OperatingSystem.IsMacCatalyst())
+            {
+                return "yt-dlp_macos";
+            }
+
+            throw new PlatformNotSupportedException();
+        }
+
+        #endregion
+
+        #region FFmpeg (Mac Catalyst y Windows)
+
+        private sealed record FfmpegSource(string ArchiveUrl, string ChecksumUrl, string ArchiveFileName);
+
+        private static FfmpegSource GetFfmpegSource()
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                if (RuntimeInformation.ProcessArchitecture != Architecture.X64)
+                {
+                    throw new PlatformNotSupportedException("YouPander requiere FFmpeg para Windows x64.");
+                }
+
+                const string baseUrl = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/";
+
+                const string archiveName = "ffmpeg-master-latest-win64-lgpl.zip";
+
+                return new FfmpegSource(baseUrl + archiveName, baseUrl + "checksums.sha256", archiveName);
+            }
+
+            if (OperatingSystem.IsMacCatalyst())
+            {
+                string architecture = RuntimeInformation.ProcessArchitecture switch
+                {
+                    Architecture.X64 => "amd64",
+                    Architecture.Arm64 => "arm64",
+
+                    _ => throw new PlatformNotSupportedException($"Arquitectura no compatible: {RuntimeInformation.ProcessArchitecture}")
+                };
+
+                const string baseUrl = "https://ffmpeg.martin-riedl.de/redirect/latest/";
+
+                string archiveUrl = $"{baseUrl}macos/{architecture}/release/ffmpeg.zip";
+
+                return new FfmpegSource(archiveUrl, archiveUrl + ".sha256", "ffmpeg.zip");
+            }
+
+            throw new PlatformNotSupportedException("FFmpeg solo está configurado para Windows y Mac Catalyst.");
+        }
+
+        /// <summary>
+        /// Comprueba e instala FFmpeg si es necesario.
+        /// La instalación se realiza una sola vez aunque haya
+        /// varias llamadas simultáneas.
+        /// </summary>
+        public async Task EnsureFfmpegInstalledAsync(CancellationToken cancellationToken = default)
+        {
+            await _ffmpegInstallLock.WaitAsync(cancellationToken);
+
+            string? zipPath = null;
+            string? stagedPath = null;
+
+            try
+            {
+                string directory = Path.GetDirectoryName(_ffmpegPath)!;
+
+                Directory.CreateDirectory(directory);
+
+                // Comprobar si la instalación existente funciona.
+                if (File.Exists(_ffmpegPath))
+                {
+                    try
+                    {
+                        await ValidateFfmpegAsync(_ffmpegPath, cancellationToken);
+                        return;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch
+                    {
+                        // Instalación corrupta o no ejecutable.
+                        // Continuamos con una instalación nueva.
+                    }
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                FfmpegSource source = GetFfmpegSource();
+
+                string id = Guid.NewGuid().ToString("N");
+
+                zipPath = Path.Combine(directory, $"ffmpeg-{id}.zip");
+
+                stagedPath = Path.Combine(directory, $"ffmpeg-{id}.tmp");
+
+                // 1. Descargar el archivo comprimido.
+                await DownloadFileAsync(source.ArchiveUrl, zipPath, cancellationToken);
+
+                // 2. Obtener el SHA-256 publicado por el proveedor.
+                string checksumText = await _ffmpegHttpClient.GetStringAsync(source.ChecksumUrl, cancellationToken);
+
+                string expectedHash = ExtractExpectedSha256(checksumText, source.ArchiveFileName);
+
+                // 3. Comprobar la integridad del ZIP.
+                await using (var archiveStream = new FileStream(
+                    zipPath,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read,
+                    81920,
+                    FileOptions.Asynchronous | FileOptions.SequentialScan))
+                {
+                    byte[] hash = await SHA256.HashDataAsync(archiveStream, cancellationToken);
+
+                    string actualHash = Convert.ToHexString(hash);
+
+                    if (!actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidDataException(
+                            "La comprobación SHA-256 de FFmpeg ha fallado. " +
+                            "El archivo descargado no es válido.");
+                    }
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // 4. Extraer únicamente el ejecutable.
+                await ExtractFfmpegAsync(zipPath, stagedPath, cancellationToken);
+
+                // 5. Dar permisos de ejecución en macOS.
+                if (OperatingSystem.IsMacCatalyst())
+                {
+                    File.SetUnixFileMode(
+                        stagedPath,
+                        UnixFileMode.UserRead |
+                        UnixFileMode.UserWrite |
+                        UnixFileMode.UserExecute |
+                        UnixFileMode.GroupRead |
+                        UnixFileMode.GroupExecute |
+                        UnixFileMode.OtherRead |
+                        UnixFileMode.OtherExecute);
+                }
+
+                // 6. Verificar que el ejecutable funciona.
+                await ValidateFfmpegAsync(stagedPath, cancellationToken);
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // 7. Sustitución del ejecutable.
+                // Ambos archivos están en el mismo directorio.
+                // No eliminamos previamente el ejecutable anterior.
+                File.Move(stagedPath, _ffmpegPath, overwrite: true);
+
+                stagedPath = null;
+
+                // 8. Verificación final.
+                await ValidateFfmpegAsync(_ffmpegPath, cancellationToken);
+            }
+            finally
+            {
+                // Limpiar archivos temporales.
+                TryDeleteFile(zipPath);
+                TryDeleteFile(stagedPath);
+
+                _ffmpegInstallLock.Release();
+            }
+        }
+
+        /// <summary>
+        /// Descarga un archivo a una ruta temporal o de destino.
+        /// Si falla, elimina el archivo incompleto.
+        /// </summary>
+        private async Task DownloadFileAsync(string url, string destinationPath, CancellationToken cancellationToken = default)
+        {
+            string? directory = Path.GetDirectoryName(destinationPath);
+
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            try
+            {
+                using HttpResponseMessage response = await _ffmpegHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+                response.EnsureSuccessStatusCode();
+
+                await using Stream source = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+                await using var destination = new FileStream(
+                    destinationPath,
+                    FileMode.CreateNew,
+                    FileAccess.Write,
+                    FileShare.None,
+                    81920,
+                    FileOptions.Asynchronous | FileOptions.SequentialScan);
+
+                await source.CopyToAsync(destination, 81920, cancellationToken);
+
+                await destination.FlushAsync(cancellationToken);
+            }
+            catch
+            {
+                TryDeleteFile(destinationPath);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Extrae únicamente ffmpeg.exe o ffmpeg.
+        /// No extrae rutas arbitrarias del ZIP.
+        /// </summary>
+        private async Task ExtractFfmpegAsync(string zipPath, string destinationPath, CancellationToken cancellationToken = default)
+        {
+            string executableName = OperatingSystem.IsWindows()
+                ? "ffmpeg.exe"
+                : "ffmpeg";
+
+            using var archive = ZipFile.OpenRead(zipPath);
+
+            var entry = archive.Entries.FirstOrDefault(e => e.Name.Equals(executableName, StringComparison.OrdinalIgnoreCase));
+
+            if (entry == null || entry.Length <= 0)
+            {
+                throw new FileNotFoundException($"No se encontró un ejecutable válido de {executableName} en el ZIP.");
+            }
+
+            await using Stream input = entry.Open();
+
+            await using var output = new FileStream(
+                destinationPath,
+                FileMode.CreateNew,
+                FileAccess.Write,
+                FileShare.None,
+                81920,
+                FileOptions.Asynchronous | FileOptions.SequentialScan);
+
+            await input.CopyToAsync(output, 81920, cancellationToken);
+
+            await output.FlushAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Obtiene el SHA-256 del archivo esperado desde el manifiesto.
+        /// </summary>
+        private static string ExtractExpectedSha256(string checksumText, string archiveFileName)
+        {
+            if (string.IsNullOrWhiteSpace(checksumText))
+            {
+                throw new InvalidDataException("El manifiesto SHA-256 está vacío.");
+            }
+
+            if (string.IsNullOrWhiteSpace(archiveFileName))
+            {
+                throw new ArgumentException("El nombre del archivo no puede estar vacío.", nameof(archiveFileName));
+            }
+
+            var namedHashes = new List<string>();
+            var unnamedHashes = new List<string>();
+
+            string[] lines = checksumText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string originalLine in lines)
+            {
+                string line = originalLine.Trim();
+
+                if (line.Length == 0)
+                {
+                    continue;
+                }
+
+                // Formato BSD:
+                // SHA256 (archivo.zip) = HASH
+                Match bsdMatch = Regex.Match(line, @"^SHA256\s*\((?<name>.+)\)\s*=\s*(?<hash>[a-fA-F0-9]{64})$", RegexOptions.IgnoreCase);
+
+                if (bsdMatch.Success)
+                {
+                    string name = bsdMatch.Groups["name"].Value.Trim();
+                    string hash = bsdMatch.Groups["hash"].Value;
+
+                    namedHashes.Add(IsExpectedArchive(name, archiveFileName)
+                            ? hash
+                            : string.Empty);
+
+                    continue;
+                }
+
+                // Formato GNU:
+                // HASH  archivo.zip
+                // HASH *archivo.zip
+                Match gnuMatch = Regex.Match(line, @"^(?<hash>[a-fA-F0-9]{64})(?:\s+[* ](?<name>.+))?$");
+
+                if (!gnuMatch.Success)
+                {
+                    throw new InvalidDataException($"Línea SHA-256 no reconocida: {line}");
+                }
+
+                string hashValue = gnuMatch.Groups["hash"].Value;
+
+                if (gnuMatch.Groups["name"].Success)
+                {
+                    string name = gnuMatch.Groups["name"].Value.Trim();
+
+                    namedHashes.Add(IsExpectedArchive(name, archiveFileName)
+                            ? hashValue
+                            : string.Empty);
+                }
+                else
+                {
+                    unnamedHashes.Add(hashValue);
+                }
+            }
+
+            // Si existen entradas con nombre, exigimos coincidencia exacta.
+            if (namedHashes.Count > 0)
+            {
+                string[] matches = namedHashes
+                    .Where(hash => !string.IsNullOrEmpty(hash))
+                    .ToArray();
+
+                if (matches.Length != 1)
+                {
+                    throw new InvalidDataException($"El manifiesto no contiene una única entrada SHA-256 " +
+                        $"válida para {archiveFileName}.");
+                }
+
+                return matches[0].ToUpperInvariant();
+            }
+
+            // Solo aceptamos un manifiesto sin nombre cuando
+            // contiene exactamente un hash.
+            if (unnamedHashes.Count == 1)
+            {
+                return unnamedHashes[0].ToUpperInvariant();
+            }
+
+            throw new InvalidDataException(
+                $"El manifiesto SHA-256 es ambiguo o no contiene " +
+                $"el hash esperado para {archiveFileName}.");
+        }
+
+        private static bool IsExpectedArchive(string manifestFileName, string expectedFileName)
+        {
+            string normalizedName = manifestFileName
+                .Replace('\\', '/')
+                .Trim();
+
+            string actualName = normalizedName
+                .Split('/')
+                .Last();
+
+            return string.Equals(actualName, expectedFileName, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Ejecuta ffmpeg -version para comprobar que el binario
+        /// puede ejecutarse y corresponde a una compilación válida.
+        /// </summary>
+        private static async Task ValidateFfmpegAsync(string executablePath, CancellationToken cancellationToken)
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = executablePath,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            startInfo.ArgumentList.Add("-version");
+
+            using var process = new Process
+            {
+                StartInfo = startInfo
+            };
+
+            if (!process.Start())
+            {
+                throw new InvalidOperationException("No se pudo iniciar FFmpeg.");
+            }
+
+            using var registration = cancellationToken.Register(() =>
+            {
+                try
+                {
+                    if (!process.HasExited)
+                        process.Kill(entireProcessTree: true);
+                }
+                catch
+                {
+                    // El proceso puede haber terminado.
+                }
+            });
+
+            Task<string> stdoutTask = process.StandardOutput.ReadToEndAsync();
+
+            Task<string> stderrTask = process.StandardError.ReadToEndAsync();
+
+            await process.WaitForExitAsync(cancellationToken);
+
+            string[] output = await Task.WhenAll(stdoutTask, stderrTask);
+
+            string combinedOutput = string.Join(Environment.NewLine, output);
+
+            if (process.ExitCode != 0 || !combinedOutput.Contains("ffmpeg version", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException(
+                    $"FFmpeg no ha superado la validación. " +
+                    $"Código: {process.ExitCode}. " +
+                    $"Salida: {combinedOutput}");
+            }
+        }
+
+        private static void TryDeleteFile(string? path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
             {
                 return;
             }
 
-            string? dir = Path.GetDirectoryName(_path);
-            if (!string.IsNullOrEmpty(dir))
+            try
             {
-                Directory.CreateDirectory(dir);
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+            catch
+            {
+                // La limpieza no debe ocultar el error original.
+            }
+        }
+
+        #endregion
+
+        private ProcessStartInfo CreateYtDlpStartInfo(IEnumerable<string> arguments)
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = _path,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            foreach (string argument in arguments)
+            {
+                startInfo.ArgumentList.Add(argument);
             }
 
-            // Obtener la última versión disponible
-            using HttpClient client = new();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("YouPander/1.0");
-
-            var json = await client.GetStringAsync(ReleasesApi);
-            using var doc = JsonDocument.Parse(json);
-            var latestTag = doc.RootElement.GetProperty("tag_name").GetString();
-
-            string url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
-
-            using HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-            response.EnsureSuccessStatusCode();
-
-            using Stream stream = await response.Content.ReadAsStreamAsync();
-            using var fs = new FileStream(_path, FileMode.Create, FileAccess.Write, FileShare.None);
-            await stream.CopyToAsync(fs);
-
-            // Guardar versión instalada
-            Preferences.Set("ytdlp_version", latestTag ?? "");
-            #endregion
-
+            return startInfo;
         }
-
-        #endregion
-
-        #region Ffmpeg
-
-        public async Task EnsureFfmpegInstalledAsync()
-        {
-            if (File.Exists(_ffmpegPath)) return;
-
-            // FFmpeg build estático para Windows (from github.com/BtbN/FFmpeg-Builds)
-            string zipUrl = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip";
-            string zipPath = Path.Combine(Path.GetDirectoryName(_ffmpegPath)!, "ffmpeg.zip");
-
-            await DownloadFileAsync(zipUrl, zipPath);
-            await ExtractFfmpegAsync(zipPath);
-        }
-
-        private async Task ExtractFfmpegAsync(string zipPath)
-        {
-            string outputDir = Path.GetDirectoryName(_ffmpegPath)!;
-
-            await Task.Run(() =>
-            {
-                using var zip = System.IO.Compression.ZipFile.OpenRead(zipPath);
-
-                // El zip contiene una carpeta raíz, buscamos ffmpeg.exe dentro de /bin/
-                var entry = zip.Entries.FirstOrDefault(e =>
-                    e.Name.Equals("ffmpeg.exe", StringComparison.OrdinalIgnoreCase) &&
-                    e.FullName.Contains("bin"));
-
-                if (entry == null)
-                    throw new FileNotFoundException("No se encontró ffmpeg.exe en el zip.");
-
-                entry.ExtractToFile(_ffmpegPath, overwrite: true);
-            });
-
-            File.Delete(zipPath); // Limpiamos el zip
-        }
-
-        private async Task DownloadFileAsync(string url, string destinationPath)
-        {
-            string? dir = Path.GetDirectoryName(destinationPath);
-            if (!string.IsNullOrEmpty(dir))
-                Directory.CreateDirectory(dir);
-
-            using HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-            response.EnsureSuccessStatusCode();
-
-            using Stream stream = await response.Content.ReadAsStreamAsync();
-            using var fs = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
-            await stream.CopyToAsync(fs);
-        }
-        #endregion
 
         private readonly List<Process> _activeProcesses = new();
         private readonly object _processLock = new();
@@ -190,85 +717,138 @@ namespace YouPander.Services
 
         }
 
+
         public async Task DownloadAsync(string url, string output, string format, IProgress<string> progress, CancellationToken token, string? formatID = null, string? TargetExtension = null)
         {
+            Directory.CreateDirectory(output);
 
-            string[] parts = BuildArguments(url, output, format, formatID, TargetExtension);
-            string args = string.Join(" ", parts);
+            List<string> arguments = BuildArguments(
+                url,
+                output,
+                format,
+                formatID,
+                TargetExtension);
 
-            using Process process = new Process
+            using Process process = new()
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = _path,
-                    Arguments = args,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                },
+                StartInfo = CreateYtDlpStartInfo(arguments),
                 EnableRaisingEvents = true
             };
 
             currentProcess = process;
 
-            //process.Start();
-            lock (_processLock) _activeProcesses.Add(process);
+            lock (_processLock)
+            {
+                _activeProcesses.Add(process);
+            }
+
+            var errorLog = new StringBuilder();
 
             try
             {
-                process.Start();
+                token.ThrowIfCancellationRequested();
 
-                // Leer stderr en paralelo para evitar que el buffer se llene y bloquee el proceso
-                var stderrTask = ConsumeStreamAsync(process.StandardError, progress, token);
-
-                string? line;
-                while ((line = await process.StandardOutput.ReadLineAsync(token)) != null)
+                if (!process.Start())
                 {
-                    token.ThrowIfCancellationRequested();
-
-                    var parsed = ParseProgress(line);
-                    if (!string.IsNullOrEmpty(parsed))
-                        progress?.Report(parsed);
+                    throw new InvalidOperationException("No se pudo iniciar yt-dlp.");
                 }
 
-                await Task.WhenAll(
-                    process.WaitForExitAsync(token),
-                    stderrTask
-                );
+                // Si se cancela, detener yt-dlp y sus procesos secundarios.
+                using var registration = token.Register(() =>
+                {
+                    try
+                    {
+                        if (!process.HasExited)
+                        {
+                            process.Kill(entireProcessTree: true);
+                        }
+                    }
+                    catch
+                    {
+                        // El proceso puede haber terminado.
+                    }
+                });
+
+                // Leer ambas salidas simultáneamente.
+                Task stdoutTask = ReadDownloadOutputAsync(process.StandardOutput, progress, null, token);
+
+                Task stderrTask = ReadDownloadOutputAsync(process.StandardError, progress, errorLog, token);
+
+                await Task.WhenAll(stdoutTask, stderrTask, process.WaitForExitAsync(token));
+
+                token.ThrowIfCancellationRequested();
+
+                // Comprobar que yt-dlp realmente ha terminado correctamente.
+                if (process.ExitCode != 0)
+                {
+                    throw new InvalidOperationException($"La descarga ha fallado. Código de salida: {process.ExitCode}\n" +
+                        errorLog);
+                }
+
+                // Solo comunicamos que ha terminado cuando el proceso
+                // ha finalizado correctamente.
+                progress?.Report(Strings.CompletedDownload);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error descargando: {ex}");
+
+                progress?.Report($"Error: {ex.Message}");
+
+                throw;
             }
             finally
             {
-                lock (_processLock) _activeProcesses.Remove(process);
-                currentProcess = null;
+                lock (_processLock)
+                {
+                    _activeProcesses.Remove(process);
+                }
+
+                if (ReferenceEquals(currentProcess, process))
+                {
+                    currentProcess = null;
+                }
             }
         }
 
-        public async Task DownloadAsync(string url, string output, string format, string? formatID = null)
+        private async Task ReadDownloadOutputAsync(StreamReader reader, IProgress<string>? progress, StringBuilder? errorLog, CancellationToken token)
         {
-            string[] parts = BuildArguments(url, output, format, formatID);
-            string args = string.Join(" ", parts);
+            string? line;
 
-            using var process = new Process
+            while ((line = await reader.ReadLineAsync(token)) != null)
             {
-                StartInfo = new ProcessStartInfo
+                token.ThrowIfCancellationRequested();
+
+                if (string.IsNullOrWhiteSpace(line))
                 {
-                    FileName = _path,
-                    Arguments = args,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
+                    continue;
                 }
-            };
 
-            process.Start();
+                // Registrar errores para poder mostrarlos si yt-dlp falla.
+                if (errorLog != null && (line.Contains("ERROR", StringComparison.OrdinalIgnoreCase)))
+                {
+                    errorLog.AppendLine(line);
+                }
 
-            // Drenar stdout y stderr para evitar deadlock por buffer lleno
-            var stdoutTask = process.StandardOutput.ReadToEndAsync();
-            var stderrTask = process.StandardError.ReadToEndAsync();
+                // Interpretar el progreso independientemente
+                // de si viene de stdout o stderr.
+                string parsed = ParseProgress(line);
 
-            await Task.WhenAll(stdoutTask, stderrTask, process.WaitForExitAsync());
+                if (!string.IsNullOrWhiteSpace(parsed))
+                {
+                    progress?.Report(parsed);
+                }
+            }
+        }
+
+
+        public Task DownloadAsync(string url, string output, string format, string? formatID = null)
+        {
+            return DownloadAsync(url, output, format, null!, CancellationToken.None, formatID);
         }
 
         // Consume el stream sin bloquearlo, opcionalmente loguea errores
@@ -292,44 +872,47 @@ namespace YouPander.Services
         public string ParseProgress(string line)
         {
             if (string.IsNullOrWhiteSpace(line))
+            {
                 return string.Empty;
+            }
 
             if (line.Contains("[download]"))
             {
-                var match = System.Text.RegularExpressions.Regex.Match(
-                    line,
-                    @"(\d{1,3}[\.,]\d+)%.*?at\s+([\d\.]+\w+/s).*?ETA\s+([\d:]+)"
+                var match = Regex.Match(line,
+                    @"(\d{1,3}(?:[\.,]\d+)?)%.*?(?:at\s+([\d\.,]+\s*\w+/s))?.*?(?:ETA\s+([\d:]+))?"
                 );
 
                 if (match.Success)
                 {
-                    var percent = match.Groups[1].Value;
-                    var speed = match.Groups[2].Value;
-                    return $"{Strings.Downloading}... {percent}% ( {speed} )";
+                    string percent = match.Groups[1].Value;
+                    string speed = match.Groups[2].Value;
+
+                    if (!string.IsNullOrWhiteSpace(speed))
+                    {
+                        return $"{Strings.Downloading}... {percent}% ({speed})";
+                    }
+
+                    return $"{Strings.Downloading}... {percent}%";
                 }
 
                 return $"{Strings.Downloading}...";
             }
 
-            if (line.Contains("[info]") || line.Contains("[youtube]"))
+            if (line.Contains("[Merger]", StringComparison.OrdinalIgnoreCase) ||
+                line.Contains("Merging formats", StringComparison.OrdinalIgnoreCase))
             {
-                // Solo mostrar info relevante, no cada metadata intermedia
-                if (line.Contains("Downloading") || line.Contains("Extracting URL"))
-                    return $"{Strings.GettingInfo}...";
+                return Strings.MergingAudioVideo;
+            }
 
-                if (line.Contains("Extracting audio"))
-                    return $"{Strings.ExtractingAudio}...";
+            if (line.Contains("[ExtractAudio]", StringComparison.OrdinalIgnoreCase) ||
+                line.Contains("Extracting audio", StringComparison.OrdinalIgnoreCase))
+            {
+                return Strings.ExtractingAudio;
+            }
 
-                if (line.Contains("Merging formats"))
-                    return $"{Strings.MergingAudioVideo}...";
-
-                if (line.Contains("[PostProcess]") || line.Contains("post-process"))
-                    return $"{Strings.ExtractingAudio}...";
-
-                if (line.Contains("100%"))
-                    return $"{Strings.CompletedDownload}";
-
-                return string.Empty; // Ignorar el resto de líneas [info]
+            if (line.Contains("[Metadata]", StringComparison.OrdinalIgnoreCase))
+            {
+                return Strings.GettingInfo;
             }
 
             return string.Empty;
@@ -339,11 +922,27 @@ namespace YouPander.Services
         {
             #region Version 3
 
-            string args = IsPlaylist(url)
-                ? $"-J --playlist-items 1 \"{url}\""
-                : $"-J \"{url}\"";
+            var arguments = new List<string>();
 
-            var raw = await Task.Run(() => RunAndCaptureAsync(args, ct), ct);
+            if (IsPlaylist(url))
+            {
+                arguments.AddRange(new[]
+                {
+                    "-J",
+                    "--playlist-items", "1",
+                    url
+                });
+            }
+            else
+            {
+                arguments.AddRange(new[]
+                {
+                    "-J",
+                    url
+                });
+            }
+
+            var raw = await Task.Run(() => RunAndCaptureAsync(arguments, ct), ct);
 
             int jsonIndex = FindJsonStart(raw);
             if (jsonIndex < 0)
@@ -359,12 +958,16 @@ namespace YouPander.Services
             {
                 var first = entries.EnumerateArray().FirstOrDefault();
                 if (first.ValueKind == JsonValueKind.Undefined)
+                {
                     return new List<FormatOption>();
+                }
                 target = first;
             }
 
             if (!target.TryGetProperty("formats", out var formats))
+            {
                 return new List<FormatOption>();
+            }
 
             return ParseBestFormats(formats);
 
@@ -542,30 +1145,58 @@ namespace YouPander.Services
 
         #region Get Info from URL
 
+
         public async Task<List<VideoInfo>> FetchInfoAsync(string url, CancellationToken ct = default, bool fullMetadata = false)
         {
-            var raw = await RunAndCaptureAsync($"--flat-playlist -J \"{url}\"", ct);
+            var arguments = new List<string>
+            {
+                "--no-warnings",
+                "--flat-playlist",
+                "-J",
+                url
+            };
 
-            var jsonStart = raw.Split('\n').FirstOrDefault(line => line.TrimStart().StartsWith("{") || line.TrimStart().StartsWith("["));
+            var raw = await RunAndCaptureAsync(arguments, ct);
 
-            if (jsonStart == null)
-                throw new Exception("yt-dlp no devolvió JSON válido.");
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                throw new Exception("yt-dlp no devolvió ningún contenido.");
+            }
 
-            var jsonOnly = raw.Substring(raw.IndexOf(jsonStart, StringComparison.Ordinal));
+            // Localizar el inicio del JSON.
+            int jsonStart = FindJsonStart(raw);
+
+            if (jsonStart < 0)
+            {
+                throw new Exception($"yt-dlp no devolvió JSON válido.\nRespuesta:\n{raw}");
+            }
+
+            // Extraer únicamente el JSON.
+            string jsonOnly = raw.Substring(jsonStart).Trim();
 
             using var doc = JsonDocument.Parse(jsonOnly);
+
             var root = doc.RootElement;
 
             var results = new List<VideoInfo>();
 
-            if (root.TryGetProperty("entries", out var entries))
+            if (root.TryGetProperty("entries", out var entries) && entries.ValueKind == JsonValueKind.Array)
             {
                 foreach (var entry in entries.EnumerateArray())
                 {
+                    ct.ThrowIfCancellationRequested();
+
                     var info = ParseEntry(entry);
 
-                    if (string.IsNullOrWhiteSpace(info.Url)) continue;
-                    if (info.Title == "[Private video]" || info.Title == "[Deleted video]") continue;
+                    if (string.IsNullOrWhiteSpace(info.Url))
+                    {
+                        continue;
+                    }
+
+                    if (info.Title == "[Private video]" || info.Title == "[Deleted video]")
+                    {
+                        continue;
+                    }
 
                     results.Add(info);
                 }
@@ -577,6 +1208,7 @@ namespace YouPander.Services
 
             return results;
         }
+
 
         private static int NormalizeResolution(int height)
         {
@@ -715,156 +1347,255 @@ namespace YouPander.Services
             };
         }
 
-        public async Task<string> RunAndCaptureAsync(string arguments, CancellationToken ct = default)
-        {
-            var sb = new StringBuilder();
+        #region Version 1
+        //public async Task<string> RunAndCaptureAsync(string arguments, CancellationToken ct = default)
+        //{
+        //    var sb = new StringBuilder();
 
+        //    using var process = new Process
+        //    {
+        //        StartInfo = new ProcessStartInfo
+        //        {
+        //            FileName = _path,
+        //            Arguments = arguments,
+        //            RedirectStandardOutput = true,
+        //            RedirectStandardError = true,
+        //            UseShellExecute = false,
+        //            CreateNoWindow = true
+        //        }
+        //    };
+
+        //    process.OutputDataReceived += (_, e) =>
+        //    {
+        //        if (e.Data != null)
+        //            sb.AppendLine(e.Data);
+        //    };
+
+        //    process.ErrorDataReceived += (_, e) =>
+        //    {
+        //        if (e.Data != null)
+        //            sb.AppendLine(e.Data);
+        //    };
+
+        //    process.Start();
+        //    process.BeginOutputReadLine();
+        //    process.BeginErrorReadLine();
+
+        //    await process.WaitForExitAsync(ct);
+
+        //    if (process.ExitCode != 0)
+        //        throw new Exception($"yt-dlp error (code {process.ExitCode}):\n{sb}");
+
+        //    return sb.ToString();
+        //}
+
+
+        public async Task<string> RunAndCaptureAsync(IEnumerable<string> arguments, CancellationToken ct = default)
+        {
             using var process = new Process
             {
-                StartInfo = new ProcessStartInfo
+                StartInfo = CreateYtDlpStartInfo(arguments)
+            };
+
+            if (!process.Start())
+            {
+                throw new InvalidOperationException("No se pudo iniciar yt-dlp.");
+            }
+
+            using var registration = ct.Register(() =>
+            {
+                try
                 {
-                    FileName = _path,
-                    Arguments = arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
+                    if (!process.HasExited)
+                    {
+                        process.Kill(entireProcessTree: true);
+                    }
                 }
-            };
+                catch
+                {
+                    // El proceso puede haber terminado.
+                }
+            });
 
-            process.OutputDataReceived += (_, e) =>
-            {
-                if (e.Data != null)
-                    sb.AppendLine(e.Data);
-            };
+            // Leer ambas salidas simultáneamente para evitar bloqueos.
+            Task<string> stdoutTask = process.StandardOutput.ReadToEndAsync();
 
-            process.ErrorDataReceived += (_, e) =>
-            {
-                if (e.Data != null)
-                    sb.AppendLine(e.Data);
-            };
-
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+            Task<string> stderrTask = process.StandardError.ReadToEndAsync();
 
             await process.WaitForExitAsync(ct);
 
-            if (process.ExitCode != 0)
-                throw new Exception($"yt-dlp error (code {process.ExitCode}):\n{sb}");
+            string stdout = await stdoutTask;
+            string stderr = await stderrTask;
 
-            return sb.ToString();
+            ct.ThrowIfCancellationRequested();
+
+            // Los errores reales se notifican, pero nunca se mezclan
+            // con el JSON de StandardOutput.
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"yt-dlp error ({process.ExitCode}):\n{stderr}");
+            }
+
+            // Las advertencias no deben contaminar el JSON.
+            if (!string.IsNullOrWhiteSpace(stderr))
+            {
+                Debug.WriteLine($"yt-dlp STDERR:\n{stderr}");
+            }
+
+            return stdout;
         }
+
+
+        #endregion
 
         #endregion
 
         #region Args Constructor
 
-        //private string[] BuildArguments(string url, string output, string format)
+        //private string[] BuildArguments(string url, string output, string format, string? formatId = null, string? targetExt = null)
         //{
         //    string[] commonArgs =
         //    [
         //        $"-o \"{output}/%(title)s.%(ext)s\"",
         //        $"--ffmpeg-location \"{_ffmpegPath}\"",
-        //        "--newline"
+        //        "--newline",
+        //        "--embed-metadata",
+        //        "--embed-thumbnail"
         //    ];
 
         //    string[] formatArgs;
 
-        //    if (format.Contains("Audio"))
+        //    if (formatId == "mp3")
         //    {
         //        formatArgs =
         //        [
         //            "-x",
         //            "--audio-format mp3",
         //            "--audio-quality 0",
-        //            "--embed-metadata",
-        //            "--embed-thumbnail"
-        //        ];
+        //];
+        //    }
+        //    else if (!string.IsNullOrEmpty(formatId))
+        //    {
+        //        // Determinar el contenedor de salida según la extensión del formato elegido
+        //        string mergeExt = targetExt?.ToLowerInvariant() switch
+        //        {
+        //            "webm" => "webm",
+        //            "mkv" => "mkv",
+        //            _ => "mp4"   // mp4 por defecto para cualquier otro
+        //        };
+
+        //        // El audio compatible según el contenedor
+        //        string audioSelector = mergeExt == "webm"
+        //            ? $"{formatId}+bestaudio[ext=webm]/bestaudio"
+        //            : $"{formatId}+bestaudio[ext=m4a]/bestaudio";
+
+        //        // Códec de audio compatible con el contenedor
+        //        string audioCodec = mergeExt == "webm"
+        //            ? "ffmpeg:-c:a libopus -b:a 192k"
+        //            : "ffmpeg:-c:a aac -b:a 192k";
+
+        //        formatArgs =
+        //        [
+        //            $"-f \"{audioSelector}\"",
+        //            $"--merge-output-format {mergeExt}",
+        //            $"--postprocessor-args \"{audioCodec}\"",
+        //];
+        //    }
+        //    else if (format.Contains("Audio"))
+        //    {
+        //        formatArgs =
+        //        [
+        //            "-x",
+        //            "--audio-format mp3",
+        //            "--audio-quality 0",
+        //];
         //    }
         //    else
         //    {
         //        formatArgs =
         //        [
         //            "-f \"bestvideo+bestaudio/best\"",
-        //            "--merge-output-format mkv",
-        //        ];
+        //            "--merge-output-format mp4",
+        //            "--postprocessor-args \"ffmpeg:-c:a aac -b:a 192k\"",
+        //];
         //    }
 
-        //    //Return the combined arguments with the URL at the end
         //    return [.. commonArgs, .. formatArgs, url];
         //}
 
-        private string[] BuildArguments(string url, string output, string format, string? formatId = null, string? targetExt = null)
+        private List<string> BuildArguments(string url, string output, string format, string? formatId = null, string? targetExt = null)
         {
-            string[] commonArgs =
-            [
-                $"-o \"{output}/%(title)s.%(ext)s\"",
-                $"--ffmpeg-location \"{_ffmpegPath}\"",
+            var args = new List<string>
+            {
+                "-o",
+                Path.Combine(output, "%(title)s.%(ext)s"),
+
+                "--ffmpeg-location",
+                _ffmpegPath,
+
                 "--newline",
                 "--embed-metadata",
                 "--embed-thumbnail"
-            ];
-
-            string[] formatArgs;
+            };
 
             if (formatId == "mp3")
             {
-                formatArgs =
-                [
+                args.AddRange(new[]
+                {
                     "-x",
-                    "--audio-format mp3",
-                    "--audio-quality 0",
-        ];
+                    "--audio-format", "mp3",
+                    "--audio-quality", "0"
+                });
             }
             else if (!string.IsNullOrEmpty(formatId))
             {
-                // Determinar el contenedor de salida según la extensión del formato elegido
                 string mergeExt = targetExt?.ToLowerInvariant() switch
                 {
                     "webm" => "webm",
                     "mkv" => "mkv",
-                    _ => "mp4"   // mp4 por defecto para cualquier otro
+                    _ => "mp4"
                 };
 
-                // El audio compatible según el contenedor
                 string audioSelector = mergeExt == "webm"
                     ? $"{formatId}+bestaudio[ext=webm]/bestaudio"
                     : $"{formatId}+bestaudio[ext=m4a]/bestaudio";
 
-                // Códec de audio compatible con el contenedor
                 string audioCodec = mergeExt == "webm"
                     ? "ffmpeg:-c:a libopus -b:a 192k"
                     : "ffmpeg:-c:a aac -b:a 192k";
 
-                formatArgs =
-                [
-                    $"-f \"{audioSelector}\"",
-                    $"--merge-output-format {mergeExt}",
-                    $"--postprocessor-args \"{audioCodec}\"",
-        ];
+                args.AddRange(new[]
+                {
+                    "-f", audioSelector,
+                    "--merge-output-format", mergeExt,
+                    "--postprocessor-args", audioCodec
+                });
             }
-            else if (format.Contains("Audio"))
+            else if (format.Contains("Audio", StringComparison.OrdinalIgnoreCase))
             {
-                formatArgs =
-                [
+                args.AddRange(new[]
+                {
                     "-x",
-                    "--audio-format mp3",
-                    "--audio-quality 0",
-        ];
+                    "--audio-format", "mp3",
+                    "--audio-quality", "0"
+                });
             }
             else
             {
-                formatArgs =
-                [
-                    "-f \"bestvideo+bestaudio/best\"",
-                    "--merge-output-format mp4",
-                    "--postprocessor-args \"ffmpeg:-c:a aac -b:a 192k\"",
-        ];
+                args.AddRange(new[]
+                {
+                    "-f", "bestvideo+bestaudio/best",
+                    "--merge-output-format", "mp4",
+                    "--postprocessor-args",
+                    "ffmpeg:-c:a aac -b:a 192k"
+                });
             }
 
-            return [.. commonArgs, .. formatArgs, url];
+            args.Add(url);
+
+            return args;
         }
+
         #endregion
 
 
@@ -895,10 +1626,17 @@ namespace YouPander.Services
                 progress?.Report($"Nueva versión encontrada: {latestTag}. Descargando...");
 
                 // Buscar la URL del asset correcto (yt-dlp.exe en Windows)
+                string assetName = GetYtDlpAssetName();
                 var assets = doc.RootElement.GetProperty("assets");
-                var downloadUrl = assets.EnumerateArray()
-                    .FirstOrDefault(a => a.GetProperty("name").GetString() == "yt-dlp.exe")
-                    .GetProperty("browser_download_url").GetString();
+
+                var asset = assets.EnumerateArray().FirstOrDefault(a => a.GetProperty("name").GetString() == assetName);
+
+                if (asset.ValueKind == JsonValueKind.Undefined)
+                {
+                    throw new FileNotFoundException($"No se encontró {assetName}.");
+                }
+
+                string? downloadUrl = asset.GetProperty("browser_download_url").GetString();
 
                 if (string.IsNullOrEmpty(downloadUrl))
                 {
@@ -933,9 +1671,25 @@ namespace YouPander.Services
                 }
 
                 // Reemplazar el binario actual con el nuevo
+                // Cerrar el archivo descargado
                 fs.Close();
-                if (File.Exists(_path)) File.Delete(_path);
-                File.Move(tempPath, _path);
+
+                // Dar permisos de ejecución en Mac Catalyst
+                if (OperatingSystem.IsMacCatalyst())
+                {
+                    File.SetUnixFileMode(
+                        tempPath,
+                        UnixFileMode.UserRead |
+                        UnixFileMode.UserWrite |
+                        UnixFileMode.UserExecute |
+                        UnixFileMode.GroupRead |
+                        UnixFileMode.GroupExecute |
+                        UnixFileMode.OtherRead |
+                        UnixFileMode.OtherExecute);
+                }
+
+                // Sustituir el ejecutable anterior
+                File.Move(tempPath, _path, overwrite: true);
 
                 Preferences.Set("ytdlp_version", latestTag ?? "");
                 progress?.Report($"yt-dlp actualizado a {latestTag}.");

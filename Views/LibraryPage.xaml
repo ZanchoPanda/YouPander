@@ -3,6 +3,7 @@
     x:Class="YouPander.Views.LibraryPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:YouPander.Resources.Converters"
     xmlns:local2="clr-namespace:YouPander.Services"
     xmlns:models="clr-namespace:YouPander.Models"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -11,6 +12,7 @@
 
     <ContentPage.Resources>
         <toolkit:InvertedBoolConverter x:Key="InvertBool" />
+        <converters:TabColumnSpanConverter x:Key="TabColumnSpanConverter" />
     </ContentPage.Resources>
 
     <Grid
@@ -70,6 +72,7 @@
                     <!--  PESTAÑA MÚSICA  -->
                     <Button
                         Grid.Column="0"
+                        Grid.ColumnSpan="{Binding HasVideos, Converter={StaticResource TabColumnSpanConverter}}"
                         BackgroundColor="{Binding SelectedTabIndex, Converter={StaticResource TabColorConverter}, ConverterParameter=0}"
                         BorderWidth="0"
                         Command="{Binding SelectTabCommand}"
@@ -77,12 +80,14 @@
                         CornerRadius="0"
                         FontAttributes="{Binding SelectedTabIndex, Converter={StaticResource TabFontConverter}, ConverterParameter=0}"
                         FontSize="14"
+                        IsVisible="{Binding HasMusic}"
                         Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Music]}"
                         TextColor="{DynamicResource ColorTextoPrimario}" />
 
                     <!--  PESTAÑA VÍDEO  -->
                     <Button
                         Grid.Column="1"
+                        Grid.ColumnSpan="{Binding HasMusic, Converter={StaticResource TabColumnSpanConverter}}"
                         BackgroundColor="{Binding SelectedTabIndex, Converter={StaticResource TabColorConverter}, ConverterParameter=1}"
                         BorderWidth="0"
                         Command="{Binding SelectTabCommand}"
@@ -90,6 +95,7 @@
                         CornerRadius="0"
                         FontAttributes="{Binding SelectedTabIndex, Converter={StaticResource TabFontConverter}, ConverterParameter=1}"
                         FontSize="14"
+                        IsVisible="{Binding HasVideos}"
                         Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Video]}"
                         TextColor="{DynamicResource ColorTextoPrimario}" />
 
@@ -101,9 +107,11 @@
                     IsVisible="{Binding SelectedTabIndex, Converter={StaticResource TabVisibleConverter}, ConverterParameter=0}"
                     ItemsSource="{Binding MusicItems}"
                     SelectionMode="None">
-
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="models:MediaItem">
+                        <!--<DataTemplate x:DataType="models:MediaItem">
 
                             <Border
                                 Margin="8,4"
@@ -145,6 +153,193 @@
                                 </Grid>
                             </Border>
 
+                        </DataTemplate>-->
+                        <DataTemplate x:DataType="models:MediaItem">
+                            <Border
+                                Margin="8,7"
+                                Padding="12,8"
+                                BackgroundColor="{DynamicResource ColorFondoSuperficie}"
+                                Stroke="{DynamicResource ColorBordeSutil}"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0.5">
+
+                                <VerticalStackLayout Spacing="10">
+
+                                    <!--  FILA DE LA CANCIÓN  -->
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+
+                                        <!--<Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryViewModel}}, Path=ToggleExpandedCommand}" CommandParameter="{Binding .}" />
+                                        </Grid.GestureRecognizers>-->
+
+                                        <Label
+                                            Grid.Column="0"
+                                            Margin="0,0,10,0"
+                                            FontSize="22"
+                                            Text="🎵"
+                                            VerticalOptions="CenterAndExpand">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryViewModel}}, Path=ToggleExpandedCommand}" CommandParameter="{Binding .}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+
+                                        <Label
+                                            Grid.Column="1"
+                                            FontSize="14"
+                                            HorizontalOptions="Fill"
+                                            LineBreakMode="TailTruncation"
+                                            Text="{Binding Title}"
+                                            TextColor="{DynamicResource ColorTextoPrimario}"
+                                            VerticalOptions="CenterAndExpand">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryViewModel}}, Path=ToggleExpandedCommand}" CommandParameter="{Binding .}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+
+                                        <Button
+                                            Grid.Column="2"
+                                            Padding="10,4"
+                                            BackgroundColor="Transparent"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryViewModel}}, Path=PlayItemCommand}"
+                                            CommandParameter="{Binding .}"
+                                            FontSize="18"
+                                            MinimumHeightRequest="40"
+                                            MinimumWidthRequest="40"
+                                            Text="▶"
+                                            TextColor="{DynamicResource ColorAcentoOscuro}" />
+
+                                    </Grid>
+
+                                    <!--  INFORMACIÓN DESPLEGABLE  -->
+                                    <Border
+                                        Padding="12"
+                                        BackgroundColor="{DynamicResource ColorFondoPrincipal}"
+                                        IsVisible="{Binding IsExpanded}"
+                                        Stroke="{DynamicResource ColorBordeSutil}"
+                                        StrokeShape="RoundRectangle 8"
+                                        StrokeThickness="0.5">
+
+                                        <VerticalStackLayout Spacing="9">
+
+                                            <Label
+                                                x:DataType="{x:Null}"
+                                                FontAttributes="Bold"
+                                                FontSize="12"
+                                                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[FileInformation]}"
+                                                TextColor="{DynamicResource ColorAcentoOscuro}"
+                                                VerticalOptions="Center"
+                                                VerticalTextAlignment="Center" />
+
+                                            <Grid ColumnDefinitions="100,*">
+                                                <Label
+                                                    Grid.Column="0"
+                                                    x:DataType="{x:Null}"
+                                                    FontSize="12"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Name]}"
+                                                    TextColor="Gray" />
+                                                <Label
+                                                    Grid.Column="1"
+                                                    FontSize="12"
+                                                    Text="{Binding FileName}"
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="100,*">
+                                                <Label
+                                                    Grid.Column="0"
+                                                    x:DataType="{x:Null}"
+                                                    FontSize="12"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Format]}"
+                                                    TextColor="Gray" />
+                                                <Label
+                                                    Grid.Column="1"
+                                                    FontSize="12"
+                                                    Text="{Binding Format}"
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="100,*">
+                                                <Label
+                                                    Grid.Column="0"
+                                                    x:DataType="{x:Null}"
+                                                    FontSize="12"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[FileSize]}"
+                                                    TextColor="Gray" />
+                                                <Label
+                                                    Grid.Column="1"
+                                                    FontSize="12"
+                                                    Text="{Binding FileSize}"
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="100,*">
+                                                <Label
+                                                    Grid.Column="0"
+                                                    x:DataType="{x:Null}"
+                                                    FontSize="12"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[CreationDate]}"
+                                                    TextColor="Gray" />
+                                                <Label
+                                                    Grid.Column="1"
+                                                    FontSize="12"
+                                                    Text="{Binding CreationDate}"
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="100,*">
+                                                <Label
+                                                    Grid.Column="0"
+                                                    x:DataType="{x:Null}"
+                                                    FontSize="12"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[ModificationDate]}"
+                                                    TextColor="Gray" />
+                                                <Label
+                                                    Grid.Column="1"
+                                                    FontSize="12"
+                                                    Text="{Binding ModificationDate}"
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="100,*">
+                                                <Label
+                                                    Grid.Column="0"
+                                                    x:DataType="{x:Null}"
+                                                    FontSize="12"
+                                                    Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Duration]}"
+                                                    TextColor="Gray" />
+                                                <Label
+                                                    Grid.Column="1"
+                                                    FontSize="12"
+                                                    Text="{Binding Duration}"
+                                                    TextColor="{DynamicResource ColorTextoPrimario}"
+                                                    VerticalOptions="Center" />
+                                            </Grid>
+
+                                            <Label
+                                                x:DataType="{x:Null}"
+                                                FontSize="12"
+                                                Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Location]}"
+                                                TextColor="Gray" />
+
+                                            <Label
+                                                FontSize="11"
+                                                LineBreakMode="CharacterWrap"
+                                                Text="{Binding FilePath}"
+                                                TextColor="{DynamicResource ColorTextoPrimario}"
+                                                VerticalOptions="Center" />
+
+                                        </VerticalStackLayout>
+
+                                    </Border>
+
+                                </VerticalStackLayout>
+
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
@@ -156,7 +351,9 @@
                     IsVisible="{Binding SelectedTabIndex, Converter={StaticResource TabVisibleConverter}, ConverterParameter=1}"
                     ItemsSource="{Binding VideoItems}"
                     SelectionMode="None">
-
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:MediaItem">
 

@@ -13,6 +13,13 @@ public partial class LibraryViewModel : ObservableObject
     public ObservableCollection<MediaItem> AllItems { get; } = new();
 
     [ObservableProperty] private bool _showTabs;
+
+    [ObservableProperty]
+    private bool _hasMusic;
+
+    [ObservableProperty]
+    private bool _hasVideos;
+
     [ObservableProperty] private int _selectedTabIndex;
 
     // ── Reproductor ───────────────────────────────────────────────────
@@ -30,46 +37,190 @@ public partial class LibraryViewModel : ObservableObject
     private int _queueIndex = -1;
 
     // ── Tabs ──────────────────────────────────────────────────────────
+    //[RelayCommand]
+    //public void SelectTab(string index) => SelectedTabIndex = int.TryParse(index, out int i) ? i : 0;
     [RelayCommand]
-    public void SelectTab(string index) => SelectedTabIndex = int.TryParse(index, out int i) ? i : 0;
+    public void SelectTab(string index)
+    {
+        if (!int.TryParse(index, out int i))
+        {
+            return;
+        }
+
+        if (i == 0 && !HasMusic)
+        {
+            return;
+        }
+
+        if (i == 1 && !HasVideos)
+        {
+            return;
+        }
+
+        foreach (var item in MusicItems)
+        {
+            item.IsExpanded = false;
+        }
+
+        foreach (var item in VideoItems)
+        {
+            item.IsExpanded = false;
+        }
+
+        SelectedTabIndex = i;
+    }
+
+    [RelayCommand]
+    public void ToggleExpanded(MediaItem item)
+    {
+        // Recordar si queremos abrir o cerrar el elemento pulsado.
+        bool expand = !item.IsExpanded;
+
+        // Cerrar cualquier otro elemento abierto.
+        foreach (var media in MusicItems)
+        {
+            media.IsExpanded = false;
+        }
+
+        foreach (var media in VideoItems)
+        {
+            media.IsExpanded = false;
+        }
+
+        foreach (var media in AllItems)
+        {
+            media.IsExpanded = false;
+        }
+
+        // Abrir el elemento seleccionado si corresponde.
+        item.IsExpanded = expand;
+    }
 
     // ── Carga desde configuración ─────────────────────────────────────
+    //public void LoadFromSettings(AppSettings settings)
+    //{
+    //    MusicItems.Clear();
+    //    VideoItems.Clear();
+    //    AllItems.Clear();
+
+    //    if (!settings.AdvancedConfig)
+    //    {
+    //        ShowTabs = false;
+    //        ScanInto(AllItems, settings.DownloadPath);
+    //        return;
+    //    }
+
+    //    var audioPath = settings.AudioDownloadPath;
+    //    var videoPath = settings.VideoDownloadPath;
+
+    //    bool sameOrBothEmpty =
+    //        (string.IsNullOrWhiteSpace(audioPath) && string.IsNullOrWhiteSpace(videoPath)) ||
+    //        string.Equals(audioPath?.Trim(), videoPath?.Trim(), StringComparison.OrdinalIgnoreCase);
+
+    //    if (sameOrBothEmpty)
+    //    {
+    //        ShowTabs = false;
+    //        ScanInto(AllItems, audioPath ?? videoPath ?? settings.DownloadPath);
+    //    }
+    //    else
+    //    {
+    //        ShowTabs = true;
+    //        ScanInto(MusicItems, audioPath);
+    //        ScanInto(VideoItems, videoPath);
+
+    //        HasMusic = MusicItems.Count > 0;
+    //        HasVideos = VideoItems.Count > 0;
+
+    //        ShowTabs = HasMusic || HasVideos;
+
+    //        // Seleccionar automáticamente una pestaña que tenga contenido.
+    //        if (HasMusic)
+    //        {
+    //            SelectedTabIndex = 0;
+    //        }
+    //        else if (HasVideos)
+    //        {
+    //            SelectedTabIndex = 1;
+    //        }
+    //    }
+    //}
+
     public void LoadFromSettings(AppSettings settings)
     {
         MusicItems.Clear();
         VideoItems.Clear();
         AllItems.Clear();
 
-        if (!settings.AdvancedConfig)
+        HasMusic = false;
+        HasVideos = false;
+
+        var audioPath = settings.AdvancedConfig
+            ? settings.AudioDownloadPath
+            : settings.DownloadPath;
+
+        var videoPath = settings.AdvancedConfig
+            ? settings.VideoDownloadPath
+            : settings.DownloadPath;
+
+        bool samePath =
+            string.IsNullOrWhiteSpace(audioPath) &&
+            string.IsNullOrWhiteSpace(videoPath);
+
+        if (!samePath &&
+            !string.IsNullOrWhiteSpace(audioPath) &&
+            !string.IsNullOrWhiteSpace(videoPath))
         {
+            samePath = string.Equals(
+                Path.GetFullPath(audioPath).TrimEnd(Path.DirectorySeparatorChar),
+                Path.GetFullPath(videoPath).TrimEnd(Path.DirectorySeparatorChar),
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (samePath)
+        {
+            var path = string.IsNullOrWhiteSpace(audioPath)
+                ? videoPath
+                : audioPath;
+
+            ScanInto(AllItems, path);
+
             ShowTabs = false;
-            ScanInto(AllItems, settings.DownloadPath);
             return;
         }
 
-        var audioPath = settings.AudioDownloadPath;
-        var videoPath = settings.VideoDownloadPath;
+        // Cargar cada tipo exclusivamente en su colección.
+        ScanInto(MusicItems, audioPath, false);
+        ScanInto(VideoItems, videoPath, true);
 
-        bool sameOrBothEmpty =
-            (string.IsNullOrWhiteSpace(audioPath) && string.IsNullOrWhiteSpace(videoPath)) ||
-            string.Equals(audioPath?.Trim(), videoPath?.Trim(), StringComparison.OrdinalIgnoreCase);
+        HasMusic = MusicItems.Count > 0;
+        HasVideos = VideoItems.Count > 0;
 
-        if (sameOrBothEmpty)
+        ShowTabs = HasMusic || HasVideos;
+
+        // Seleccionar una pestaña que realmente tenga contenido.
+        if (HasMusic)
         {
-            ShowTabs = false;
-            ScanInto(AllItems, audioPath ?? videoPath ?? settings.DownloadPath);
+            SelectedTabIndex = 0;
+        }
+        else if (HasVideos)
+        {
+            SelectedTabIndex = 1;
         }
         else
         {
-            ShowTabs = true;
-            ScanInto(MusicItems, audioPath);
-            ScanInto(VideoItems, videoPath);
+            ShowTabs = false;
         }
     }
-
-    private static void ScanInto(ObservableCollection<MediaItem> target, string? path)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="path"></param>
+    /// <param name="isVideo"></param>
+    private static void ScanInto(ObservableCollection<MediaItem> target, string? path, bool? isVideo = null)
     {
-        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+        if (string.IsNullOrWhiteSpace(path) ||
+            !Directory.Exists(path))
         {
             return;
         }
@@ -77,26 +228,34 @@ public partial class LibraryViewModel : ObservableObject
         foreach (var file in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
         {
             var item = MediaItem.TryCreate(file);
-            if (item is not null)
+
+            if (item == null)
             {
-                target.Add(item);
+                continue;
             }
+
+            if (isVideo.HasValue && item.IsVideo != isVideo.Value)
+            {
+                continue;
+            }
+
+            target.Add(item);
         }
     }
-
     // ── Comandos de reproducción ──────────────────────────────────────
     [RelayCommand]
     public void PlayItem(MediaItem item)
     {
         var source = ShowTabs
-            ? (SelectedTabIndex == 0 ? MusicItems : VideoItems)
-            : AllItems;
+        ? (SelectedTabIndex == 0 ? MusicItems : VideoItems)
+        : AllItems;
 
         _queue = IsShuffleOn
             ? source.OrderBy(_ => Random.Shared.Next()).ToList()
             : source.ToList();
 
         _queueIndex = _queue.IndexOf(item);
+
         SetCurrentItem(item);
     }
 
