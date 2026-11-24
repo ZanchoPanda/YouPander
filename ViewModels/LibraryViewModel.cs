@@ -96,55 +96,6 @@ public partial class LibraryViewModel : ObservableObject
         item.IsExpanded = expand;
     }
 
-    // ── Carga desde configuración ─────────────────────────────────────
-    //public void LoadFromSettings(AppSettings settings)
-    //{
-    //    MusicItems.Clear();
-    //    VideoItems.Clear();
-    //    AllItems.Clear();
-
-    //    if (!settings.AdvancedConfig)
-    //    {
-    //        ShowTabs = false;
-    //        ScanInto(AllItems, settings.DownloadPath);
-    //        return;
-    //    }
-
-    //    var audioPath = settings.AudioDownloadPath;
-    //    var videoPath = settings.VideoDownloadPath;
-
-    //    bool sameOrBothEmpty =
-    //        (string.IsNullOrWhiteSpace(audioPath) && string.IsNullOrWhiteSpace(videoPath)) ||
-    //        string.Equals(audioPath?.Trim(), videoPath?.Trim(), StringComparison.OrdinalIgnoreCase);
-
-    //    if (sameOrBothEmpty)
-    //    {
-    //        ShowTabs = false;
-    //        ScanInto(AllItems, audioPath ?? videoPath ?? settings.DownloadPath);
-    //    }
-    //    else
-    //    {
-    //        ShowTabs = true;
-    //        ScanInto(MusicItems, audioPath);
-    //        ScanInto(VideoItems, videoPath);
-
-    //        HasMusic = MusicItems.Count > 0;
-    //        HasVideos = VideoItems.Count > 0;
-
-    //        ShowTabs = HasMusic || HasVideos;
-
-    //        // Seleccionar automáticamente una pestaña que tenga contenido.
-    //        if (HasMusic)
-    //        {
-    //            SelectedTabIndex = 0;
-    //        }
-    //        else if (HasVideos)
-    //        {
-    //            SelectedTabIndex = 1;
-    //        }
-    //    }
-    //}
-
     public void LoadFromSettings(AppSettings settings)
     {
         MusicItems.Clear();
@@ -219,8 +170,7 @@ public partial class LibraryViewModel : ObservableObject
     /// <param name="isVideo"></param>
     private static void ScanInto(ObservableCollection<MediaItem> target, string? path, bool? isVideo = null)
     {
-        if (string.IsNullOrWhiteSpace(path) ||
-            !Directory.Exists(path))
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
         {
             return;
         }

@@ -73,7 +73,9 @@ public partial class LibraryPage : ContentPage
             var item = _vm.CurrentItem;
 
             if (item is not null)
+            {
                 await LoadMediaAsync(item.FilePath);
+            }
 
             return;
         }
@@ -81,14 +83,20 @@ public partial class LibraryPage : ContentPage
         if (e.PropertyName == nameof(LibraryViewModel.IsPlaying))
         {
             if (_isLoadingNewItem || !_isMediaReady || !_isPageActive)
+            {
                 return;
+            }
 
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
                 if (_vm.IsPlaying)
+                {
                     Player.Play();
+                }
                 else
+                {
                     Player.Pause();
+                }
             });
 
             return;
@@ -108,7 +116,9 @@ public partial class LibraryPage : ContentPage
     private async Task LoadMediaAsync(string filePath)
     {
         if (!_isPageActive)
+        {
             return;
+        }
 
         // Invalidar cualquier carga anterior.
         _mediaLoadCts?.Cancel();
@@ -128,7 +138,9 @@ public partial class LibraryPage : ContentPage
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
                 if (!_isPageActive || token.IsCancellationRequested)
+                {
                     return;
+                }
 
                 // Detener la reproducción anterior.
                 Player.Stop();
@@ -145,35 +157,34 @@ public partial class LibraryPage : ContentPage
                 _isMediaReady = false;
             }
 
-            System.Diagnostics.Debug.WriteLine(
-                $"Error cargando medio: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Error cargando medio: {ex}");
         }
     }
 
     // ── Eventos MediaElement ──────────────────────────────────────
 
-    private async void Player_MediaOpened(
-        object? sender,
-        EventArgs e)
+    private async void Player_MediaOpened(object? sender, EventArgs e)
     {
         if (!_isPageActive)
+        {
             return;
+        }
 
         try
         {
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
                 if (!_isPageActive)
+                {
                     return;
+                }
 
                 _isMediaReady = true;
                 _isLoadingNewItem = false;
 
                 Player.Volume = _vm.Volume;
 
-                _vm.UpdateProgress(
-                    0,
-                    Player.Duration.TotalSeconds);
+                _vm.UpdateProgress(0, Player.Duration.TotalSeconds);
 
                 _vm.IsPlaying = true;
 
@@ -182,41 +193,34 @@ public partial class LibraryPage : ContentPage
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"Error inicializando reproductor: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Error inicializando reproductor: {ex}");
         }
     }
 
-    private void Player_PositionChanged(
-        object? sender,
-        MediaPositionChangedEventArgs e)
+    private void Player_PositionChanged(object? sender, MediaPositionChangedEventArgs e)
     {
-        if (!_isPageActive ||
-            !_isMediaReady ||
-            _isSeeking ||
-            _isLoadingNewItem)
+        if (!_isPageActive || !_isMediaReady || _isSeeking || _isLoadingNewItem)
+        {
             return;
+        }
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            if (!_isPageActive ||
-                !_isMediaReady ||
-                _isSeeking ||
-                _isLoadingNewItem)
+            if (!_isPageActive || !_isMediaReady || _isSeeking || _isLoadingNewItem)
+            {
                 return;
+            }
 
-            _vm.UpdateProgress(
-                e.Position.TotalSeconds,
-                Player.Duration.TotalSeconds);
+            _vm.UpdateProgress(e.Position.TotalSeconds, Player.Duration.TotalSeconds);
         });
     }
 
-    private async void Player_MediaEnded(
-        object? sender,
-        EventArgs e)
+    private async void Player_MediaEnded(object? sender, EventArgs e)
     {
         if (!_isPageActive || !_isMediaReady)
+        {
             return;
+        }
 
         try
         {
@@ -225,11 +229,11 @@ public partial class LibraryPage : ContentPage
                 await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     if (!_isPageActive || !_isMediaReady)
+                    {
                         return;
+                    }
 
-                    await Player.SeekTo(
-                        TimeSpan.Zero,
-                        CancellationToken.None);
+                    await Player.SeekTo(TimeSpan.Zero, CancellationToken.None);
 
                     Player.Play();
                 });
@@ -245,29 +249,23 @@ public partial class LibraryPage : ContentPage
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"Error al finalizar reproducción: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Error al finalizar reproducción: {ex}");
         }
     }
 
     // ── Eventos Slider ────────────────────────────────────────────
 
-    private void Slider_DragStarted(
-        object? sender,
-        EventArgs e)
+    private void Slider_DragStarted(object? sender, EventArgs e)
     {
         if (_isMediaReady && !_isLoadingNewItem)
+        {
             _isSeeking = true;
+        }
     }
 
-    private async void Slider_DragCompleted(
-        object? sender,
-        EventArgs e)
+    private async void Slider_DragCompleted(object? sender, EventArgs e)
     {
-        if (sender is not Slider slider ||
-            !_isPageActive ||
-            !_isMediaReady ||
-            _isLoadingNewItem)
+        if (sender is not Slider slider || !_isPageActive || !_isMediaReady || _isLoadingNewItem)
         {
             _isSeeking = false;
             return;
@@ -280,17 +278,16 @@ public partial class LibraryPage : ContentPage
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 if (!_isPageActive || !_isMediaReady)
+                {
                     return;
+                }
 
-                await Player.SeekTo(
-                    target,
-                    CancellationToken.None);
+                await Player.SeekTo(target, CancellationToken.None);
             });
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"Error realizando Seek: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Error realizando Seek: {ex}");
         }
         finally
         {
@@ -300,12 +297,12 @@ public partial class LibraryPage : ContentPage
 
     // ── Volumen ───────────────────────────────────────────────────
 
-    private void VolumeSlider_ValueChanged(
-        object? sender,
-        ValueChangedEventArgs e)
+    private void VolumeSlider_ValueChanged(object? sender, ValueChangedEventArgs e)
     {
         if (!_isPageActive)
+        {
             return;
+        }
 
         Player.Volume = e.NewValue;
         _vm.Volume = e.NewValue;

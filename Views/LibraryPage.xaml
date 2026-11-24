@@ -111,49 +111,6 @@
                         <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
-                        <!--<DataTemplate x:DataType="models:MediaItem">
-
-                            <Border
-                                Margin="8,4"
-                                Padding="12,8"
-                                BackgroundColor="{DynamicResource ColorFondoSuperficie}"
-                                Stroke="{DynamicResource ColorBordeSutil}"
-                                StrokeShape="RoundRectangle 10"
-                                StrokeThickness="0.5">
-
-                                <Grid ColumnDefinitions="Auto,*,Auto">
-
-                                    <Label
-                                        Grid.Column="0"
-                                        Margin="0,0,10,0"
-                                        FontSize="22"
-                                        Text="🎵"
-                                        VerticalOptions="Center" />
-
-                                    <Label
-                                        Grid.Column="1"
-                                        FontSize="14"
-                                        LineBreakMode="TailTruncation"
-                                        Text="{Binding Title}"
-                                        TextColor="{DynamicResource ColorTextoPrimario}"
-                                        VerticalOptions="Center" />
-
-                                    <Button
-                                        Grid.Column="2"
-                                        Padding="10,4"
-                                        BackgroundColor="Transparent"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryViewModel}}, Path=PlayItemCommand}"
-                                        CommandParameter="{Binding .}"
-                                        FontSize="18"
-                                        MinimumHeightRequest="40"
-                                        MinimumWidthRequest="40"
-                                        Text="▶"
-                                        TextColor="{DynamicResource ColorAcentoOscuro}" />
-
-                                </Grid>
-                            </Border>
-
-                        </DataTemplate>-->
                         <DataTemplate x:DataType="models:MediaItem">
                             <Border
                                 Margin="8,7"
@@ -167,11 +124,6 @@
 
                                     <!--  FILA DE LA CANCIÓN  -->
                                     <Grid ColumnDefinitions="Auto,*,Auto">
-
-                                        <!--<Grid.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryViewModel}}, Path=ToggleExpandedCommand}" CommandParameter="{Binding .}" />
-                                        </Grid.GestureRecognizers>-->
-
                                         <Label
                                             Grid.Column="0"
                                             Margin="0,0,10,0"

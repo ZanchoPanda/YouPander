@@ -189,36 +189,6 @@ public partial class BrowserPage : ContentPage
         }
         #endregion
 
-        #region Version 
-
-        //try
-        //{
-        //    // Forzar inicialización del CoreWebView2 antes de cargar URL
-        //    await WebViewControl.EvaluateJavaScriptAsync("1");
-        //}
-        //catch { }
-
-        //try
-        //{
-        //    CargarUrl(_url);
-
-        //    _tracker?.Dispose();
-        //    _tracker = new WebViewUrlTracker(WebViewControl, url =>
-        //    {
-        //        MainThread.BeginInvokeOnMainThread(() =>
-        //        {
-        //            _url = url;
-        //            LblUrl.Text = url;
-        //        });
-        //    });
-        //    _tracker.Start();
-        //}
-        //catch (Exception ex)
-        //{
-        //    MainThread.BeginInvokeOnMainThread(async () =>
-        //        await DisplayAlert("Error WebView", ex.Message, "OK"));
-        //}
-        #endregion
     }
 
     private void CargarUrl(string url)

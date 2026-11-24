@@ -52,10 +52,6 @@
         </Grid>
 
         <WebView x:Name="WebViewControl" Grid.Row="1" />
-        <!--
-            Navigating="OnNavigating"
-            Navigated="OnNavigated"
-        -->
 
     </Grid>
 </ContentPage>

@@ -177,25 +177,6 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
 
     #endregion
 
-    //public MainViewModel()
-    //{
-    //    _settings = new SettingsService();
-
-    //    if (OperatingSystem.IsWindows())
-    //    {
-    //        var ytPath = Path.Combine(FileSystem.AppDataDirectory, "yt-dlp.exe");
-    //        _ytDlp = new YtDlpService(ytPath);
-    //    }
-
-    //    VideoItems = new ObservableCollection<VideoItem>();
-    //    VideoItems.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ShowVideoList));
-
-    //    SearchCommand = new Command(async () => await SearchAsync(), () => !IsSearching && !IsDownloading);
-    //    DownloadCommand = new Command(async () => await Download(), () => !IsDownloading);
-    //    CancelCommand = new Command(async () => await CancelDownload(), () => IsDownloading);
-    //    OpenSettingsCommand = new Command(async () => await Shell.Current.GoToAsync("///SettingsPage"));
-    //}
-
     public MainViewModel(SettingsService settings, HistoryService history, YtDlpService ytDlp)
     {
         _settings = settings;
@@ -264,20 +245,11 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
 
             NotifyCommandsCanExecuteChanged();
 
-            // Si es un solo video, lanzar descarga directamente
-            //if (VideoItems.Count == 1)
-            //    await Download();
-
-            //if (VideoItems.Count == 1)
-            //{
             var formats = await _ytDlp.FetchFormatsAsync(Url, _cts.Token);
             AvailableFormats = new ObservableCollection<FormatOption>(formats);
             OnPropertyChanged(nameof(HasFormats));
 
             SelectedFormatOption = AvailableFormats.FirstOrDefault();
-            // No lanzar descarga automática, esperar a que el usuario elija formato
-            //return;
-            //}
 
         }
         catch (OperationCanceledException) { }
