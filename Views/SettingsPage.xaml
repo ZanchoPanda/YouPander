@@ -18,7 +18,7 @@
                 Text="{Binding Source={x:Static local2:LocalizationResourceManager.Instance}, Path=[Language]}"
                 TextColor="{DynamicResource ColorTextoPrimario}" />
 
-            <Picker
+            <!--<Picker
                 BackgroundColor="{DynamicResource ColorFondoElevado}"
                 SelectedItem="{Binding Settings.Language}"
                 TextColor="{DynamicResource ColorTextoPrimario}">
@@ -28,7 +28,14 @@
                         <x:String>es</x:String>
                     </x:Array>
                 </Picker.ItemsSource>
-            </Picker>
+            </Picker>-->
+
+            <Picker
+                BackgroundColor="{DynamicResource ColorFondoElevado}"
+                ItemDisplayBinding="{Binding DisplayName}"
+                ItemsSource="{Binding AvailableLanguages}"
+                SelectedItem="{Binding SelectedLanguage}"
+                TextColor="{DynamicResource ColorTextoPrimario}" />
 
             <!--  Ruta  -->
             <Label

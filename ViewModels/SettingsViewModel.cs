@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
@@ -36,6 +37,21 @@ namespace YouPander.ViewModels
         [ObservableProperty]
         private bool _temaClaro;
 
+        public ObservableCollection<LanguageOption> AvailableLanguages { get; } = new ObservableCollection<LanguageOption>
+        {
+            new LanguageOption("es", "Español"),
+            new LanguageOption("en", "English"),
+            new LanguageOption("de", "Deutsch"),
+            new LanguageOption("fr", "Français"),
+            new LanguageOption("it", "Italiano"),
+            new LanguageOption("pt", "Português"),
+            new LanguageOption("ja", "日本語"),
+            new LanguageOption("zh", "中文")
+        };
+
+        [ObservableProperty]
+        private LanguageOption selectedLanguage;
+
         #region Commands
 
         public Command SaveCommand { get; }
@@ -60,6 +76,8 @@ namespace YouPander.ViewModels
             }
 
             Settings = _settingsService.Load();
+
+            SelectedLanguage = AvailableLanguages.FirstOrDefault(x => x.Code == Settings.Language) ?? AvailableLanguages.First();
 
             SaveCommand = new Command(async () => await Save());
             BrowseFolderCommand = new Command(async () => await BrowseFolderAsync());
@@ -97,6 +115,11 @@ namespace YouPander.ViewModels
 
         private async Task Save()
         {
+            if (SelectedLanguage != null)
+            {
+                Settings.Language = SelectedLanguage.Code;
+            }
+
             _settingsService.Save(Settings);
 
             LocalizationResourceManager.Instance.SetCulture(Settings.Language);
@@ -180,7 +203,9 @@ namespace YouPander.ViewModels
         private void ApplyTheme()
         {
             if (Settings == null)
+            {
                 return;
+            }
 
             // Aplicar la paleta propia de YouPander
             TemaService.AplicarTema(Settings.DarkMode);
@@ -193,7 +218,9 @@ namespace YouPander.ViewModels
                     var hex = Settings.ThemeColor;
 
                     if (!hex.StartsWith("#"))
+                    {
                         hex = "#" + hex;
+                    }
 
                     var color = Color.FromArgb(hex);
 
