@@ -118,168 +118,231 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ActivateAdvancedConfig" xml:space="preserve">
-  <value>詳細設定を有効にする</value>
-</data>
-<data name="AdvancedConfig" xml:space="preserve">
-  <value>詳細設定</value>
-</data>
-<data name="All" xml:space="preserve">
-  <value>すべて</value>
-</data>
-<data name="AudioDownloadPath" xml:space="preserve">
-  <value>音声のダウンロード先</value>
-</data>
-<data name="Cancel" xml:space="preserve">
-  <value>キャンセル</value>
-</data>
-<data name="CancelDownloads" xml:space="preserve">
-  <value>ダウンロードをキャンセルしています</value>
-</data>
-<data name="Cancelled" xml:space="preserve">
-  <value>❌ キャンセル済み</value>
-</data>
-<data name="CannotOpenFolder" xml:space="preserve">
-  <value>フォルダーを開けません</value>
-</data>
-<data name="ClearAll" xml:space="preserve">
-  <value>すべてクリア</value>
-</data>
-<data name="CompletedDownload" xml:space="preserve">
-  <value>ダウンロードが完了しました</value>
-</data>
-<data name="CreationDate" xml:space="preserve">
-  <value>作成日：</value>
-</data>
-<data name="DarkMode" xml:space="preserve">
-  <value>ダークモード</value>
-</data>
-<data name="Done" xml:space="preserve">
-  <value>✅ 完了</value>
-</data>
-<data name="Download" xml:space="preserve">
-  <value>ダウンロード</value>
-</data>
-<data name="Downloading" xml:space="preserve">
-  <value>ダウンロード中</value>
-</data>
-<data name="DownloadPath" xml:space="preserve">
-  <value>ダウンロード先</value>
-</data>
-<data name="Duration" xml:space="preserve">
-  <value>再生時間：</value>
-</data>
-<data name="EmptyUrlError" xml:space="preserve">
-  <value>続行する前にURLを入力してください。</value>
-</data>
-<data name="Error" xml:space="preserve">
-  <value>エラー</value>
-</data>
-<data name="ExtractingAudio" xml:space="preserve">
-  <value>音声を抽出しています</value>
-</data>
-<data name="FetchingInfo" xml:space="preserve">
-  <value>情報を取得しています...</value>
-</data>
-<data name="FileInformation" xml:space="preserve">
-  <value>ファイル情報</value>
-</data>
-<data name="FileSize" xml:space="preserve">
-  <value>ファイルサイズ：</value>
-</data>
-<data name="Format" xml:space="preserve">
-  <value>形式：</value>
-</data>
-<data name="GettingInfo" xml:space="preserve">
-  <value>情報を取得中</value>
-</data>
-<data name="History" xml:space="preserve">
-  <value>履歴</value>
-</data>
-<data name="Home" xml:space="preserve">
-  <value>ホーム</value>
-</data>
-<data name="Language" xml:space="preserve">
-  <value>言語</value>
-</data>
-<data name="Library" xml:space="preserve">
-  <value>ライブラリ</value>
-</data>
-<data name="Location" xml:space="preserve">
-  <value>保存場所</value>
-</data>
-<data name="MergingAudioVideo" xml:space="preserve">
-  <value>音声と動画を結合しています</value>
-</data>
-<data name="ModificationDate" xml:space="preserve">
-  <value>更新日：</value>
-</data>
-<data name="Music" xml:space="preserve">
-  <value>🎵 音楽</value>
-</data>
-<data name="Name" xml:space="preserve">
-  <value>名前：</value>
-</data>
-<data name="No" xml:space="preserve">
-  <value>いいえ</value>
-</data>
-<data name="Ok" xml:space="preserve">
-  <value>OK</value>
-</data>
-<data name="OnlyAvailableOnWindows" xml:space="preserve">
-  <value>ダウンロード機能はWindowsでのみ利用できます</value>
-</data>
-<data name="OpenDownloadedFolder" xml:space="preserve">
-  <value>完了後にダウンロードフォルダーを開く</value>
-</data>
-<data name="OpenDownloadFolder" xml:space="preserve">
-  <value>ダウンロードフォルダーを開きますか？</value>
-</data>
-<data name="Player" xml:space="preserve">
-  <value>プレーヤー</value>
-</data>
-<data name="PrincipalColorHex" xml:space="preserve">
-  <value>メインカラー (#HEX)</value>
-</data>
-<data name="Save" xml:space="preserve">
-  <value>保存</value>
-</data>
-<data name="Search" xml:space="preserve">
-  <value>検索</value>
-</data>
-<data name="SelectFolder" xml:space="preserve">
-  <value>フォルダーを選択</value>
-</data>
-<data name="Settings" xml:space="preserve">
-  <value>設定</value>
-</data>
-<data name="ShowOriginalVid" xml:space="preserve">
-  <value>元の動画を表示</value>
-</data>
-<data name="TextAdvancedConfig" xml:space="preserve">
-  <value>カスタム設定</value>
-</data>
-<data name="ThisMonth" xml:space="preserve">
-  <value>今月</value>
-</data>
-<data name="ThisWeek" xml:space="preserve">
-  <value>今週</value>
-</data>
-<data name="Today" xml:space="preserve">
-  <value>今日</value>
-</data>
-<data name="Type" xml:space="preserve">
-  <value>種類</value>
-</data>
-<data name="URLToDownload" xml:space="preserve">
-  <value>ダウンロードするURL</value>
-</data>
-<data name="Video" xml:space="preserve">
-  <value>🎬 動画</value>
-</data>
-<data name="VideoDownloadPath" xml:space="preserve">
-  <value>動画のダウンロード先</value>
-</data>
-<data name="Yes" xml:space="preserve">
-  <value>はい</value>
-</data>
+    <value>詳細設定を有効にする</value>
+  </data>
+  <data name="AdvancedConfig" xml:space="preserve">
+    <value>詳細設定</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>すべて</value>
+  </data>
+  <data name="AudioDownloadPath" xml:space="preserve">
+    <value>音声のダウンロード先</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="CancelDownloads" xml:space="preserve">
+    <value>ダウンロードをキャンセルしています</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>❌ キャンセル済み</value>
+  </data>
+  <data name="CannotOpenFolder" xml:space="preserve">
+    <value>フォルダーを開けません</value>
+  </data>
+  <data name="ClearAll" xml:space="preserve">
+    <value>すべてクリア</value>
+  </data>
+  <data name="CompletedDownload" xml:space="preserve">
+    <value>ダウンロードが完了しました</value>
+  </data>
+  <data name="CreationDate" xml:space="preserve">
+    <value>作成日：</value>
+  </data>
+  <data name="DarkMode" xml:space="preserve">
+    <value>ダークモード</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>✅ 完了</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>ダウンロード</value>
+  </data>
+  <data name="Downloading" xml:space="preserve">
+    <value>ダウンロード中</value>
+  </data>
+  <data name="DownloadPath" xml:space="preserve">
+    <value>ダウンロード先</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>再生時間：</value>
+  </data>
+  <data name="EmptyUrlError" xml:space="preserve">
+    <value>続行する前にURLを入力してください。</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>エラー</value>
+  </data>
+  <data name="ExtractingAudio" xml:space="preserve">
+    <value>音声を抽出しています</value>
+  </data>
+  <data name="FetchingInfo" xml:space="preserve">
+    <value>情報を取得しています...</value>
+  </data>
+  <data name="FileInformation" xml:space="preserve">
+    <value>ファイル情報</value>
+  </data>
+  <data name="FileSize" xml:space="preserve">
+    <value>ファイルサイズ：</value>
+  </data>
+  <data name="Format" xml:space="preserve">
+    <value>形式：</value>
+  </data>
+  <data name="GettingInfo" xml:space="preserve">
+    <value>情報を取得中</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>履歴</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>ホーム</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>ライブラリ</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>保存場所</value>
+  </data>
+  <data name="MergingAudioVideo" xml:space="preserve">
+    <value>音声と動画を結合しています</value>
+  </data>
+  <data name="ModificationDate" xml:space="preserve">
+    <value>更新日：</value>
+  </data>
+  <data name="Music" xml:space="preserve">
+    <value>🎵 音楽</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>名前：</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>いいえ</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="OnlyAvailableOnWindows" xml:space="preserve">
+    <value>ダウンロード機能はWindowsでのみ利用できます</value>
+  </data>
+  <data name="OpenDownloadedFolder" xml:space="preserve">
+    <value>完了後にダウンロードフォルダーを開く</value>
+  </data>
+  <data name="OpenDownloadFolder" xml:space="preserve">
+    <value>ダウンロードフォルダーを開きますか？</value>
+  </data>
+  <data name="Player" xml:space="preserve">
+    <value>プレーヤー</value>
+  </data>
+  <data name="PrincipalColorHex" xml:space="preserve">
+    <value>メインカラー (#HEX)</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>検索</value>
+  </data>
+  <data name="SelectFolder" xml:space="preserve">
+    <value>フォルダーを選択</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="ShowOriginalVid" xml:space="preserve">
+    <value>元の動画を表示</value>
+  </data>
+  <data name="TextAdvancedConfig" xml:space="preserve">
+    <value>カスタム設定</value>
+  </data>
+  <data name="ThisMonth" xml:space="preserve">
+    <value>今月</value>
+  </data>
+  <data name="ThisWeek" xml:space="preserve">
+    <value>今週</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>今日</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>種類</value>
+  </data>
+  <data name="URLToDownload" xml:space="preserve">
+    <value>ダウンロードするURL</value>
+  </data>
+  <data name="Video" xml:space="preserve">
+    <value>🎬 動画</value>
+  </data>
+  <data name="VideoDownloadPath" xml:space="preserve">
+    <value>動画のダウンロード先</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>はい</value>
+  </data>
+  <data name="UnsupportedPlatform" xml:space="preserve">
+    <value>YouPanderはWindowsおよびmacOS（Mac Catalyst）でのみ利用できます。</value>
+  </data>
+  <data name="YtDlpStartError" xml:space="preserve">
+    <value>yt-dlpを起動できませんでした。</value>
+  </data>
+  <data name="FfmpegStartError" xml:space="preserve">
+    <value>FFmpegを起動できませんでした。</value>
+  </data>
+  <data name="DownloadError" xml:space="preserve">
+    <value>ダウンロード中にエラーが発生しました。</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>ダウンロードに失敗しました。</value>
+  </data>
+  <data name="YtDlpNoContent" xml:space="preserve">
+    <value>yt-dlpからコンテンツが返されませんでした。</value>
+  </data>
+  <data name="InvalidJsonResponse" xml:space="preserve">
+    <value>yt-dlpから無効なJSONレスポンスが返されました。</value>
+  </data>
+  <data name="FfmpegValidationError" xml:space="preserve">
+    <value>FFmpegの検証に失敗しました。</value>
+  </data>
+  <data name="ChecksumValidationError" xml:space="preserve">
+    <value>ファイルの整合性チェックに失敗しました。</value>
+  </data>
+  <data name="MissingExecutable" xml:space="preserve">
+    <value>必要な実行ファイルが見つかりません。</value>
+  </data>
+  <data name="UpdateError" xml:space="preserve">
+    <value>yt-dlpの更新中にエラーが発生しました。</value>
+  </data>
+  <data name="UpdateChecking" xml:space="preserve">
+    <value>yt-dlpの更新を確認しています...</value>
+  </data>
+  <data name="AlreadyUpdated" xml:space="preserve">
+    <value>yt-dlpはすでに最新の状態です。</value>
+  </data>
+  <data name="NewVersionFound" xml:space="preserve">
+    <value>新しいバージョンが見つかりました: {0}。ダウンロードしています...</value>
+  </data>
+  <data name="UpdatedVersion" xml:space="preserve">
+    <value>yt-dlpをバージョン{0}に更新しました。</value>
+  </data>
+  <data name="ErrorLoadingHistory" xml:space="preserve">
+    <value>ダウンロード履歴の読み込み中にエラーが発生しました。</value>
+  </data>
+  <data name="ErrorDeletingHistory" xml:space="preserve">
+    <value>履歴項目の削除中にエラーが発生しました</value>
+  </data>
+  <data name="ErrorClearingHistory" xml:space="preserve">
+    <value>ダウンロード履歴の削除中にエラーが発生しました。</value>
+  </data>
+  <data name="DownloadQueued" xml:space="preserve">
+    <value>⏳ キューに追加中...</value>
+  </data>
+  <data name="YtDlpUpdatedTitle" xml:space="preserve">
+    <value>yt-dlp が  に更新されました</value>
+  </data>
+  <data name="YtDlpUpdatedMessage" xml:space="preserve">
+    <value>バージョン {0} が自動的にインストールされました</value>
+  </data>
 </root>

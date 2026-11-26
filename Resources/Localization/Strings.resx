@@ -139,7 +139,7 @@
     <value>❌ Cancelled</value>
   </data>
   <data name="CannotOpenFolder" xml:space="preserve">
-    <value>Can't open folder</value>
+    <value>Unable to open the download folder.</value>
   </data>
   <data name="ClearAll" xml:space="preserve">
     <value>ClearAll</value>
@@ -169,7 +169,7 @@
     <value>Duration:</value>
   </data>
   <data name="EmptyUrlError" xml:space="preserve">
-    <value>Please enter a URL before continuing.</value>
+    <value>Please enter a valid URL.</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
@@ -226,7 +226,7 @@
     <value>Ok</value>
   </data>
   <data name="OnlyAvailableOnWindows" xml:space="preserve">
-    <value>Downloaded function only able for Windows</value>
+    <value>This feature is only available on Windows.</value>
   </data>
   <data name="OpenDownloadedFolder" xml:space="preserve">
     <value>Open downloads when finish</value>
@@ -281,5 +281,68 @@
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>
+  </data>
+  <data name="UnsupportedPlatform" xml:space="preserve">
+    <value>YouPander solo admite Windows y macOS (Mac Catalyst).</value>
+  </data>
+  <data name="YtDlpStartError" xml:space="preserve">
+    <value>Could not start yt-dlp.</value>
+  </data>
+  <data name="FfmpegStartError" xml:space="preserve">
+    <value>Could not start FFmpeg.</value>
+  </data>
+  <data name="DownloadError" xml:space="preserve">
+    <value>An error occurred while downloading.</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>The download failed.</value>
+  </data>
+  <data name="YtDlpNoContent" xml:space="preserve">
+    <value>yt-dlp did not return any content.</value>
+  </data>
+  <data name="InvalidJsonResponse" xml:space="preserve">
+    <value>yt-dlp returned an invalid JSON response.</value>
+  </data>
+  <data name="FfmpegValidationError" xml:space="preserve">
+    <value>FFmpeg validation failed.</value>
+  </data>
+  <data name="ChecksumValidationError" xml:space="preserve">
+    <value>The file integrity check failed.</value>
+  </data>
+  <data name="MissingExecutable" xml:space="preserve">
+    <value>The required executable could not be found.</value>
+  </data>
+  <data name="UpdateError" xml:space="preserve">
+    <value>An error occurred while updating yt-dlp.</value>
+  </data>
+  <data name="UpdateChecking" xml:space="preserve">
+    <value>Checking for yt-dlp updates...</value>
+  </data>
+  <data name="AlreadyUpdated" xml:space="preserve">
+    <value>yt-dlp is already up to date.</value>
+  </data>
+  <data name="NewVersionFound" xml:space="preserve">
+    <value>New version found: {0}. Downloading...</value>
+  </data>
+  <data name="UpdatedVersion" xml:space="preserve">
+    <value>yt-dlp updated to {0}.</value>
+  </data>
+  <data name="ErrorLoadingHistory" xml:space="preserve">
+    <value>An error occurred while loading download history.</value>
+  </data>
+  <data name="ErrorDeletingHistory" xml:space="preserve">
+    <value>An error occurred while deleting the history record.</value>
+  </data>
+  <data name="ErrorClearingHistory" xml:space="preserve">
+    <value>An error occurred while clearing download history.</value>
+  </data>
+  <data name="DownloadQueued" xml:space="preserve">
+    <value>⏳ Queued...</value>
+  </data>
+  <data name="YtDlpUpdatedTitle" xml:space="preserve">
+    <value>yt-dlp updated</value>
+  </data>
+  <data name="YtDlpUpdatedMessage" xml:space="preserve">
+    <value>Version {0} has been installed automatically..</value>
   </data>
 </root>

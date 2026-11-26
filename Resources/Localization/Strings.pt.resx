@@ -118,168 +118,231 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ActivateAdvancedConfig" xml:space="preserve">
-  <value>Ativar configuração avançada</value>
-</data>
-<data name="AdvancedConfig" xml:space="preserve">
-  <value>Configuração avançada</value>
-</data>
-<data name="All" xml:space="preserve">
-  <value>Todos</value>
-</data>
-<data name="AudioDownloadPath" xml:space="preserve">
-  <value>Caminho de transferência de áudio</value>
-</data>
-<data name="Cancel" xml:space="preserve">
-  <value>Cancelar</value>
-</data>
-<data name="CancelDownloads" xml:space="preserve">
-  <value>A cancelar transferências</value>
-</data>
-<data name="Cancelled" xml:space="preserve">
-  <value>❌ Cancelado</value>
-</data>
-<data name="CannotOpenFolder" xml:space="preserve">
-  <value>Não foi possível abrir a pasta</value>
-</data>
-<data name="ClearAll" xml:space="preserve">
-  <value>Limpar tudo</value>
-</data>
-<data name="CompletedDownload" xml:space="preserve">
-  <value>Transferência concluída</value>
-</data>
-<data name="CreationDate" xml:space="preserve">
-  <value>Data de criação:</value>
-</data>
-<data name="DarkMode" xml:space="preserve">
-  <value>Modo escuro</value>
-</data>
-<data name="Done" xml:space="preserve">
-  <value>✅ Concluído</value>
-</data>
-<data name="Download" xml:space="preserve">
-  <value>Transferir</value>
-</data>
-<data name="Downloading" xml:space="preserve">
-  <value>A transferir</value>
-</data>
-<data name="DownloadPath" xml:space="preserve">
-  <value>Caminho de transferência</value>
-</data>
-<data name="Duration" xml:space="preserve">
-  <value>Duração:</value>
-</data>
-<data name="EmptyUrlError" xml:space="preserve">
-  <value>Introduza um URL antes de continuar.</value>
-</data>
-<data name="Error" xml:space="preserve">
-  <value>Erro</value>
-</data>
-<data name="ExtractingAudio" xml:space="preserve">
-  <value>A extrair áudio</value>
-</data>
-<data name="FetchingInfo" xml:space="preserve">
-  <value>A obter informações...</value>
-</data>
-<data name="FileInformation" xml:space="preserve">
-  <value>Informações do ficheiro</value>
-</data>
-<data name="FileSize" xml:space="preserve">
-  <value>Tamanho do ficheiro:</value>
-</data>
-<data name="Format" xml:space="preserve">
-  <value>Formato:</value>
-</data>
-<data name="GettingInfo" xml:space="preserve">
-  <value>A obter informações</value>
-</data>
-<data name="History" xml:space="preserve">
-  <value>Histórico</value>
-</data>
-<data name="Home" xml:space="preserve">
-  <value>Início</value>
-</data>
-<data name="Language" xml:space="preserve">
-  <value>Idioma</value>
-</data>
-<data name="Library" xml:space="preserve">
-  <value>Biblioteca</value>
-</data>
-<data name="Location" xml:space="preserve">
-  <value>Localização</value>
-</data>
-<data name="MergingAudioVideo" xml:space="preserve">
-  <value>A combinar áudio e vídeo</value>
-</data>
-<data name="ModificationDate" xml:space="preserve">
-  <value>Data de modificação:</value>
-</data>
-<data name="Music" xml:space="preserve">
-  <value>🎵 Música</value>
-</data>
-<data name="Name" xml:space="preserve">
-  <value>Nome:</value>
-</data>
-<data name="No" xml:space="preserve">
-  <value>Não</value>
-</data>
-<data name="Ok" xml:space="preserve">
-  <value>OK</value>
-</data>
-<data name="OnlyAvailableOnWindows" xml:space="preserve">
-  <value>A funcionalidade de transferência só está disponível no Windows</value>
-</data>
-<data name="OpenDownloadedFolder" xml:space="preserve">
-  <value>Abrir a pasta de transferências quando terminar</value>
-</data>
-<data name="OpenDownloadFolder" xml:space="preserve">
-  <value>Quer abrir a pasta de transferências?</value>
-</data>
-<data name="Player" xml:space="preserve">
-  <value>Reprodutor</value>
-</data>
-<data name="PrincipalColorHex" xml:space="preserve">
-  <value>Cor principal (#HEX)</value>
-</data>
-<data name="Save" xml:space="preserve">
-  <value>Guardar</value>
-</data>
-<data name="Search" xml:space="preserve">
-  <value>Pesquisar</value>
-</data>
-<data name="SelectFolder" xml:space="preserve">
-  <value>Selecionar pasta</value>
-</data>
-<data name="Settings" xml:space="preserve">
-  <value>Definições</value>
-</data>
-<data name="ShowOriginalVid" xml:space="preserve">
-  <value>Mostrar vídeo original</value>
-</data>
-<data name="TextAdvancedConfig" xml:space="preserve">
-  <value>Configuração personalizada</value>
-</data>
-<data name="ThisMonth" xml:space="preserve">
-  <value>Este mês</value>
-</data>
-<data name="ThisWeek" xml:space="preserve">
-  <value>Esta semana</value>
-</data>
-<data name="Today" xml:space="preserve">
-  <value>Hoje</value>
-</data>
-<data name="Type" xml:space="preserve">
-  <value>Tipo</value>
-</data>
-<data name="URLToDownload" xml:space="preserve">
-  <value>URL para transferir</value>
-</data>
-<data name="Video" xml:space="preserve">
-  <value>🎬 Vídeo</value>
-</data>
-<data name="VideoDownloadPath" xml:space="preserve">
-  <value>Caminho de transferência de vídeo</value>
-</data>
-<data name="Yes" xml:space="preserve">
-  <value>Sim</value>
-</data>
+    <value>Ativar configuração avançada</value>
+  </data>
+  <data name="AdvancedConfig" xml:space="preserve">
+    <value>Configuração avançada</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="AudioDownloadPath" xml:space="preserve">
+    <value>Caminho de transferência de áudio</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="CancelDownloads" xml:space="preserve">
+    <value>A cancelar transferências</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>❌ Cancelado</value>
+  </data>
+  <data name="CannotOpenFolder" xml:space="preserve">
+    <value>Não foi possível abrir a pasta</value>
+  </data>
+  <data name="ClearAll" xml:space="preserve">
+    <value>Limpar tudo</value>
+  </data>
+  <data name="CompletedDownload" xml:space="preserve">
+    <value>Transferência concluída</value>
+  </data>
+  <data name="CreationDate" xml:space="preserve">
+    <value>Data de criação:</value>
+  </data>
+  <data name="DarkMode" xml:space="preserve">
+    <value>Modo escuro</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>✅ Concluído</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Transferir</value>
+  </data>
+  <data name="Downloading" xml:space="preserve">
+    <value>A transferir</value>
+  </data>
+  <data name="DownloadPath" xml:space="preserve">
+    <value>Caminho de transferência</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Duração:</value>
+  </data>
+  <data name="EmptyUrlError" xml:space="preserve">
+    <value>Introduza um URL antes de continuar.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Erro</value>
+  </data>
+  <data name="ExtractingAudio" xml:space="preserve">
+    <value>A extrair áudio</value>
+  </data>
+  <data name="FetchingInfo" xml:space="preserve">
+    <value>A obter informações...</value>
+  </data>
+  <data name="FileInformation" xml:space="preserve">
+    <value>Informações do ficheiro</value>
+  </data>
+  <data name="FileSize" xml:space="preserve">
+    <value>Tamanho do ficheiro:</value>
+  </data>
+  <data name="Format" xml:space="preserve">
+    <value>Formato:</value>
+  </data>
+  <data name="GettingInfo" xml:space="preserve">
+    <value>A obter informações</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>Histórico</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Início</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>Biblioteca</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Localização</value>
+  </data>
+  <data name="MergingAudioVideo" xml:space="preserve">
+    <value>A combinar áudio e vídeo</value>
+  </data>
+  <data name="ModificationDate" xml:space="preserve">
+    <value>Data de modificação:</value>
+  </data>
+  <data name="Music" xml:space="preserve">
+    <value>🎵 Música</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nome:</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Não</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="OnlyAvailableOnWindows" xml:space="preserve">
+    <value>A funcionalidade de transferência só está disponível no Windows</value>
+  </data>
+  <data name="OpenDownloadedFolder" xml:space="preserve">
+    <value>Abrir a pasta de transferências quando terminar</value>
+  </data>
+  <data name="OpenDownloadFolder" xml:space="preserve">
+    <value>Quer abrir a pasta de transferências?</value>
+  </data>
+  <data name="Player" xml:space="preserve">
+    <value>Reprodutor</value>
+  </data>
+  <data name="PrincipalColorHex" xml:space="preserve">
+    <value>Cor principal (#HEX)</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Pesquisar</value>
+  </data>
+  <data name="SelectFolder" xml:space="preserve">
+    <value>Selecionar pasta</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Definições</value>
+  </data>
+  <data name="ShowOriginalVid" xml:space="preserve">
+    <value>Mostrar vídeo original</value>
+  </data>
+  <data name="TextAdvancedConfig" xml:space="preserve">
+    <value>Configuração personalizada</value>
+  </data>
+  <data name="ThisMonth" xml:space="preserve">
+    <value>Este mês</value>
+  </data>
+  <data name="ThisWeek" xml:space="preserve">
+    <value>Esta semana</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Hoje</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="URLToDownload" xml:space="preserve">
+    <value>URL para transferir</value>
+  </data>
+  <data name="Video" xml:space="preserve">
+    <value>🎬 Vídeo</value>
+  </data>
+  <data name="VideoDownloadPath" xml:space="preserve">
+    <value>Caminho de transferência de vídeo</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Sim</value>
+  </data>
+  <data name="UnsupportedPlatform" xml:space="preserve">
+    <value>O YouPander só é compatível com Windows e macOS (Mac Catalyst).</value>
+  </data>
+  <data name="YtDlpStartError" xml:space="preserve">
+    <value>Não foi possível iniciar o yt-dlp.</value>
+  </data>
+  <data name="FfmpegStartError" xml:space="preserve">
+    <value>Não foi possível iniciar o FFmpeg.</value>
+  </data>
+  <data name="DownloadError" xml:space="preserve">
+    <value>Ocorreu um erro durante a transferência.</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>A transferência falhou.</value>
+  </data>
+  <data name="YtDlpNoContent" xml:space="preserve">
+    <value>O yt-dlp não devolveu qualquer conteúdo.</value>
+  </data>
+  <data name="InvalidJsonResponse" xml:space="preserve">
+    <value>O yt-dlp devolveu uma resposta JSON inválida.</value>
+  </data>
+  <data name="FfmpegValidationError" xml:space="preserve">
+    <value>A validação do FFmpeg falhou.</value>
+  </data>
+  <data name="ChecksumValidationError" xml:space="preserve">
+    <value>A verificação da integridade do ficheiro falhou.</value>
+  </data>
+  <data name="MissingExecutable" xml:space="preserve">
+    <value>Não foi possível encontrar o executável necessário.</value>
+  </data>
+  <data name="UpdateError" xml:space="preserve">
+    <value>Ocorreu um erro ao atualizar o yt-dlp.</value>
+  </data>
+  <data name="UpdateChecking" xml:space="preserve">
+    <value>A verificar atualizações do yt-dlp...</value>
+  </data>
+  <data name="AlreadyUpdated" xml:space="preserve">
+    <value>O yt-dlp já está atualizado.</value>
+  </data>
+  <data name="NewVersionFound" xml:space="preserve">
+    <value>Nova versão encontrada: {0}. A transferir...</value>
+  </data>
+  <data name="UpdatedVersion" xml:space="preserve">
+    <value>O yt-dlp foi atualizado para a versão {0}.</value>
+  </data>
+  <data name="ErrorLoadingHistory" xml:space="preserve">
+    <value>Erro ao carregar o histórico de transferências.</value>
+  </data>
+  <data name="ErrorDeletingHistory" xml:space="preserve">
+    <value>Erro ao eliminar o registo do histórico.</value>
+  </data>
+  <data name="ErrorClearingHistory" xml:space="preserve">
+    <value>Erro ao limpar o histórico de transferências.</value>
+  </data>
+  <data name="DownloadQueued" xml:space="preserve">
+    <value>⏳ Em fila de espera...</value>
+  </data>
+  <data name="YtDlpUpdatedTitle" xml:space="preserve">
+    <value>yt-dlp atualizado</value>
+  </data>
+  <data name="YtDlpUpdatedMessage" xml:space="preserve">
+    <value>A versão {0} foi instalada automaticamente.</value>
+  </data>
 </root>

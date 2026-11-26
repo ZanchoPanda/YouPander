@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using YouPander.Models;
+using YouPander.Resources.Localization;
 using YouPander.Services;
 using static YouPander.Resources.Enums.EnumsYouPander;
 
@@ -129,7 +130,7 @@ namespace YouPander.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading history: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"{Strings.ErrorLoadingHistory}: {ex.Message}");
             }
         }
 
@@ -216,7 +217,7 @@ namespace YouPander.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error deleting history record: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"{Strings.ErrorDeletingHistory}: {ex.Message}");
             }
         }
 
@@ -231,7 +232,7 @@ namespace YouPander.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error clearing history: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"{Strings.ErrorClearingHistory}: {ex.Message}");
             }
         }
 

@@ -282,4 +282,67 @@
   <data name="Yes" xml:space="preserve">
     <value>Sí</value>
   </data>
+  <data name="UnsupportedPlatform" xml:space="preserve">
+    <value>YouPander is only admited in Windows and macOS (Mac Catalyst).</value>
+  </data>
+  <data name="YtDlpStartError" xml:space="preserve">
+    <value>No se pudo iniciar yt-dlp.</value>
+  </data>
+  <data name="FfmpegStartError" xml:space="preserve">
+    <value>No se pudo iniciar FFmpeg.</value>
+  </data>
+  <data name="DownloadError" xml:space="preserve">
+    <value>Se ha producido un error durante la descarga.</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>La descarga ha fallado.</value>
+  </data>
+  <data name="YtDlpNoContent" xml:space="preserve">
+    <value>yt-dlp no ha devuelto ningún contenido.</value>
+  </data>
+  <data name="InvalidJsonResponse" xml:space="preserve">
+    <value>yt-dlp ha devuelto una respuesta JSON no válida.</value>
+  </data>
+  <data name="FfmpegValidationError" xml:space="preserve">
+    <value>La validación de FFmpeg ha fallado.</value>
+  </data>
+  <data name="ChecksumValidationError" xml:space="preserve">
+    <value>La comprobación de integridad del archivo ha fallado.</value>
+  </data>
+  <data name="MissingExecutable" xml:space="preserve">
+    <value>No se ha encontrado el ejecutable necesario.</value>
+  </data>
+  <data name="UpdateError" xml:space="preserve">
+    <value>Se ha producido un error al actualizar yt-dlp.</value>
+  </data>
+  <data name="UpdateChecking" xml:space="preserve">
+    <value>Comprobando actualizaciones de yt-dlp...</value>
+  </data>
+  <data name="AlreadyUpdated" xml:space="preserve">
+    <value>yt-dlp ya está actualizado.</value>
+  </data>
+  <data name="NewVersionFound" xml:space="preserve">
+    <value>Nueva versión encontrada: {0}. Descargando...</value>
+  </data>
+  <data name="UpdatedVersion" xml:space="preserve">
+    <value>yt-dlp actualizado a {0}.</value>
+  </data>
+  <data name="ErrorLoadingHistory" xml:space="preserve">
+    <value>Error al cargar el historial de descargas.</value>
+  </data>
+  <data name="ErrorDeletingHistory" xml:space="preserve">
+    <value>Error al eliminar el registro del historial.</value>
+  </data>
+  <data name="ErrorClearingHistory" xml:space="preserve">
+    <value>Error al borrar el historial de descargas.</value>
+  </data>
+  <data name="DownloadQueued" xml:space="preserve">
+    <value>⏳ En cola...</value>
+  </data>
+  <data name="YtDlpUpdatedTitle" xml:space="preserve">
+    <value>yt-dlp actualizado</value>
+  </data>
+  <data name="YtDlpUpdatedMessage" xml:space="preserve">
+    <value>Se ha instalado automáticamente la versión {0}.</value>
+  </data>
 </root>

@@ -375,7 +375,7 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
         if (token.IsCancellationRequested) return;
 
         // Mostrar estado de cola ANTES de esperar el semáforo
-        item.Status = "⏳ En cola...";
+        item.Status = Strings.DownloadQueued;
         item.Progress = 0;
 
         await _downloadSemaphore.WaitAsync(token);
@@ -505,9 +505,9 @@ public class MainViewModel : BaseViewModel, IQueryAttributable
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     await Shell.Current.DisplayAlert(
-                        "yt-dlp actualizado",
-                        $"Se ha instalado la versión {newVersion} automáticamente.",
-                        "OK");
+                        Strings.YtDlpUpdatedTitle,
+                        Strings.YtDlpUpdatedMessage,
+                        Strings.Ok);
                 });
             }
         });

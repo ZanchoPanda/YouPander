@@ -53,7 +53,7 @@ namespace YouPander.Services
         {
             if (!OperatingSystem.IsWindows() && !OperatingSystem.IsMacCatalyst())
             {
-                throw new PlatformNotSupportedException("YouPander solo admite Windows y macOS (Mac Catalyst).");
+                throw new PlatformNotSupportedException(Strings.UnsupportedPlatform);
             }
 
             if (string.IsNullOrWhiteSpace(path))

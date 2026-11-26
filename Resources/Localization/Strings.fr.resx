@@ -118,168 +118,231 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ActivateAdvancedConfig" xml:space="preserve">
-  <value>Activer la configuration avancée</value>
-</data>
-<data name="AdvancedConfig" xml:space="preserve">
-  <value>Configuration avancée</value>
-</data>
-<data name="All" xml:space="preserve">
-  <value>Tout</value>
-</data>
-<data name="AudioDownloadPath" xml:space="preserve">
-  <value>Dossier de téléchargement audio</value>
-</data>
-<data name="Cancel" xml:space="preserve">
-  <value>Annuler</value>
-</data>
-<data name="CancelDownloads" xml:space="preserve">
-  <value>Annulation des téléchargements</value>
-</data>
-<data name="Cancelled" xml:space="preserve">
-  <value>❌ Annulé</value>
-</data>
-<data name="CannotOpenFolder" xml:space="preserve">
-  <value>Impossible d'ouvrir le dossier</value>
-</data>
-<data name="ClearAll" xml:space="preserve">
-  <value>Tout effacer</value>
-</data>
-<data name="CompletedDownload" xml:space="preserve">
-  <value>Téléchargement terminé</value>
-</data>
-<data name="CreationDate" xml:space="preserve">
-  <value>Date de création :</value>
-</data>
-<data name="DarkMode" xml:space="preserve">
-  <value>Mode sombre</value>
-</data>
-<data name="Done" xml:space="preserve">
-  <value>✅ Terminé</value>
-</data>
-<data name="Download" xml:space="preserve">
-  <value>Télécharger</value>
-</data>
-<data name="Downloading" xml:space="preserve">
-  <value>Téléchargement en cours</value>
-</data>
-<data name="DownloadPath" xml:space="preserve">
-  <value>Dossier de téléchargement</value>
-</data>
-<data name="Duration" xml:space="preserve">
-  <value>Durée :</value>
-</data>
-<data name="EmptyUrlError" xml:space="preserve">
-  <value>Veuillez saisir une URL avant de continuer.</value>
-</data>
-<data name="Error" xml:space="preserve">
-  <value>Erreur</value>
-</data>
-<data name="ExtractingAudio" xml:space="preserve">
-  <value>Extraction de l'audio</value>
-</data>
-<data name="FetchingInfo" xml:space="preserve">
-  <value>Récupération des informations...</value>
-</data>
-<data name="FileInformation" xml:space="preserve">
-  <value>Informations sur le fichier</value>
-</data>
-<data name="FileSize" xml:space="preserve">
-  <value>Taille du fichier :</value>
-</data>
-<data name="Format" xml:space="preserve">
-  <value>Format :</value>
-</data>
-<data name="GettingInfo" xml:space="preserve">
-  <value>Récupération des informations</value>
-</data>
-<data name="History" xml:space="preserve">
-  <value>Historique</value>
-</data>
-<data name="Home" xml:space="preserve">
-  <value>Accueil</value>
-</data>
-<data name="Language" xml:space="preserve">
-  <value>Langue</value>
-</data>
-<data name="Library" xml:space="preserve">
-  <value>Bibliothèque</value>
-</data>
-<data name="Location" xml:space="preserve">
-  <value>Emplacement</value>
-</data>
-<data name="MergingAudioVideo" xml:space="preserve">
-  <value>Fusion de l'audio et de la vidéo</value>
-</data>
-<data name="ModificationDate" xml:space="preserve">
-  <value>Date de modification :</value>
-</data>
-<data name="Music" xml:space="preserve">
-  <value>🎵 Musique</value>
-</data>
-<data name="Name" xml:space="preserve">
-  <value>Nom :</value>
-</data>
-<data name="No" xml:space="preserve">
-  <value>Non</value>
-</data>
-<data name="Ok" xml:space="preserve">
-  <value>OK</value>
-</data>
-<data name="OnlyAvailableOnWindows" xml:space="preserve">
-  <value>La fonction de téléchargement est uniquement disponible sous Windows</value>
-</data>
-<data name="OpenDownloadedFolder" xml:space="preserve">
-  <value>Ouvrir le dossier des téléchargements une fois terminé</value>
-</data>
-<data name="OpenDownloadFolder" xml:space="preserve">
-  <value>Voulez-vous ouvrir le dossier des téléchargements ?</value>
-</data>
-<data name="Player" xml:space="preserve">
-  <value>Lecteur</value>
-</data>
-<data name="PrincipalColorHex" xml:space="preserve">
-  <value>Couleur principale (#HEX)</value>
-</data>
-<data name="Save" xml:space="preserve">
-  <value>Enregistrer</value>
-</data>
-<data name="Search" xml:space="preserve">
-  <value>Rechercher</value>
-</data>
-<data name="SelectFolder" xml:space="preserve">
-  <value>Sélectionner un dossier</value>
-</data>
-<data name="Settings" xml:space="preserve">
-  <value>Paramètres</value>
-</data>
-<data name="ShowOriginalVid" xml:space="preserve">
-  <value>Afficher la vidéo originale</value>
-</data>
-<data name="TextAdvancedConfig" xml:space="preserve">
-  <value>Configuration personnalisée</value>
-</data>
-<data name="ThisMonth" xml:space="preserve">
-  <value>Ce mois-ci</value>
-</data>
-<data name="ThisWeek" xml:space="preserve">
-  <value>Cette semaine</value>
-</data>
-<data name="Today" xml:space="preserve">
-  <value>Aujourd'hui</value>
-</data>
-<data name="Type" xml:space="preserve">
-  <value>Type</value>
-</data>
-<data name="URLToDownload" xml:space="preserve">
-  <value>URL à télécharger</value>
-</data>
-<data name="Video" xml:space="preserve">
-  <value>🎬 Vidéo</value>
-</data>
-<data name="VideoDownloadPath" xml:space="preserve">
-  <value>Dossier de téléchargement vidéo</value>
-</data>
-<data name="Yes" xml:space="preserve">
-  <value>Oui</value>
-</data>
+    <value>Activer la configuration avancée</value>
+  </data>
+  <data name="AdvancedConfig" xml:space="preserve">
+    <value>Configuration avancée</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Tout</value>
+  </data>
+  <data name="AudioDownloadPath" xml:space="preserve">
+    <value>Dossier de téléchargement audio</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="CancelDownloads" xml:space="preserve">
+    <value>Annulation des téléchargements</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>❌ Annulé</value>
+  </data>
+  <data name="CannotOpenFolder" xml:space="preserve">
+    <value>Impossible d'ouvrir le dossier</value>
+  </data>
+  <data name="ClearAll" xml:space="preserve">
+    <value>Tout effacer</value>
+  </data>
+  <data name="CompletedDownload" xml:space="preserve">
+    <value>Téléchargement terminé</value>
+  </data>
+  <data name="CreationDate" xml:space="preserve">
+    <value>Date de création :</value>
+  </data>
+  <data name="DarkMode" xml:space="preserve">
+    <value>Mode sombre</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>✅ Terminé</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Télécharger</value>
+  </data>
+  <data name="Downloading" xml:space="preserve">
+    <value>Téléchargement en cours</value>
+  </data>
+  <data name="DownloadPath" xml:space="preserve">
+    <value>Dossier de téléchargement</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Durée :</value>
+  </data>
+  <data name="EmptyUrlError" xml:space="preserve">
+    <value>Veuillez saisir une URL avant de continuer.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Erreur</value>
+  </data>
+  <data name="ExtractingAudio" xml:space="preserve">
+    <value>Extraction de l'audio</value>
+  </data>
+  <data name="FetchingInfo" xml:space="preserve">
+    <value>Récupération des informations...</value>
+  </data>
+  <data name="FileInformation" xml:space="preserve">
+    <value>Informations sur le fichier</value>
+  </data>
+  <data name="FileSize" xml:space="preserve">
+    <value>Taille du fichier :</value>
+  </data>
+  <data name="Format" xml:space="preserve">
+    <value>Format :</value>
+  </data>
+  <data name="GettingInfo" xml:space="preserve">
+    <value>Récupération des informations</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>Historique</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Accueil</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>Bibliothèque</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Emplacement</value>
+  </data>
+  <data name="MergingAudioVideo" xml:space="preserve">
+    <value>Fusion de l'audio et de la vidéo</value>
+  </data>
+  <data name="ModificationDate" xml:space="preserve">
+    <value>Date de modification :</value>
+  </data>
+  <data name="Music" xml:space="preserve">
+    <value>🎵 Musique</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nom :</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Non</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="OnlyAvailableOnWindows" xml:space="preserve">
+    <value>La fonction de téléchargement est uniquement disponible sous Windows</value>
+  </data>
+  <data name="OpenDownloadedFolder" xml:space="preserve">
+    <value>Ouvrir le dossier des téléchargements une fois terminé</value>
+  </data>
+  <data name="OpenDownloadFolder" xml:space="preserve">
+    <value>Voulez-vous ouvrir le dossier des téléchargements ?</value>
+  </data>
+  <data name="Player" xml:space="preserve">
+    <value>Lecteur</value>
+  </data>
+  <data name="PrincipalColorHex" xml:space="preserve">
+    <value>Couleur principale (#HEX)</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
+  <data name="SelectFolder" xml:space="preserve">
+    <value>Sélectionner un dossier</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="ShowOriginalVid" xml:space="preserve">
+    <value>Afficher la vidéo originale</value>
+  </data>
+  <data name="TextAdvancedConfig" xml:space="preserve">
+    <value>Configuration personnalisée</value>
+  </data>
+  <data name="ThisMonth" xml:space="preserve">
+    <value>Ce mois-ci</value>
+  </data>
+  <data name="ThisWeek" xml:space="preserve">
+    <value>Cette semaine</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Aujourd'hui</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="URLToDownload" xml:space="preserve">
+    <value>URL à télécharger</value>
+  </data>
+  <data name="Video" xml:space="preserve">
+    <value>🎬 Vidéo</value>
+  </data>
+  <data name="VideoDownloadPath" xml:space="preserve">
+    <value>Dossier de téléchargement vidéo</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Oui</value>
+  </data>
+  <data name="UnsupportedPlatform" xml:space="preserve">
+    <value>YouPander est uniquement pris en charge sous Windows et macOS (Mac Catalyst).</value>
+  </data>
+  <data name="YtDlpStartError" xml:space="preserve">
+    <value>Impossible de démarrer yt-dlp.</value>
+  </data>
+  <data name="FfmpegStartError" xml:space="preserve">
+    <value>Impossible de démarrer FFmpeg.</value>
+  </data>
+  <data name="DownloadError" xml:space="preserve">
+    <value>Une erreur s'est produite lors du téléchargement.</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>Le téléchargement a échoué.</value>
+  </data>
+  <data name="YtDlpNoContent" xml:space="preserve">
+    <value>yt-dlp n'a renvoyé aucun contenu.</value>
+  </data>
+  <data name="InvalidJsonResponse" xml:space="preserve">
+    <value>yt-dlp a renvoyé une réponse JSON invalide.</value>
+  </data>
+  <data name="FfmpegValidationError" xml:space="preserve">
+    <value>La validation de FFmpeg a échoué.</value>
+  </data>
+  <data name="ChecksumValidationError" xml:space="preserve">
+    <value>La vérification de l'intégrité du fichier a échoué.</value>
+  </data>
+  <data name="MissingExecutable" xml:space="preserve">
+    <value>L'exécutable requis est introuvable.</value>
+  </data>
+  <data name="UpdateError" xml:space="preserve">
+    <value>Une erreur s'est produite lors de la mise à jour de yt-dlp.</value>
+  </data>
+  <data name="UpdateChecking" xml:space="preserve">
+    <value>Vérification des mises à jour de yt-dlp...</value>
+  </data>
+  <data name="AlreadyUpdated" xml:space="preserve">
+    <value>yt-dlp est déjà à jour.</value>
+  </data>
+  <data name="NewVersionFound" xml:space="preserve">
+    <value>Nouvelle version disponible : {0}. Téléchargement...</value>
+  </data>
+  <data name="UpdatedVersion" xml:space="preserve">
+    <value>yt-dlp mis à jour vers la version {0}.</value>
+  </data>
+  <data name="ErrorLoadingHistory" xml:space="preserve">
+    <value>Une erreur s'est produite lors du chargement de l'historique des téléchargements.</value>
+  </data>
+  <data name="ErrorDeletingHistory" xml:space="preserve">
+    <value>Une erreur s'est produite lors de la suppression de l'entrée de l'historique.</value>
+  </data>
+  <data name="ErrorClearingHistory" xml:space="preserve">
+    <value>Une erreur s'est produite lors de la suppression de l'historique des téléchargements.</value>
+  </data>
+  <data name="DownloadQueued" xml:space="preserve">
+    <value>⏳ En attente...</value>
+  </data>
+  <data name="YtDlpUpdatedTitle" xml:space="preserve">
+    <value>yt-dlp a été mis à jour</value>
+  </data>
+  <data name="YtDlpUpdatedMessage" xml:space="preserve">
+    <value>La version {0} a été installée automatiquement.</value>
+  </data>
 </root>

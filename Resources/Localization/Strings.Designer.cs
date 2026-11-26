@@ -88,6 +88,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a yt-dlp is already up to date..
+        /// </summary>
+        internal static string AlreadyUpdated {
+            get {
+                return ResourceManager.GetString("AlreadyUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Audio Download Path.
         /// </summary>
         internal static string AudioDownloadPath {
@@ -124,11 +133,20 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Can&apos;t open folder.
+        ///   Busca una cadena traducida similar a Unable to open the download folder..
         /// </summary>
         internal static string CannotOpenFolder {
             get {
                 return ResourceManager.GetString("CannotOpenFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The file integrity check failed..
+        /// </summary>
+        internal static string ChecksumValidationError {
+            get {
+                return ResourceManager.GetString("ChecksumValidationError", resourceCulture);
             }
         }
         
@@ -187,6 +205,24 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a An error occurred while downloading..
+        /// </summary>
+        internal static string DownloadError {
+            get {
+                return ResourceManager.GetString("DownloadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The download failed..
+        /// </summary>
+        internal static string DownloadFailed {
+            get {
+                return ResourceManager.GetString("DownloadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Downloading.
         /// </summary>
         internal static string Downloading {
@@ -205,6 +241,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a ⏳ Queued....
+        /// </summary>
+        internal static string DownloadQueued {
+            get {
+                return ResourceManager.GetString("DownloadQueued", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Duration:.
         /// </summary>
         internal static string Duration {
@@ -214,7 +259,7 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Please enter a URL before continuing..
+        ///   Busca una cadena traducida similar a Please enter a valid URL..
         /// </summary>
         internal static string EmptyUrlError {
             get {
@@ -228,6 +273,33 @@ namespace YouPander.Resources.Localization {
         internal static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An error occurred while clearing download history..
+        /// </summary>
+        internal static string ErrorClearingHistory {
+            get {
+                return ResourceManager.GetString("ErrorClearingHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An error occurred while deleting the history record..
+        /// </summary>
+        internal static string ErrorDeletingHistory {
+            get {
+                return ResourceManager.GetString("ErrorDeletingHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An error occurred while loading download history..
+        /// </summary>
+        internal static string ErrorLoadingHistory {
+            get {
+                return ResourceManager.GetString("ErrorLoadingHistory", resourceCulture);
             }
         }
         
@@ -246,6 +318,24 @@ namespace YouPander.Resources.Localization {
         internal static string FetchingInfo {
             get {
                 return ResourceManager.GetString("FetchingInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Could not start FFmpeg..
+        /// </summary>
+        internal static string FfmpegStartError {
+            get {
+                return ResourceManager.GetString("FfmpegStartError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a FFmpeg validation failed..
+        /// </summary>
+        internal static string FfmpegValidationError {
+            get {
+                return ResourceManager.GetString("FfmpegValidationError", resourceCulture);
             }
         }
         
@@ -304,6 +394,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a yt-dlp returned an invalid JSON response..
+        /// </summary>
+        internal static string InvalidJsonResponse {
+            get {
+                return ResourceManager.GetString("InvalidJsonResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Language.
         /// </summary>
         internal static string Language {
@@ -340,6 +439,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a The required executable could not be found..
+        /// </summary>
+        internal static string MissingExecutable {
+            get {
+                return ResourceManager.GetString("MissingExecutable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Modification date:.
         /// </summary>
         internal static string ModificationDate {
@@ -367,6 +475,15 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a New version found: {0}. Downloading....
+        /// </summary>
+        internal static string NewVersionFound {
+            get {
+                return ResourceManager.GetString("NewVersionFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a No.
         /// </summary>
         internal static string No {
@@ -385,7 +502,7 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Downloaded function only able for Windows.
+        ///   Busca una cadena traducida similar a This feature is only available on Windows..
         /// </summary>
         internal static string OnlyAvailableOnWindows {
             get {
@@ -520,6 +637,42 @@ namespace YouPander.Resources.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a YouPander solo admite Windows y macOS (Mac Catalyst)..
+        /// </summary>
+        internal static string UnsupportedPlatform {
+            get {
+                return ResourceManager.GetString("UnsupportedPlatform", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Checking for yt-dlp updates....
+        /// </summary>
+        internal static string UpdateChecking {
+            get {
+                return ResourceManager.GetString("UpdateChecking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a yt-dlp updated to {0}..
+        /// </summary>
+        internal static string UpdatedVersion {
+            get {
+                return ResourceManager.GetString("UpdatedVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An error occurred while updating yt-dlp..
+        /// </summary>
+        internal static string UpdateError {
+            get {
+                return ResourceManager.GetString("UpdateError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a URL to download.
         /// </summary>
         internal static string URLToDownload {
@@ -552,6 +705,42 @@ namespace YouPander.Resources.Localization {
         internal static string Yes {
             get {
                 return ResourceManager.GetString("Yes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a yt-dlp did not return any content..
+        /// </summary>
+        internal static string YtDlpNoContent {
+            get {
+                return ResourceManager.GetString("YtDlpNoContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Could not start yt-dlp..
+        /// </summary>
+        internal static string YtDlpStartError {
+            get {
+                return ResourceManager.GetString("YtDlpStartError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Version {0} has been installed automatically...
+        /// </summary>
+        internal static string YtDlpUpdatedMessage {
+            get {
+                return ResourceManager.GetString("YtDlpUpdatedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a yt-dlp updated.
+        /// </summary>
+        internal static string YtDlpUpdatedTitle {
+            get {
+                return ResourceManager.GetString("YtDlpUpdatedTitle", resourceCulture);
             }
         }
     }
