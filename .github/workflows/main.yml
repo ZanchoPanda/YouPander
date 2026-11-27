@@ -4,9 +4,8 @@ name: Build YouPander macOS
 on:
   workflow_dispatch:
 
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 permissions:
   contents: write
@@ -15,6 +14,8 @@ jobs:
 
   build-macos:
     name: Build macOS ${{ matrix.arch }}
+
+    if: startsWith(github.event.release.tag_name, 'v') || github.event_name == 'workflow_dispatch'
 
     strategy:
       fail-fast: false
@@ -32,9 +33,11 @@ jobs:
 
     steps:
 
-      # 1. Descargar el código
+      # 1. Descargar el código correspondiente al tag
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
 
       # 2. Instalar .NET 10.0.401
       - name: Setup .NET
@@ -50,9 +53,6 @@ jobs:
 
           echo "=== Selected SDK ==="
           dotnet --version
-
-          echo "=== SDK information ==="
-          dotnet --info
 
           if [[ "$(dotnet --version)" != "10.0.401" ]]; then
             echo "ERROR: Se necesita exactamente .NET SDK 10.0.401"
@@ -76,13 +76,9 @@ jobs:
           echo "=== Xcode version ==="
           xcodebuild -version
 
-          echo "=== Active developer directory ==="
-          xcode-select -p
-
-          echo "=== Locate actool ==="
           xcrun --find actool
 
-      # 5. Instalar MAUI con workload set fijo
+      # 5. Instalar MAUI
       - name: Install MAUI workload
         run: |
           dotnet workload install maui \
@@ -91,10 +87,7 @@ jobs:
       # 6. Comprobar workloads
       - name: Verify MAUI workloads
         run: |
-          echo "=== Workload version ==="
           dotnet workload --version
-
-          echo "=== Installed workloads ==="
           dotnet workload list
 
       # 7. Instalar create-dmg
@@ -111,14 +104,8 @@ jobs:
           echo "=== .NET ==="
           dotnet --info
 
-          echo "=== MAUI workloads ==="
-          dotnet workload list
-
           echo "=== actool ==="
           xcrun --find actool
-
-          echo "=== MacOS SDK ==="
-          xcrun --sdk macosx --show-sdk-version
 
       # 9. Compilar aplicación
       - name: Publish YouPander
@@ -143,11 +130,9 @@ jobs:
             exit 1
           fi
 
-          echo "Aplicación encontrada: $APP_PATH"
-
           echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
 
-      # 11. Preparar contenido del DMG
+      # 11. Preparar DMG
       - name: Prepare DMG
         run: |
           mkdir -p staging
@@ -167,10 +152,10 @@ jobs:
             --icon-size 100 \
             --app-drop-link 450 200 \
             --icon "YouPander.app" 150 200 \
-            "Output/YouPander_${{ github.ref_name }}_macOS_${{ matrix.arch }}.dmg" \
+            "Output/YouPander_${{ github.event.release.tag_name || github.ref_name }}_macOS_${{ matrix.arch }}.dmg" \
             "staging"
 
-      # 13. Subir instalador como artefacto
+      # 13. Subir DMG como artefacto
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
@@ -179,15 +164,15 @@ jobs:
           if-no-files-found: error
 
   # ==========================================
-  # PUBLICAR EN GITHUB RELEASES
+  # AÑADIR DMG A LA RELEASE EXISTENTE
   # ==========================================
 
   release:
-    name: Publish GitHub Release
+    name: Attach DMG to GitHub Release
 
     needs: build-macos
 
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.event.release.tag_name, 'v')
 
     runs-on: ubuntu-latest
 
@@ -196,7 +181,7 @@ jobs:
 
     steps:
 
-      # 1. Descargar los DMG generados
+      # 1. Descargar los dos DMG
       - name: Download DMG artifacts
         uses: actions/download-artifact@v4
         with:
@@ -204,9 +189,13 @@ jobs:
           path: release-assets
           merge-multiple: true
 
-      # 2. Publicar GitHub Release
-      - name: Publish Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: release-assets/*.dmg
-          generate_release_notes: true
+      # 2. Adjuntar los DMG a la Release existente
+      - name: Upload DMG to existing Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          gh release upload "$TAG_NAME" \
+            release-assets/*.dmg \
+            --repo "$REPOSITORY"
