@@ -1,207 +1,228 @@
-🚀 What is YouPander?
+🚀 YouPander
 
-YouPander is an application built with .NET MAUI that combines an integrated browser with a powerful download system powered by yt-dlp and ffmpeg.
+A simple, powerful and ad-free multimedia downloader built with .NET MAUI.
 
-It allows you to browse YouTube, watch content, and download videos or audio with format and quality selection, all from a simple, fast, and ad-free interface.
+YouPander combines an integrated web browser with a powerful download engine powered by yt-dlp and FFmpeg.
 
-The application automatically manages the required dependencies on Windows, providing a ready-to-use experience without complex configuration.
+Browse YouTube, watch content and download videos or extract audio from YouTube and other yt-dlp-compatible platforms — all from a clean, intuitive and ad-free interface.
 
-    ⚠️ Personal project developed independently during my free time with the goal of learning, improving my skills, and creating a useful tool.
+The application automatically manages the required dependencies on Windows, providing a ready-to-use experience without complicated setup.
 
-✨ Main Features
-
-📺 YouTube Browser with Ad-Block
-- Built-in web browser inside the application
-- Smooth browsing experience without leaving the app
-- Integrated ad blocker
-
+⚠️ Personal project: YouPander is independently developed in my free time as a way to learn, improve my development skills and build something useful for the community.
+✨ Features
+📺 Integrated Browser & Ad Blocker
+Built-in web browser for browsing without leaving the application.
+Smooth and seamless browsing experience.
+Integrated ad blocker for a cleaner experience.
 ⬇️ Video & Audio Downloads
-- Download content from YouTube and yt-dlp compatible platforms
-- Download as video or extract audio
-- Select quality and format before downloading
-- Playlist support
-- Simultaneous downloads with individual progress tracking
-- Real-time download cancellation
-
-🕘 History & Management
-- Complete download history storage
-- Quick retry for previous downloads
-- Simple management of download history and recent activity
-
+Download content from YouTube and other yt-dlp-compatible platforms.
+Download videos or extract audio.
+Choose your preferred quality and format before downloading.
+Playlist support.
+Multiple simultaneous downloads with individual progress tracking.
+Cancel downloads in real time.
+🕘 Download History & Management
+Persistent download history stored locally.
+Quickly retry previous downloads.
+Easy management of download history and recent activity.
 🎨 Customization
-- Light and dark themes
-- Advanced folder configuration
-- Automatic opening of the download folder
+Light and dark themes.
+Advanced download folder configuration.
+Separate destination folders for audio and video.
+Automatically open the download folder when downloads finish.
+🌍 Multilingual Interface
 
-🌍 Multilanguage Support
+Currently available languages:
 
-Currently available in:
-- 🇪🇸 Spanish
-- 🇬🇧 English
-
+🇪🇸 Spanish
+🇬🇧 English
+🇵🇹 Portuguese
+🇨🇳 Chinese
+🇮🇹 Italian
+🇩🇪 German
+🇫🇷 French
 💻 Supported Platforms
-
-- ✅ Full Support	✅ -----> Window 10/11
-- ⚠️ Coming Soon	✅ -----> Android, iOS, macOS (Catalyst)
-
-**Currently**, full download functionality is only available on Windows due to native process restrictions on other platforms.
-
-🛠️ Technologies Used
-
-- .NET MAUI 10 — Cross-platform application framework
-- yt-dlp — Download engine
-- ffmpeg — Multimedia conversion and processing
-- SQLite — Local download history
-- CommunityToolkit.Maui — Additional components and utilities
-- MVVM Architecture
-
+Platform	Status
+🪟 Windows 10 / 11	✅ Fully supported
+🍎 macOS (Apple Silicon & Intel)	⚠️ Planned
+🤖 Android	⚠️ Planned
+📱 iOS	⚠️ Planned
+Note: Full download functionality is currently available only on Windows due to platform-specific native process execution limitations. Support for other platforms is planned.
+🛠️ Technologies
+Technology	Purpose
+.NET MAUI 10	Cross-platform application framework
+yt-dlp	Video and audio download engine
+FFmpeg	Multimedia processing and conversion
+SQLite	Local download history storage
+CommunityToolkit.Maui	Additional components and utilities
+MVVM	Application architecture
 ⚙️ Configuration
 
-From the settings panel, you can configure:
+YouPander provides a settings panel where you can customize:
 
-- Download folder
-- Separate folders for audio and video
-- Application language
-- Visual theme
-- Automatic folder opening after downloads finish
+Download destination folder.
+Separate folders for audio and video files.
+Application language.
+Visual theme.
+Automatic download folder opening after downloads finish.
+🗺️ Roadmap
 
-📌 Future Improvements
-- Full cross-platform support
-- Performance improvements
-- Advanced download management
-- More customization options (theme selector, colors, etc.)
-- New multimedia formats and tools
+Some of the improvements planned for future releases:
 
+Full cross-platform download support.
+Performance and stability improvements.
+Advanced download management.
+More customization options, including additional themes and colors.
+Support for additional multimedia formats and tools.
 ❤️ Support the Project
 
-Contributions are welcome.
+YouPander is an independent personal project, and contributions are always welcome!
 
-If you'd like to report a bug, suggest an improvement, or submit a pull request, please open an issue first to discuss it.
+If you find a bug, have an idea for a new feature or want to contribute code, feel free to open an issue or submit a pull request.
 
-If you enjoy YouPander and would like to support its development, you can buy me a coffee:
-
-[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
+If you enjoy using YouPander and would like to support its development, you can buy me a coffee:
 
 <p align="center">
-  <a href="https://ko-fi.com/zanchopanda" target="_blank">
-    <img width="500" alt="DigiviceKofi" src="https://github.com/user-attachments/assets/8199d3d7-30c7-4d1e-88aa-01c4efd2df49" />
-  </a>
+<a href="https://ko-fi.com/zanchopanda">
+<img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" />
+</a>
 </p>
 
-[![Keep me debugging at 3AM](https://img.shields.io/badge/Keep_me_debugging_at_3AM-111111?style=for-the-badge&logo=github&logoColor=white)](https://ko-fi.com/zanchopanda)
+<p align="center">
+<a href="https://ko-fi.com/zanchopanda">
+<img width="500" alt="Support YouPander development" src="https://github.com/user-attachments/assets/8199d3d7-30c7-4d1e-88aa-01c4efd2df49" />
+</a>
+</p>
+
+<p align="center">
+<a href="https://ko-fi.com/zanchopanda">
+<img src="https://img.shields.io/badge/Keep_me_debugging_at_3AM-111111?style=for-the-badge&logo=github&logoColor=white" alt="Keep me debugging at 3 AM" />
+</a>
+</p>
 
 ⚠️ Legal Notice
 
-This application is intended for personal and educational use only.
+YouPander is intended for personal and educational use.
 
-The user is responsible for how they use the tool and for complying with the terms of service and policies of the platforms from which content is downloaded.
+Users are solely responsible for how they use the application and for complying with the terms of service, copyright laws and policies of the platforms from which they download content.
 
-YouPander uses yt-dlp as its download engine. Make sure you have the right to download the content before using the application.
-
+YouPander uses yt-dlp as its download engine. Always make sure you have the necessary rights and permissions to download any content before using the application.
 
 📄 License
 
 This project is licensed under the MIT License. See the LICENSE file for more information.
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+🇪🇸 Versión en Español
 🚀 ¿Qué es YouPander?
 
-YouPander es una aplicación desarrollada en .NET MAUI que combina un navegador integrado con un potente sistema de descargas basado en yt-dlp y ffmpeg.
+Un descargador multimedia sencillo, potente y sin anuncios, desarrollado con .NET MAUI.
 
-Permite navegar por YouTube, visualizar contenido y descargar vídeos o audio con selección de formato y calidad, todo desde una interfaz sencilla, rápida y sin anuncios.
+YouPander combina un navegador web integrado con un potente motor de descargas basado en yt-dlp y FFmpeg.
 
-La aplicación gestiona automáticamente las dependencias necesarias en Windows, ofreciendo una experiencia lista para usar sin configuraciones complejas.
+Navega por YouTube, visualiza contenido y descarga vídeos o extrae audio de YouTube y otras plataformas compatibles con yt-dlp, todo desde una interfaz limpia, intuitiva y sin anuncios.
 
-    ⚠️ Proyecto personal desarrollado en solitario durante mi tiempo libre con el objetivo de aprender, mejorar habilidades y crear una herramienta útil.
+La aplicación gestiona automáticamente las dependencias necesarias en Windows, ofreciendo una experiencia lista para usar sin configuraciones complicadas.
 
+⚠️ Proyecto personal: YouPander es un proyecto desarrollado de forma independiente durante mi tiempo libre, con el objetivo de aprender, mejorar mis habilidades de desarrollo y crear una herramienta útil para la comunidad.
 ✨ Características principales
-
-📺 Navegador Youtube con ad-block
-- Navegador web incorporado dentro de la aplicación
-- Navegación fluida sin salir de la app
-- Bloqueador de anuncios integrado
-
+📺 Navegador integrado y bloqueador de anuncios
+Navegador web integrado para navegar sin salir de la aplicación.
+Experiencia de navegación fluida e intuitiva.
+Bloqueador de anuncios integrado para una navegación más limpia.
 ⬇️ Descarga de vídeos y audio
-- Descarga contenido desde YouTube y plataformas compatibles con yt-dlp
-- Descarga en formato vídeo o extracción de audio
-- Selección de calidad y formato antes de descargar
-- Compatibilidad con playlists
-- Descargas simultáneas con progreso individual
-- Cancelación de descargas en tiempo real
-
-🕘 Historial y gestión
-- Historial completo de descargas almacenado
-- Reintento rápido de descargas anteriores
-- Gestión sencilla del historial y actividad reciente
-
+Descarga contenido de YouTube y otras plataformas compatibles con yt-dlp.
+Descarga vídeos o extrae únicamente el audio.
+Selección de calidad y formato antes de descargar.
+Compatibilidad con listas de reproducción (playlists).
+Múltiples descargas simultáneas con seguimiento individual del progreso.
+Cancelación de descargas en tiempo real.
+🕘 Historial y gestión de descargas
+Historial persistente de descargas almacenado localmente.
+Posibilidad de reintentar rápidamente descargas anteriores.
+Gestión sencilla del historial y de la actividad reciente.
 🎨 Personalización
-- Temas claro y oscuro
-- Configuración avanzada de carpetas
-- Apertura automática de la carpeta de descarga
+Temas claro y oscuro.
+Configuración avanzada de las carpetas de descarga.
+Carpetas independientes para archivos de audio y vídeo.
+Apertura automática de la carpeta de descargas al finalizar.
+🌍 Interfaz multiidioma
 
-🌍 Multiidioma
+Idiomas disponibles actualmente:
 
-Disponible actualmente en:
-- 🇪🇸 Español
-- 🇬🇧 Inglés
-
+🇪🇸 Español
+🇬🇧 Inglés
+🇵🇹 Portugués
+🇨🇳 Chino
+🇮🇹 Italiano
+🇩🇪 Alemán
+🇫🇷 Francés
 💻 Plataformas compatibles
-- ✅ Full Support	✅ -----> Window 10/11
-- ⚠️ Próximamente	✅ -----> Android, iOS, macOS (Catalyst)
-
-**Actualmente**, la funcionalidad completa de descarga está disponible únicamente en Windows debido a restricciones de procesos nativos en otras plataformas.
-
+Plataforma	Estado
+🪟 Windows 10 / 11	✅ Totalmente compatible
+🍎 macOS (Apple Silicon e Intel)	⚠️ Previsto
+🤖 Android	⚠️ Previsto
+📱 iOS	⚠️ Previsto
+Nota: Actualmente, la funcionalidad completa de descarga solo está disponible en Windows debido a limitaciones específicas de ejecución de procesos nativos en otras plataformas. Se prevé ampliar la compatibilidad en futuras versiones.
 🛠️ Tecnologías utilizadas
-- .NET MAUI 10 — Aplicación multiplataforma
-- yt-dlp — Motor de descarga
-- ffmpeg — Conversión y procesamiento multimedia
-- SQLite — Historial local de descargas
-- CommunityToolkit.Maui — Componentes y utilidades adicionales
-- Arquitectura MVVM
-
+Tecnología	Función
+.NET MAUI 10	Framework de desarrollo multiplataforma
+yt-dlp	Motor de descarga de vídeos y audio
+FFmpeg	Procesamiento y conversión multimedia
+SQLite	Almacenamiento local del historial
+CommunityToolkit.Maui	Componentes y utilidades adicionales
+MVVM	Arquitectura de la aplicación
 ⚙️ Configuración
 
-Desde el panel de ajustes puedes configurar:
-- Carpeta de descargas
-- Carpetas separadas para audio y vídeo
-- Idioma de la aplicación
-- Tema visual
-- Apertura automática de carpetas tras finalizar una descarga
+Desde el panel de ajustes puedes personalizar:
 
-📌 Futuras mejoras
+Carpeta de destino de las descargas.
+Carpetas independientes para audio y vídeo.
+Idioma de la aplicación.
+Tema visual.
+Apertura automática de la carpeta de descargas al finalizar.
+🗺️ Próximas mejoras
 
-- Soporte multiplataforma completo
-- Mejoras de rendimiento
-- Gestión avanzada de descargas
-- Más opciones de personalización (Selector de tema, color, etc)
-- Nuevos formatos y herramientas multimedia
+Algunas de las mejoras previstas para futuras versiones:
 
+Compatibilidad completa de descargas multiplataforma.
+Mejoras de rendimiento y estabilidad.
+Gestión avanzada de descargas.
+Más opciones de personalización, incluyendo nuevos temas y colores.
+Compatibilidad con nuevos formatos y herramientas multimedia.
 ❤️ Apoya el proyecto
 
-Las contribuciones son bienvenidas.
+YouPander es un proyecto personal e independiente, ¡y cualquier contribución es bienvenida!
 
-Si quieres reportar un bug, proponer una mejora o enviar un pull request, abre un issue primero para discutirlo.
+Si encuentras algún error, tienes una idea para una nueva funcionalidad o quieres colaborar con el código, puedes abrir un issue o enviar un pull request.
 
 Si te gusta YouPander y quieres apoyar su desarrollo, puedes invitarme a un café:
 
-[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/zanchopanda)
-
 <p align="center">
-  <a href="https://ko-fi.com/zanchopanda" target="_blank">
-    <img width="500" alt="DigiviceKofi" src="https://github.com/user-attachments/assets/8199d3d7-30c7-4d1e-88aa-01c4efd2df49" />
-  </a>
+<a href="https://ko-fi.com/zanchopanda">
+<img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Apóyame en Ko-fi" />
+</a>
 </p>
 
-[![Mantenme hasta las 3AM](https://img.shields.io/badge/Keep_me_debugging_at_3AM-111111?style=for-the-badge&logo=github&logoColor=white)](https://ko-fi.com/zanchopanda)
+<p align="center">
+<a href="https://ko-fi.com/zanchopanda">
+<img width="500" alt="Apoya el desarrollo de YouPander" src="https://github.com/user-attachments/assets/8199d3d7-30c7-4d1e-88aa-01c4efd2df49" />
+</a>
+</p>
+
+<p align="center">
+<a href="https://ko-fi.com/zanchopanda">
+<img src="https://img.shields.io/badge/Mantenme_programando_a_las_3AM-111111?style=for-the-badge&logo=github&logoColor=white" alt="Mantenme programando a las 3 AM" />
+</a>
+</p>
 
 ⚠️ Aviso legal
 
-Esta aplicación está pensada únicamente para uso personal y educativo.
-El usuario es responsable del uso que haga de la herramienta y del cumplimiento de los términos de servicio y políticas de las plataformas desde las que descargue contenido.
+YouPander está pensado para uso personal y educativo.
 
-YouPander utiliza yt-dlp como motor de descarga. Asegúrate de tener derecho a descargar el contenido antes de utilizar la aplicación.
+Los usuarios son los únicos responsables del uso que hagan de la aplicación y del cumplimiento de los términos de servicio, las leyes de derechos de autor y las políticas de las plataformas desde las que descarguen contenido.
+
+YouPander utiliza yt-dlp como motor de descargas. Asegúrate siempre de disponer de los derechos y permisos necesarios para descargar cualquier contenido antes de utilizar la aplicación.
 
 📄 Licencia
 
-Este proyecto está bajo licencia MIT. Consulta el archivo LICENSE para más información.
+Este proyecto está publicado bajo la licencia MIT. Consulta el archivo LICENSE para obtener más información.
