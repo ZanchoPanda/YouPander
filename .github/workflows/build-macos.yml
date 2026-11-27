@@ -22,11 +22,11 @@ jobs:
         include:
           - arch: x64
             rid: maccatalyst-x64
-            runner: macos-15-intel
+            runner: macos-26-intel
 
           - arch: arm64
             rid: maccatalyst-arm64
-            runner: macos-15
+            runner: macos-26
 
     runs-on: ${{ matrix.runner }}
 
@@ -42,15 +42,33 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      # 3. Instalar workloads MAUI
+      # 3. Seleccionar Xcode 26
+      - name: Select Xcode 26
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.0.app
+          xcodebuild -version
+
+      # 4. Instalar workloads MAUI
       - name: Install MAUI workload
         run: dotnet workload install maui
 
-      # 4. Instalar create-dmg
+      # 5. Instalar create-dmg
       - name: Install create-dmg
         run: brew install create-dmg
 
-      # 5. Compilar aplicación
+      # 6. Comprobar entorno
+      - name: Check build environment
+        run: |
+          echo "=== Xcode ==="
+          xcodebuild -version
+
+          echo "=== .NET ==="
+          dotnet --info
+
+          echo "=== MAUI workloads ==="
+          dotnet workload list
+
+      # 7. Compilar aplicación
       - name: Publish YouPander
         run: |
           dotnet publish YouPander.csproj \
@@ -60,7 +78,7 @@ jobs:
             -p:CreatePackage=false \
             -p:EnableCodeSigning=false
 
-      # 6. Localizar aplicación compilada
+      # 8. Localizar aplicación compilada
       - name: Locate application
         run: |
           APP_PATH=$(find bin/Release/net10.0-maccatalyst \
@@ -73,16 +91,19 @@ jobs:
             exit 1
           fi
 
+          echo "Aplicación encontrada: $APP_PATH"
           echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
 
-      # 7. Preparar contenido del DMG
+      # 9. Preparar contenido del DMG
       - name: Prepare DMG
         run: |
           mkdir -p staging
+
           ditto "$APP_PATH" "staging/YouPander.app"
+
           ln -s /Applications staging/Applications
 
-      # 8. Crear instalador
+      # 10. Crear instalador DMG
       - name: Generate DMG
         run: |
           mkdir -p Output
@@ -96,7 +117,7 @@ jobs:
             "Output/YouPander_${{ github.ref_name }}_macOS_${{ matrix.arch }}.dmg" \
             "staging"
 
-      # 9. Subir instalador como artefacto
+      # 11. Subir instalador como artefacto
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
@@ -111,7 +132,9 @@ jobs:
   release:
     name: Publish GitHub Release
     needs: build-macos
+
     if: startsWith(github.ref, 'refs/tags/v')
+
     runs-on: ubuntu-latest
 
     permissions:
@@ -119,6 +142,7 @@ jobs:
 
     steps:
 
+      # 1. Descargar los DMG generados
       - name: Download DMG artifacts
         uses: actions/download-artifact@v4
         with:
@@ -126,6 +150,7 @@ jobs:
           path: release-assets
           merge-multiple: true
 
+      # 2. Publicar GitHub Release
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
