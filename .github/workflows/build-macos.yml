@@ -40,21 +40,40 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 10.0.401
 
-      # 3. Seleccionar Xcode 26
-      - name: Select Xcode 26
+      # 3. Seleccionar e inicializar Xcode 26.6
+      - name: Configure Xcode
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.0.app
+          if [ ! -d "/Applications/Xcode_26.6.app" ]; then
+            echo "ERROR: No se encuentra Xcode 26.6"
+            ls -d /Applications/Xcode*.app
+            exit 1
+          fi
+
+          sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
+
+          sudo xcodebuild -license accept
+          sudo xcodebuild -runFirstLaunch
+
+          echo "=== Xcode version ==="
           xcodebuild -version
 
-      # 4. Instalar workloads MAUI
+          echo "=== Active developer directory ==="
+          xcode-select -p
+
+          echo "=== Locate actool ==="
+          xcrun --find actool
+
+      # 4. Instalar workload MAUI versionado
       - name: Install MAUI workload
-        run: dotnet workload install maui
+        run: |
+          dotnet workload install maui --version 10.0.401
 
       # 5. Instalar create-dmg
       - name: Install create-dmg
-        run: brew install create-dmg
+        run: |
+          brew install create-dmg
 
       # 6. Comprobar entorno
       - name: Check build environment
@@ -67,6 +86,12 @@ jobs:
 
           echo "=== MAUI workloads ==="
           dotnet workload list
+
+          echo "=== actool ==="
+          xcrun --find actool
+
+          echo "=== MacOS SDK ==="
+          xcrun --sdk macosx --show-sdk-version
 
       # 7. Compilar aplicación
       - name: Publish YouPander
@@ -87,11 +112,12 @@ jobs:
             -print -quit)
 
           if [ -z "$APP_PATH" ]; then
-            echo "No se encontró YouPander.app"
+            echo "ERROR: No se encontró YouPander.app"
             exit 1
           fi
 
           echo "Aplicación encontrada: $APP_PATH"
+
           echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
 
       # 9. Preparar contenido del DMG
@@ -131,6 +157,7 @@ jobs:
 
   release:
     name: Publish GitHub Release
+
     needs: build-macos
 
     if: startsWith(github.ref, 'refs/tags/v')
