@@ -42,7 +42,24 @@ jobs:
         with:
           dotnet-version: 10.0.401
 
-      # 3. Seleccionar e inicializar Xcode 26.6
+      # 3. Verificar SDK seleccionado
+      - name: Verify .NET SDK
+        run: |
+          echo "=== Installed SDKs ==="
+          dotnet --list-sdks
+
+          echo "=== Selected SDK ==="
+          dotnet --version
+
+          echo "=== SDK information ==="
+          dotnet --info
+
+          if [[ "$(dotnet --version)" != "10.0.401" ]]; then
+            echo "ERROR: Se está utilizando un SDK incorrecto"
+            exit 1
+          fi
+
+      # 4. Seleccionar e inicializar Xcode 26.6
       - name: Configure Xcode
         run: |
           if [ ! -d "/Applications/Xcode_26.6.app" ]; then
@@ -65,17 +82,28 @@ jobs:
           echo "=== Locate actool ==="
           xcrun --find actool
 
-      # 4. Instalar workload MAUI versionado
+      # 5. Instalar MAUI con workload set fijo
       - name: Install MAUI workload
         run: |
-          dotnet workload install maui --version 10.0.401
+          dotnet workload install maui \
+            --version 10.0.401 \
+            --skip-manifest-update
 
-      # 5. Instalar create-dmg
+      # 6. Comprobar workloads
+      - name: Verify MAUI workloads
+        run: |
+          echo "=== Workload version ==="
+          dotnet workload --version
+
+          echo "=== Installed workloads ==="
+          dotnet workload list
+
+      # 7. Instalar create-dmg
       - name: Install create-dmg
         run: |
           brew install create-dmg
 
-      # 6. Comprobar entorno
+      # 8. Comprobar entorno
       - name: Check build environment
         run: |
           echo "=== Xcode ==="
@@ -93,7 +121,7 @@ jobs:
           echo "=== MacOS SDK ==="
           xcrun --sdk macosx --show-sdk-version
 
-      # 7. Compilar aplicación
+      # 9. Compilar aplicación
       - name: Publish YouPander
         run: |
           dotnet publish YouPander.csproj \
@@ -103,7 +131,7 @@ jobs:
             -p:CreatePackage=false \
             -p:EnableCodeSigning=false
 
-      # 8. Localizar aplicación compilada
+      # 10. Localizar aplicación compilada
       - name: Locate application
         run: |
           APP_PATH=$(find bin/Release/net10.0-maccatalyst \
@@ -120,7 +148,7 @@ jobs:
 
           echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
 
-      # 9. Preparar contenido del DMG
+      # 11. Preparar contenido del DMG
       - name: Prepare DMG
         run: |
           mkdir -p staging
@@ -129,7 +157,7 @@ jobs:
 
           ln -s /Applications staging/Applications
 
-      # 10. Crear instalador DMG
+      # 12. Crear instalador DMG
       - name: Generate DMG
         run: |
           mkdir -p Output
@@ -143,7 +171,7 @@ jobs:
             "Output/YouPander_${{ github.ref_name }}_macOS_${{ matrix.arch }}.dmg" \
             "staging"
 
-      # 11. Subir instalador como artefacto
+      # 13. Subir instalador como artefacto
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
