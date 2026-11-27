@@ -68,11 +68,8 @@ Currently available languages:
 
 Platform	Status
     🪟 Windows 10 / 11	✅ Fully supported
-    
     🍎 macOS (Apple Silicon & Intel)	✅ Fully supported
-    
     🤖 Android	⚠️ Planned
-    
     📱 iOS	⚠️ Planned
     
 Note: Full download functionality is currently available only on Windows and Mac (Beta test right now) due to platform-specific native process execution limitations. Support for other platforms is planned.
