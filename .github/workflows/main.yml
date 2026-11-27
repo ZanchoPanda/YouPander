@@ -36,7 +36,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Instalar .NET 10
+      # 2. Instalar .NET 10.0.401
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -55,7 +55,7 @@ jobs:
           dotnet --info
 
           if [[ "$(dotnet --version)" != "10.0.401" ]]; then
-            echo "ERROR: Se está utilizando un SDK incorrecto"
+            echo "ERROR: Se necesita exactamente .NET SDK 10.0.401"
             exit 1
           fi
 
