@@ -1,0 +1,158 @@
+
+name: Build YouPander macOS
+
+on:
+  workflow_dispatch:
+
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+
+  build-macos:
+    name: Build macOS ${{ matrix.arch }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            rid: maccatalyst-x64
+            runner: macos-26-intel
+
+          - arch: arm64
+            rid: maccatalyst-arm64
+            runner: macos-26
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+
+      # 1. Descargar el código
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Instalar .NET 10
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      # 3. Seleccionar Xcode 26
+      - name: Select Xcode 26
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.0.app
+          xcodebuild -version
+
+      # 4. Instalar workloads MAUI
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+
+      # 5. Instalar create-dmg
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      # 6. Comprobar entorno
+      - name: Check build environment
+        run: |
+          echo "=== Xcode ==="
+          xcodebuild -version
+
+          echo "=== .NET ==="
+          dotnet --info
+
+          echo "=== MAUI workloads ==="
+          dotnet workload list
+
+      # 7. Compilar aplicación
+      - name: Publish YouPander
+        run: |
+          dotnet publish YouPander.csproj \
+            -f net10.0-maccatalyst \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            -p:CreatePackage=false \
+            -p:EnableCodeSigning=false
+
+      # 8. Localizar aplicación compilada
+      - name: Locate application
+        run: |
+          APP_PATH=$(find bin/Release/net10.0-maccatalyst \
+            -name "YouPander.app" \
+            -type d \
+            -print -quit)
+
+          if [ -z "$APP_PATH" ]; then
+            echo "No se encontró YouPander.app"
+            exit 1
+          fi
+
+          echo "Aplicación encontrada: $APP_PATH"
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+
+      # 9. Preparar contenido del DMG
+      - name: Prepare DMG
+        run: |
+          mkdir -p staging
+
+          ditto "$APP_PATH" "staging/YouPander.app"
+
+          ln -s /Applications staging/Applications
+
+      # 10. Crear instalador DMG
+      - name: Generate DMG
+        run: |
+          mkdir -p Output
+
+          create-dmg \
+            --volname "YouPander" \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --app-drop-link 450 200 \
+            --icon "YouPander.app" 150 200 \
+            "Output/YouPander_${{ github.ref_name }}_macOS_${{ matrix.arch }}.dmg" \
+            "staging"
+
+      # 11. Subir instalador como artefacto
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: YouPander-macOS-${{ matrix.arch }}
+          path: Output/*.dmg
+          if-no-files-found: error
+
+  # ==========================================
+  # PUBLICAR EN GITHUB RELEASES
+  # ==========================================
+
+  release:
+    name: Publish GitHub Release
+    needs: build-macos
+
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+
+      # 1. Descargar los DMG generados
+      - name: Download DMG artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: YouPander-macOS-*
+          path: release-assets
+          merge-multiple: true
+
+      # 2. Publicar GitHub Release
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*.dmg
+          generate_release_notes: true
