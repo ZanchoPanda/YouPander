@@ -86,8 +86,7 @@ jobs:
       - name: Install MAUI workload
         run: |
           dotnet workload install maui \
-            --version 10.0.401 \
-            --skip-manifest-update
+            --version 10.0.401
 
       # 6. Comprobar workloads
       - name: Verify MAUI workloads
